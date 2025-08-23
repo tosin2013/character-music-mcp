@@ -15,7 +15,9 @@ import pytest
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from server import CharacterProfile, ArtistPersona, PersonaGenerator
+from server import CharacterProfile, ArtistPersona
+# Use the actual MusicPersonaGenerator from server
+from server import MusicPersonaGenerator as PersonaGenerator
 from tests.fixtures.test_data import TestDataManager, test_data_manager
 from tests.fixtures.mock_contexts import MockContext, create_mock_context
 
@@ -31,7 +33,7 @@ class TestPersonaCreation:
         await ctx.info("Testing persona generation from simple character")
         
         # Generate persona
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Validate basic persona structure
         assert persona.artist_name is not None and len(persona.artist_name.strip()) > 0, \
@@ -54,7 +56,7 @@ class TestPersonaCreation:
         
         await ctx.info("Testing persona generation from complex character")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Complex character should generate rich persona
         assert len(persona.personality_traits) >= 5, "Complex character should have rich personality traits"
@@ -81,8 +83,8 @@ class TestPersonaCreation:
         await ctx.info("Testing persona generation consistency")
         
         # Generate persona multiple times
-        persona1 = await generator.create_artist_persona(expected_char, ctx)
-        persona2 = await generator.create_artist_persona(expected_char, ctx)
+        persona1 = await generator.generate_artist_persona(expected_char, ctx)
+        persona2 = await generator.generate_artist_persona(expected_char, ctx)
         
         # Core elements should be consistent
         assert persona1.primary_genre == persona2.primary_genre, \
@@ -106,7 +108,7 @@ class TestPersonalityTraitMapping:
         
         await ctx.info("Testing emotional trait mapping")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Emotional traits should influence musical choices
         emotional_genres = ["blues", "soul", "gospel", "folk", "country"]
@@ -132,7 +134,7 @@ class TestPersonalityTraitMapping:
         
         await ctx.info("Testing intellectual trait mapping")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Intellectual traits should influence genre selection
         intellectual_genres = ["progressive", "art rock", "ambient", "experimental", "post-rock"]
@@ -159,7 +161,7 @@ class TestPersonalityTraitMapping:
         
         await ctx.info("Testing creative trait mapping")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Creative traits should influence genre and style
         creative_genres = ["indie", "alternative", "art pop", "experimental", "singer-songwriter"]
@@ -185,7 +187,7 @@ class TestPersonalityTraitMapping:
         
         await ctx.info("Testing adventurous trait mapping")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Adventurous traits should influence genre selection
         adventurous_genres = ["electronic", "synthwave", "space rock", "progressive", "cinematic"]
@@ -225,7 +227,7 @@ class TestGenreMapping:
         
         for char_name, expected_genres in test_cases:
             expected_char = data_manager.get_expected_character(char_name)
-            persona = await generator.create_artist_persona(expected_char, ctx)
+            persona = await generator.generate_artist_persona(expected_char, ctx)
             
             # Should map to one of the expected genres
             genre_match = any(expected_genre in persona.primary_genre.lower() 
@@ -242,7 +244,7 @@ class TestGenreMapping:
         
         await ctx.info("Testing genre consistency with traits")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Genre should match character's dark, mysterious nature
         dark_genres = ["dark electronic", "industrial", "gothic", "alternative", "dark ambient"]
@@ -264,7 +266,7 @@ class TestGenreMapping:
         
         await ctx.info("Testing cross-genre influences")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Should handle the blend of historical and intellectual elements
         possible_genres = ["classical", "orchestral", "chamber", "neoclassical", "art pop", "progressive"]
@@ -295,7 +297,7 @@ class TestVocalStyleDetermination:
         
         await ctx.info("Testing emotional vocal styles")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Emotional character should have emotionally expressive vocal style
         emotional_descriptors = ["soulful", "raw", "emotional", "powerful", "heartfelt", "vulnerable", "passionate"]
@@ -316,7 +318,7 @@ class TestVocalStyleDetermination:
         
         await ctx.info("Testing intellectual vocal styles")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Intellectual character should have thoughtful vocal style
         intellectual_descriptors = ["contemplative", "thoughtful", "measured", "articulate", "profound", "reflective"]
@@ -340,7 +342,7 @@ class TestVocalStyleDetermination:
         
         await ctx.info("Testing confident vocal styles")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Confident character should have strong vocal style
         confident_descriptors = ["powerful", "commanding", "strong", "confident", "authoritative", "bold", "soaring"]
@@ -361,7 +363,7 @@ class TestVocalStyleDetermination:
         
         await ctx.info("Testing vulnerable vocal styles")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Vulnerable character should have intimate vocal style
         vulnerable_descriptors = ["intimate", "vulnerable", "delicate", "tender", "soft", "whispered", "fragile", "honest"]
@@ -386,7 +388,7 @@ class TestInstrumentalPreferences:
         
         await ctx.info("Testing emotional instrumental preferences")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Emotional character should prefer expressive instruments
         emotional_instruments = ["piano", "guitar", "strings", "organ", "harmonica", "saxophone", "violin"]
@@ -410,7 +412,7 @@ class TestInstrumentalPreferences:
         
         await ctx.info("Testing electronic instrumental preferences")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Sci-fi character should prefer electronic instruments
         electronic_instruments = ["synthesizer", "electronic", "digital", "sampler", "drum machine", "sequencer"]
@@ -434,7 +436,7 @@ class TestInstrumentalPreferences:
         
         await ctx.info("Testing traditional instrumental preferences")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Historical character should prefer classical instruments
         classical_instruments = ["piano", "violin", "cello", "harpsichord", "chamber", "orchestral", "strings", "woodwinds"]
@@ -458,7 +460,7 @@ class TestInstrumentalPreferences:
         
         await ctx.info("Testing versatile instrumental preferences")
         
-        persona = await generator.create_artist_persona(expected_char, ctx)
+        persona = await generator.generate_artist_persona(expected_char, ctx)
         
         # Creative character should have diverse instrumental preferences
         assert len(persona.instrumental_preferences) >= 3, \

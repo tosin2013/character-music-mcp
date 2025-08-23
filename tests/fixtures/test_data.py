@@ -39,6 +39,9 @@ class TestDataManager:
         self.expected_personas = self._initialize_expected_personas()
         self.expected_commands = self._initialize_expected_commands()
     
+    # Prevent pytest from treating this as a test class
+    __test__ = False
+    
     def _initialize_scenarios(self) -> Dict[str, TestScenario]:
         """Initialize test scenarios with different complexity levels"""
         return {
