@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-08-23 14:49:55",
+  "metrics": {
+    "Test Coverage": {
+      "value": 0.0,
+      "status": "critical",
+      "trend": "Stable"
+    },
+    "Test Success Rate": {
+      "value": 0.0,
+      "status": "critical",
+      "trend": "Stable"
+    },
+    "Performance Score": {
+      "value": 0.0,
+      "status": "critical",
+      "trend": "Stable"
+    },
+    "Documentation Quality": {
+      "value": 0.0,
+      "status": "critical",
+      "trend": "Stable"
+    },
+    "Security Score": {
+      "value": 0.0,
+      "status": "critical",
+      "trend": "Stable"
+    },
+    "Code Quality": {
+      "value": 0.0,
+      "status": "critical",
+      "trend": "Stable"
+    }
+  },
+  "alerts_count": 0,
+  "system_health": "warning"
+}

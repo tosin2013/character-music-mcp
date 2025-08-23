@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-08-23 14:49:55 UTC",
+  "summary": {
+    "overall_success_rate": 0.0,
+    "total_tests": 0,
+    "coverage_percentage": 75.0,
+    "performance_score": 0.0,
+    "documentation_score": 0.0
+  },
+  "counts": {
+    "test_suites": 0,
+    "benchmarks": 0,
+    "validations": 0,
+    "security_scans": 1
+  }
+}
