@@ -1,0 +1,2324 @@
+{
+  "total_examples": 151,
+  "passed_examples": 0,
+  "failed_examples": 151,
+  "warning_examples": 0,
+  "overall_success_rate": 0.0,
+  "average_execution_time": 4.2867976308658424e-06,
+  "validation_timestamp": "2025-08-23T09:47:09.257654",
+  "detailed_results": [
+    {
+      "example_name": "lyric_generation_narrative_1",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 5.245208740234375e-06,
+      "input_text": "**Output includes:**\n- `formatted_lyrics`: Complete song lyrics ready for Suno\n- `character_interpretation`: How the character would interpret the content\n- `personal_story`: Character's personal connection to the content\n- `suno_command`: Complete Suno command with lyrics included\n\n### 2. Story-Integrated Album Creation\n\nFor multi-track albums with lyrics for each song:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_2",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "**Each track includes:**\n- Complete lyrics with verse/chorus/bridge structure\n- Character-specific vocal delivery notes\n- Thematic content tied to character psychology\n- Suno commands with embedded lyrics\n\n### 3. Character Album Creation\n\nFor character-focused albums with deep lyrical development:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_3",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "## How Lyric Generation Works\n\n### Character Psychology → Lyrical Voice\n\nThe system analyzes character traits and translates them into lyrical characteristics:\n\n#### Introspective Characters",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_6",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "### Emotional Mapping to Lyrics\n\nThe system maps character emotional states to specific lyrical elements:\n\n#### Verse Generation\n- **Opening lines**: Establish character's current emotional state\n- **Development**: Explore the situation or conflict\n- **Transition**: Bridge to chorus with emotional build\n\n#### Chorus Creation\n- **Hook**: Memorable phrase capturing core emotion\n- **Emotional core**: Character's primary feeling or desire\n- **Universal connection**: Relatable human experience\n\n#### Bridge Development\n- **Transformation**: Character growth or realization moment\n- **Contrast**: Different perspective or emotional shift\n- **Resolution setup**: Preparation for song's conclusion\n\n## Lyric Generation Examples\n\n### Example 1: Introspective Character\n\n**Input Character Analysis:**",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_8",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "### Example 2: Working-Class Character\n\n**Input Character Analysis:**",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_10",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "## Advanced Lyric Techniques\n\n### 1. Multi-Character Perspectives\n\nFor albums with multiple characters, the system creates distinct lyrical voices:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_11",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "### 2. Narrative Arc Integration\n\nLyrics follow character development across an album:\n\n**Track 1 (Setup)**: \"I used to believe in fairy tales\"\n**Track 4 (Conflict)**: \"Reality came crashing down\"\n**Track 7 (Growth)**: \"Now I write my own story\"\n**Track 10 (Resolution)**: \"Fairy tales are what we make them\"\n\n### 3. Cultural and Regional Voice\n\nThe system adapts lyrical style to character background:\n\n#### Southern Character",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_14",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 2.6226043701171875e-06,
+      "input_text": "## Customizing Lyric Generation\n\n### Influencing Lyrical Style\n\nYou can guide lyric generation by emphasizing certain character traits:\n\n#### For More Poetic Lyrics\nInclude character traits like:\n- \"Reads poetry in quiet moments\"\n- \"Finds beauty in everyday details\"\n- \"Expresses emotions through metaphor\"\n\n#### For More Direct Lyrics\nInclude character traits like:\n- \"Says exactly what they mean\"\n- \"Values honesty over diplomacy\"\n- \"Prefers action to contemplation\"\n\n#### For More Storytelling Lyrics\nInclude character traits like:\n- \"Keeper of family stories\"\n- \"Connects past and present\"\n- \"Learns through narrative\"\n\n### Genre-Specific Lyrical Approaches\n\n#### Folk Lyrics\n- Storytelling verses with clear narrative progression\n- Simple, memorable language\n- Cultural and family imagery\n- Wisdom-sharing tone\n\n#### Rock/Alternative Lyrics\n- Emotional intensity and personal struggle\n- Rebellion against constraints\n- Powerful, declarative statements\n- Cathartic release themes\n\n#### Hip-Hop Lyrics\n- Rhythmic, percussive language\n- Social commentary and personal truth\n- Wordplay and clever rhyme schemes\n- Community and identity themes\n\n#### Electronic/Experimental Lyrics\n- Abstract imagery and concepts\n- Technology and modern life themes\n- Fragmented or non-linear structure\n- Atmospheric and mood-focused\n\n## Quality Indicators for Generated Lyrics\n\n### Strong Lyrical Results\n- **Character authenticity**: Lyrics sound like they come from the character's genuine voice\n- **Emotional coherence**: Feelings expressed match character psychology\n- **Narrative consistency**: Story elements align with character background\n- **Universal relatability**: Specific character experience connects to broader human themes\n- **Musical compatibility**: Lyrics work well with suggested musical style\n\n### Common Issues and Solutions\n\n#### \"Lyrics feel generic\"\n**Problem**: Character analysis lacks specific psychological details\n**Solution**: Add more unique character traits, specific experiences, and individual quirks\n\n#### \"Lyrics don't match the character\"\n**Problem**: Character psychology doesn't align with lyrical content\n**Solution**: Ensure character analysis captures authentic voice and perspective\n\n#### \"Lyrics are too abstract\"\n**Problem**: Not enough concrete details in character background\n**Solution**: Include specific experiences, relationships, and formative events\n\n#### \"Lyrics don't flow well\"\n**Problem**: Character's natural speech patterns not captured\n**Solution**: Include dialogue examples and speech pattern descriptions\n\n## Using Generated Lyrics in Suno\n\n### Formatting for Suno\n\nThe system automatically formats lyrics for Suno compatibility:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_narrative_15",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 5.0067901611328125e-06,
+      "input_text": "### Suno Command Integration\n\nGenerated lyrics are automatically integrated into Suno commands:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_code_1",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 1.6689300537109375e-05,
+      "input_text": "result = await process_universal_content(\"\"\"\nYour narrative text here - character stories, philosophical content, \npersonal experiences, or any content you want transformed into music.\n\"\"\")",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_code_2",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 1.5020370483398438e-05,
+      "input_text": "album_result = await create_story_integrated_album(\n    narrative_text=\"Your character narrative here\",\n    album_title=\"Your Album Title\",\n    track_count=8\n)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lyric_generation_code_3",
+      "file_path": "docs/user_guides/lyric_generation.md",
+      "validation_status": "failed",
+      "execution_time": 1.0013580322265625e-05,
+      "input_text": "character_album = await create_character_album(\n    content=\"Character narrative or description\",\n    album_concept=\"Central theme or concept\"\n)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_1",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "Sarah stared at the letter, her heart racing. She had dreamed of this opportunity \nfor years, but now that it was here, all she could think about was her mother's \ndisappointed face. \"You're abandoning us,\" the voice in her head whispered, \nsounding exactly like her father had before he left.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_2",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "When the deadline moved up by three weeks, Marcus didn't panic like his colleagues. \nInstead, he methodically reorganized his schedule, called in favors from old contacts, \nand worked eighteen-hour days without complaint. It was the same focused intensity \nthat had gotten him through medical school after his parents said he wasn't smart enough.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_3",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Emma always let her younger brother win at chess, even though she could beat him \nin six moves. She remembered being his age and losing constantly to their older \ncousin, the humiliation burning in her chest for days. \"Good game,\" she said, \nruffling his hair as he celebrated his \"victory.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_4",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Stage 1: Surface traits\n\"David was always punctual, arriving exactly five minutes early to every meeting.\"\n\nStage 2: Behavioral patterns\n\"His punctuality wasn't just politeness—it was armor. Being late meant being vulnerable, \nand David had learned early that vulnerability was dangerous.\"\n\nStage 3: Psychological depth\n\"The day his father missed his graduation because of 'work,' David promised himself \nhe would never disappoint anyone the way he had been disappointed. Time became his \nway of showing respect, even when others didn't deserve it.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_5",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"Maria was known for her fierce independence, yet she called her mother every day. \nShe had traveled solo through thirty countries but couldn't eat dinner alone without \nfeeling anxious. Her friends saw confidence; her journal revealed someone constantly \nquestioning every decision.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_6",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"Alex spent hours in coffee shops, not for the caffeine but for the anonymous \ncompany. Surrounded by strangers, she could finally think clearly about the \nperson she was becoming versus the person everyone expected her to be. Her \nnotebook filled with half-finished thoughts about identity, belonging, and \nthe weight of other people's dreams.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_7",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "\"Jake's anger wasn't loud—it was the quiet kind that built pressure until \nsomething had to break. He channeled it into his guitar, fingers bleeding \nfrom practice sessions that lasted until dawn. Music was his rebellion against \na world that demanded he be smaller, quieter, more acceptable.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_8",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "\"Luna saw patterns everywhere—in traffic lights, in conversation rhythms, in \nthe way people moved through spaces. Her mind worked like a synthesizer, \nlayering observations until they became something entirely new. She was most \nherself in the space between what was and what could be.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_9",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"Every family gathering, Grandpa Joe would tell the same stories, but Emma \nnoticed he changed small details each time. She realized he wasn't just \npreserving history—he was keeping it alive, letting it grow. Now, with his \nchair empty, she understood that stories weren't meant to be perfect; they \nwere meant to be true.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_10",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "\"Present-day Sarah organized her life in color-coded calendars, but teenage Sarah \nhad been chaos incarnate. The transformation happened the night she found her \nmother crying over unpaid bills. That's when the free-spirited girl decided \nstructure wasn't prison—it was power.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_11",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.1457672119140625e-06,
+      "input_text": "\"Marcus felt most himself in empty libraries at 2 AM, surrounded by the weight \nof other people's thoughts. The silence wasn't lonely—it was full of possibility. \nHere, among the books, he could be the scholar his working-class family never \nunderstood he needed to become.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_12",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 1.9073486328125e-06,
+      "input_text": "\"Elena noticed sounds others missed—the slight wheeze in her father's breathing, \nthe way her daughter's laugh changed when she was hiding something, the particular \nsilence that meant her husband was working through a problem. Her world was built \non these subtle frequencies, making her both incredibly empathetic and occasionally \noverwhelmed by information others couldn't hear.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_13",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.1457672119140625e-06,
+      "input_text": "\"The grief wasn't sharp anymore—it had worn smooth like sea glass, something \nshe could carry without cutting herself. But on quiet mornings, when the light \nhit the kitchen table just right, she still set two cups of coffee out of habit.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_14",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.1457672119140625e-06,
+      "input_text": "\"Every rejection letter felt like proof that she was fooling herself, until the \nmorning she realized she had written fifty stories in pursuit of one acceptance. \nThe writing itself had become the victory; everything else was just bonus.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_15",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.6226043701171875e-06,
+      "input_text": "\"The moment she saw the test results, something fundamental shifted in Rebecca's \nchest. Not fear—she had expected that. This was clarity, sharp and clean as \nbroken glass. She finally knew exactly who she was and what she had to do.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_16",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "\"When David spoke, people listened—not because he was loud, but because every \nword carried weight. He had learned early that silence was more powerful than \nshouting, that conviction could be quiet and still move mountains.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_17",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "\"Sarah's voice got softer when she told the truth, as if honesty required \nwhispering. Her most important conversations happened in the spaces between \nwords, in the pauses where vulnerability lived.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_18",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"Luna spoke in layers—surface conversation for most people, but underneath, \na constant stream of observations and connections that only a few could follow. \nHer thoughts moved faster than her words, creating a rhythm all her own.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_19",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 4.76837158203125e-06,
+      "input_text": "\"Emma was a teacher who loved her students but felt unfulfilled.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_20",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "\"Emma graded papers until midnight, writing encouraging notes on every assignment, \nbut drove home wondering if she was making any real difference in her students' lives.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_21",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "\"Emma graded papers until midnight, writing encouraging notes on every assignment—\nthe same kind her third-grade teacher Mrs. Patterson had written for her when \nher parents were divorcing. But driving home through empty streets, she wondered \nif she was trying to save her students or save the scared eight-year-old she \nused to be.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_22",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"The concept of 'home' meant different things to each of them: to Maria, it was \nthe sound of her grandmother's sewing machine; to James, it was the absence of \nshouting; to Alex, it was anywhere she could be herself without explanation.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "prompt_engineering_narrative_23",
+      "file_path": "docs/user_guides/prompt_engineering.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"By day, Dr. Chen was precision incarnate—steady hands, measured words, clinical \ndetachment. But her evenings belonged to jazz piano, where she could finally let \nher emotions run wild in the spaces between the notes. The music held all the \nfeelings her profession required her to contain.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_1",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"Let's go,\" John said. \"We're late.\"\nMary nodded and grabbed her coat.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_2",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 4.291534423828125e-06,
+      "input_text": "\"Let's go,\" John said, his voice tight with the anxiety that always surfaced \nwhen schedules went awry. Mary recognized the tone—the same one he'd used \nduring their wedding planning when every delay felt like a personal failure. \nShe nodded and grabbed her coat, knowing that rushing would calm him more \nthan any reassurance.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_3",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Sarah stared at the job offer, her mind racing. Part of her—the part that \nsounded like her mother—whispered that she wasn't qualified enough. But \nanother voice, newer and stronger, reminded her of every challenge she'd \nalready overcome.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_4",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "Marcus approached the podium with the same steady confidence he'd learned \nin debate class, back when his stutter made every word a battle. Public \nspeaking was still terrifying, but he'd discovered that preparation could \novercome almost any fear.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_5",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Elena was known as the office optimist, always ready with encouragement \nand solutions. What her colleagues didn't see were the 3 AM anxiety spirals, \nthe way she practiced positive responses in the mirror, or how exhausting \nit was to be everyone else's source of hope when she struggled to find \nher own.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_6",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Instead of: \"He was organized.\"\nUse: \"David labeled everything—not just files and folders, but his emotions \ntoo. 'Productive anxiety,' he'd call the feeling before big presentations. \n'Nostalgic melancholy' for Sunday evenings. Naming things made them manageable.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_7",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "The woman who now ran board meetings with quiet authority was the same person \nwho used to hide in bathroom stalls during high school lunch periods. The \ntransformation hadn't been sudden—it was built from a thousand small moments \nof choosing courage over comfort.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_8",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "# Instead of complex custom commands, try:\n\"A melancholic indie folk song about finding strength in solitude, \nwith gentle acoustic guitar and vulnerable female vocals\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_9",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "# Correct format:\n[Verse 1]\n[Chorus]\n[Bridge]\n[Outro]\n\n# Avoid:\n(Verse 1) - incorrect parentheses\n[Verse One] - spell out numbers\n[Pre-Chorus] - use [Bridge] instead",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_10",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 4.291534423828125e-06,
+      "input_text": "# Too complex:\n\"indie folk rock electronic ambient experimental jazz fusion\"\n\n# Better:\n\"indie folk with subtle electronic elements\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_11",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "# If character analysis shows:\n- Introspective, melancholic → indie folk, alternative\n- Rebellious, intense → rock, punk\n- Complex, layered thinking → electronic, experimental\n- Traditional, storytelling → folk, country",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_12",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "# Generic:\n\"A sad song about loss\"\n\n# Character-informed:\n\"A song capturing the quiet grief of someone who lost their father young, \nwith the kind of restrained emotion that comes from being strong for others\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_13",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Instead of: \"John was quiet and thoughtful.\"\nUse: \"John spoke in careful, measured sentences, always pausing to consider \nhis words. He had a habit of starting difficult conversations with 'I've \nbeen thinking about something...' and ending them with 'Does that make sense?'\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_14",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 4.291534423828125e-06,
+      "input_text": "For a mechanic character: \"Life's like an engine - sometimes you need to \ntake it apart to understand what's broken.\"\n\nFor a teacher character: \"Every student is a story waiting to be written, \nand I'm just here to help them find their voice.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_15",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "\"Sarah stared at the job offer, her mind racing between excitement and terror. \n'This is what you wanted,' she told herself, but her father's voice whispered \nback, 'People like us don't get opportunities like this.'\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_16",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "For Folk: Include storytelling nature, cultural connections, simple wisdom\nFor Rock: Include intensity, rebellion, emotional expression needs\nFor Hip-Hop: Include strong voice, social awareness, rhythmic speech patterns",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_17",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "\"Part of me wants to run away and start over somewhere new, but another \npart knows that running never solved anything. I'm torn between the person \nI was raised to be and the person I'm becoming.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_18",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "\"Every time I smell coffee brewing, I'm back in Mom's kitchen, listening \nto her hum while she made breakfast. Now the house is silent, and I don't \nknow how to fill that space.\"",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_19",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "# Consistent elements to maintain:\n- Key relationships (related keys)\n- Instrumentation palette\n- Production style\n- Vocal approach\n- Tempo relationships",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_20",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Track 1: Character's public persona\nTrack 2: Private struggles\nTrack 3: Relationships and connections\nTrack 4: Past experiences that shaped them\nTrack 5: Growth and resolution",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_21",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Opening: Introduction and setup\nEarly tracks: Establish character and conflict\nMiddle tracks: Explore complexity and development\nLater tracks: Climax and transformation\nClosing: Resolution and new understanding",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_22",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Primary character: 3-4 songs exploring deep psychology\nSecondary characters: 1-2 songs each, supporting main narrative\nEnsemble pieces: 1-2 songs bringing characters together",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_23",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "#### Review MCP Configuration\nCheck your MCP client configuration:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_24",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "#### Check File Permissions\nEnsure run script is executable:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_25",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "### Performance Issues\n\n**Symptoms:**\n- Slow processing times\n- Memory usage warnings\n- Timeouts on large inputs\n\n**Solutions:**\n\n#### Optimize Input Size\nFor large texts, break into smaller sections:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_narrative_26",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "#### Use Incremental Processing\nProcess complex albums in stages:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "troubleshooting_code_2",
+      "file_path": "docs/user_guides/troubleshooting.md",
+      "validation_status": "failed",
+      "execution_time": 2.002716064453125e-05,
+      "input_text": "# Step 1: Analyze characters\ncharacters = await analyze_character_text(narrative)\n\n# Step 2: Generate personas for main characters only\nmain_personas = await generate_artist_personas(main_characters)\n\n# Step 3: Create commands for priority tracks\npriority_commands = await create_suno_commands(main_personas, characters)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 2)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_narrative_1",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "2. **Make the run script executable**\n   ```bash\n   chmod +x run.sh\n   ```\n\n3. **Test the installation**\n   ```bash\n   ./run.sh\n   ```\n   The server will automatically install dependencies on first run.\n\n### MCP Client Configuration\n\n#### Claude Desktop Setup\nAdd to your Claude Desktop MCP configuration file:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_narrative_2",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Replace `/path/to/character-music-mcp/` with your actual project path.\n\n## Your First Music Generation\n\n### Step 1: Prepare Your Text\nStart with any narrative content containing characters:\n- Novel excerpts\n- Short stories\n- Character descriptions\n- Screenplay scenes\n- Personal narratives\n\n**Example text:**",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_narrative_3",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "### Step 2: Analyze Characters\nUse the `analyze_character_text` tool:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_narrative_4",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "This will return detailed character profiles with psychological analysis.\n\n### Step 3: Generate Musical Personas\nTransform characters into musical artists:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_narrative_5",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "### Step 4: Generate Complete Songs with Lyrics\nCreate full songs with character-driven lyrics:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_narrative_6",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "This provides:\n- Complete formatted lyrics\n- Character interpretation\n- Suno-ready commands with embedded lyrics\n\n### Step 5: Use in Suno AI\nCopy the generated commands (with lyrics included) into Suno AI and create your music!\n\n## Quick Start with Complete Workflow\n\nFor rapid prototyping, use the complete workflow tool:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_narrative_7",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "This executes all steps in one operation and provides:\n- Character analysis\n- Musical personas\n- **Complete song lyrics** in character voice\n- Multiple Suno command variations with embedded lyrics\n- Production notes and recommendations\n\nFor even more comprehensive lyric generation, try:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_code_1",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 7.867813110351562e-06,
+      "input_text": "result = await analyze_character_text(\"\"\"\nEmma stood at the crossroads, her heart heavy with the weight of her decision...\n\"\"\")",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_code_2",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 7.152557373046875e-06,
+      "input_text": "personas = await generate_artist_personas(result)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_code_3",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 5.7220458984375e-06,
+      "input_text": "song_result = await process_universal_content(\"\"\"\nYour narrative text here...\n\"\"\")",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_code_4",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 7.867813110351562e-06,
+      "input_text": "complete_result = await complete_workflow(\"\"\"\nYour narrative text here...\n\"\"\")",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "getting_started_code_5",
+      "file_path": "docs/user_guides/getting_started.md",
+      "validation_status": "failed",
+      "execution_time": 7.152557373046875e-06,
+      "input_text": "lyric_result = await process_universal_content(\"\"\"\nYour narrative text here...\n\"\"\")",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_narrative_1",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Sarah's story began in the small coastal town where she grew up feeling invisible. \nAs the middle child of five, she learned early to find solace in solitude, \nspending hours by the lighthouse reading poetry and dreaming of distant cities.\n\nWhen her father left when she was sixteen, Sarah became the family anchor, \nworking part-time jobs to help her mother pay bills while maintaining perfect \ngrades. The weight of responsibility aged her beyond her years, but it also \nforged an inner strength she didn't know she possessed.\n\nCollege offered escape, but also overwhelming freedom. For the first time, \nSarah could choose her own path, yet she found herself paralyzed by possibilities. \nThe girl who had dreamed of adventure now feared leaving her comfort zone...\n\n[Continue with more character development, relationships, challenges, growth]",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_narrative_2",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "The system will identify multiple facets of the character suitable for different songs:\n- **Core personality traits** → Main album themes\n- **Relationships** → Collaborative or contrasting songs\n- **Conflicts** → Tension and resolution tracks\n- **Growth moments** → Transformation songs\n- **Backstory elements** → Origin and foundation tracks\n\n### Step 3: Song Mapping Strategy\n\nMap character elements to album structure:\n\n**Opening Tracks**: Character introduction and setting\n- Use character's \"skin layer\" traits\n- Establish musical identity and vocal style\n- Set the emotional and sonic palette\n\n**Middle Tracks**: Conflict and development\n- Explore \"flesh layer\" relationships and experiences\n- Introduce musical variations and genre blending\n- Build emotional intensity and complexity\n\n**Closing Tracks**: Resolution and transformation\n- Dive into \"core layer\" psychology\n- Resolve musical and emotional tensions\n- Provide character growth and closure\n\n### Step 4: Create Song Variations\n\nFor each album track, generate multiple Suno command variations:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_narrative_3",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Select commands that:\n- **Maintain thematic consistency** across the album\n- **Offer musical variety** while staying true to character\n- **Build emotional progression** from track to track\n- **Provide production coherence** through similar sonic elements\n\n## Multi-Character Albums\n\n### Ensemble Approach\n\nWhen working with multiple characters, you have several structural options:\n\n#### Option 1: Character Per Track\nEach song focuses on a different character's perspective:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_narrative_4",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "#### Option 2: Relationship Dynamics\nSongs explore character interactions and relationships:\n\nFocus your narrative input on:\n- **Dialogue scenes** between characters\n- **Shared experiences** and how each character reacts\n- **Conflicts and resolutions** between characters\n- **Character growth** through relationships\n\n#### Option 3: Thematic Unity\nAll characters contribute to exploring a central theme:\n\n- Identify the **unifying theme** (love, loss, growth, rebellion)\n- Show how **each character** embodies different aspects of the theme\n- Create **musical bridges** that connect character perspectives\n- Build toward a **unified resolution** or understanding\n\n### Multi-Character Production Tips\n\n1. **Maintain Sonic Cohesion**: Use similar production styles or recurring musical elements\n2. **Vary Vocal Approaches**: Different characters can have different vocal styles while maintaining album unity\n3. **Create Musical Conversations**: Use similar chord progressions or melodies across character songs\n4. **Build Narrative Arc**: Order songs to tell a complete story across all characters\n\n## Concept Albums from Character Psychology\n\n### Abstract Theme Development\n\nTransform character psychology into abstract musical concepts:\n\n#### Step 1: Extract Core Themes\nFrom character analysis, identify abstract concepts:\n- **Isolation** → Sparse arrangements, echo effects, minor keys\n- **Transformation** → Genre shifts, key changes, building dynamics\n- **Conflict** → Dissonance, rhythm changes, contrasting sections\n- **Hope** → Major progressions, rising melodies, warm timbres\n\n#### Step 2: Use Creative Music Generation\nFor abstract concepts, use the creative generation tool:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_narrative_5",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 5.0067901611328125e-06,
+      "input_text": "#### Step 3: Character-Informed Abstraction\nCombine character insights with abstract generation:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_narrative_6",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "## Album Production Workflow\n\n### Pre-Production Planning\n\n1. **Define Album Scope**\n   - Number of tracks (typically 8-12 for character albums)\n   - Overall runtime and pacing\n   - Musical style consistency vs. variety\n\n2. **Character Mapping**\n   - Which character aspects become songs\n   - How characters relate across tracks\n   - Emotional arc from first to last song\n\n3. **Musical Architecture**\n   - Key relationships between songs\n   - Tempo and energy flow\n   - Production style evolution\n\n### Production Phase\n\n1. **Generate All Commands First**\n   - Create multiple variations for each planned track\n   - Ensure musical coherence across the album\n   - Plan for transitions and flow\n\n2. **Suno Production Strategy**\n   - Use consistent seeds for related tracks\n   - Maintain similar production tags for cohesion\n   - Create variations for A/B testing\n\n3. **Quality Control**\n   - Test command effectiveness before full production\n   - Ensure character authenticity in musical choices\n   - Verify emotional arc progression\n\n### Post-Production Considerations\n\n1. **Album Sequencing**\n   - Order tracks for optimal emotional journey\n   - Consider energy levels and pacing\n   - Create natural transitions between songs\n\n2. **Thematic Consistency**\n   - Verify each track serves the overall narrative\n   - Ensure character development is clear\n   - Maintain musical identity throughout\n\n## Advanced Album Techniques\n\n### Character Evolution Albums\n\nTrack a character's growth across multiple life stages:",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_code_1",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 5.9604644775390625e-06,
+      "input_text": "album_result = await complete_workflow(long_character_narrative)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_code_2",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 9.059906005859375e-06,
+      "input_text": "# For each character aspect identified\npersonas = await generate_artist_personas(character_analysis)\ncommands = await create_suno_commands(personas, character_analysis)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 2)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_code_3",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 3.5762786865234375e-05,
+      "input_text": "# Analyze text with multiple characters\nmulti_char_analysis = await analyze_character_text(ensemble_narrative)\n\n# Generate personas for each character\nall_personas = await generate_artist_personas(multi_char_analysis)\n\n# Create distinct commands for each character\ncharacter_commands = {}\nfor character in multi_char_analysis['characters']:\n    char_commands = await create_suno_commands(\n        [persona for persona in all_personas if persona['character_name'] == character['name']], \n        multi_char_analysis\n    )\n    character_commands[character['name']] = char_commands",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 2)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_code_4",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 8.821487426757812e-06,
+      "input_text": "concept_music = await creative_music_generation(\n    concept=\"The feeling of being caught between who you were and who you're becoming\",\n    style_preference=\"indie folk with electronic elements\"\n)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 1)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_code_5",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 2.002716064453125e-05,
+      "input_text": "# First get character analysis\nchar_analysis = await analyze_character_text(narrative)\n\n# Then use character psychology to inform abstract concepts\nabstract_concept = f\"The internal landscape of {character_name}: {main_psychological_theme}\"\nconcept_music = await creative_music_generation(\n    concept=abstract_concept,\n    style_preference=character_informed_genre\n)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 2)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "album_creation_guide_code_6",
+      "file_path": "docs/user_guides/album_creation_guide.md",
+      "validation_status": "failed",
+      "execution_time": 2.193450927734375e-05,
+      "input_text": "# Analyze character at different time periods\nyoung_character = await analyze_character_text(early_life_narrative)\nmature_character = await analyze_character_text(later_life_narrative)\n\n# Generate personas for each life stage\nyoung_persona = await generate_artist_personas(young_character)\nmature_persona = await generate_artist_personas(mature_character)\n\n# Create musical evolution\nevolution_commands = await create_suno_commands(\n    [young_persona, mature_persona], \n    combined_character_analysis\n)",
+      "expected_output": {
+        "should_execute": true
+      },
+      "actual_output": {
+        "syntax_valid": false
+      },
+      "error_message": "Syntax error: 'await' outside function (<string>, line 2)",
+      "confidence_scores": {
+        "syntax_score": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_1",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Elena grew up in the shadow of the lighthouse, where her father kept watch over ships \nthat rarely came anymore. The automated systems had made his job obsolete years ago, \nbut he stayed out of stubbornness and love for the solitude. Elena understood both \nimpulses—she had inherited his need for quiet spaces and his fear of being needed \nby no one.\n\nAt seventeen, she spent her days reading poetry on the rocky shore, writing in \njournals that she hid beneath her mattress. The words came easily when she was \nalone, but around others, she felt like she was speaking a foreign language. Her \nclassmates talked about college and careers, while Elena dreamed of staying by \nthe sea forever, tending to something beautiful and forgotten.\n\nThe night her father had his heart attack, Elena realized that solitude and \nisolation weren't the same thing. She had been so busy protecting herself from \nthe world that she had forgotten to let anyone in. As she sat in the hospital \nwaiting room, surrounded by the fluorescent buzz of modern life, she understood \nthat the lighthouse had been both sanctuary and prison.\n\nWhen her father recovered, Elena made a decision. She would leave for college, \nnot to escape the lighthouse, but to learn how to carry its light with her. \nThe sea would always be there, but she was ready to discover what lay beyond \nthe horizon she had watched for so long.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_2",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "A gentle indie folk song about growing up in isolation by the sea, with acoustic guitar, \nsoft female vocals, and subtle ocean sounds. Melancholic but beautiful, like watching \nships from a lighthouse window.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_3",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "Style: indie folk, acoustic\nMood: melancholic, contemplative, nostalgic\nInstruments: acoustic guitar, subtle strings, ocean ambience\nVocals: soft female, vulnerable, intimate\nTempo: slow to medium\nKey: minor key, possibly D minor or A minor",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_4",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 2.6226043701171875e-06,
+      "input_text": "[Intro: Ocean waves, single acoustic guitar]\n[Verse 1]\n[Chorus]\n[Verse 2]\n[Chorus]\n[Bridge: Strings enter, building emotion]\n[Final Chorus]\n[Outro: Return to ocean sounds]",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_5",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "An emotional indie folk song about a moment of crisis and realization in a hospital \nwaiting room, with building intensity, acoustic guitar, and vulnerable vocals that \ngrow stronger through the song.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_6",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Style: indie folk with alternative elements\nMood: anxious building to determined\nInstruments: acoustic guitar, subtle electric elements, strings\nVocals: vulnerable building to powerful\nTempo: medium, with dynamic changes\nStructure: builds from quiet to intense",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_7",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "A hopeful indie folk song about acceptance and finding peace, with warm acoustic guitar, \ngentle strings, and confident but tender female vocals. The feeling of coming home to yourself.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_narrative_8",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Style: indie folk, warm and resolved\nMood: peaceful, accepting, hopeful\nInstruments: acoustic guitar, warm strings, subtle harmonies\nVocals: confident but tender, mature\nTempo: medium, steady and grounding\nKey: major key resolution",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_expected_1",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_expected_1",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 9.5367431640625e-07,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "lighthouse_keeper_daughter_expected_1",
+      "file_path": "examples/character_driven_albums/lighthouse_keeper_daughter.md",
+      "validation_status": "failed",
+      "execution_time": 9.5367431640625e-07,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_1",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Marcus had been working the night shift at St. Mary's Hospital for eight years, \nlong enough to know that 3 AM was when people told the truth. In the fluorescent-lit \ncorridors, between the beeping machines and whispered conversations, he had become \na keeper of secrets—last words, first confessions, and everything in between.\n\nHe hadn't planned to be a nurse. The pre-med track had been his father's dream, \nbut Marcus discovered he was better at healing hearts than fixing them. His large \nhands, which had once fumbled with surgical instruments, were gentle when holding \nthe hand of a scared patient. His deep voice, which had struggled through organic \nchemistry presentations, could calm a panicking family member with just a few words.\n\nThe night shift suited him. During the day, the hospital buzzed with administrators \nand visiting hours, but at night, it became something different—a place where \nvulnerability was honest and help was immediate. Marcus thrived in the quiet \nintensity, the way crisis could bring out both the worst and best in people.\n\nBut eight years of absorbing other people's pain had left marks. He carried home \nstories he couldn't share, faces he couldn't forget, and a bone-deep exhaustion \nthat sleep couldn't cure. His apartment felt too quiet after the constant hum \nof the hospital, and he found himself staying later each shift, reluctant to \nreturn to a world that felt less real than the one where he spent his nights.\n\nThe morning he found Mrs. Patterson, the elderly woman from room 314, had passed \npeacefully in her sleep, Marcus realized he had been holding his breath for years. \nShe had been his favorite patient—sharp-witted and kind, with stories that made \nthe long hours pass quickly. Her death wasn't tragic; she had been ready, surrounded \nby family. But it reminded Marcus that he had been so busy caring for others that \nhe had forgotten to care for himself.\n\nStanding in the hospital parking lot as the sun rose, Marcus made a decision. \nHe would keep working nights—it was where he belonged—but he would also start \nliving during the day. The healing he offered others needed to include himself, \nor eventually, there would be nothing left to give.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_2",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "A powerful alternative rock song about working the night shift in a hospital, \nwith driving electric guitar, steady drums, and deep male vocals. Atmospheric \nand intense, capturing the quiet intensity of caring for others in the dark hours.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_3",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "Style: alternative rock, post-rock influences\nMood: intense, atmospheric, purposeful\nInstruments: electric guitar (clean and distorted), bass, drums, ambient textures\nVocals: deep male, powerful but controlled\nTempo: medium-fast, driving rhythm\nKey: minor key, possibly E minor\nStructure: builds from atmospheric intro to full band",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_4",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "[Intro: Atmospheric guitar, hospital ambience]\n[Verse 1: Clean guitar, bass enters]\n[Pre-Chorus: Building intensity]\n[Chorus: Full band, powerful vocals]\n[Verse 2]\n[Pre-Chorus]\n[Chorus]\n[Bridge: Quieter, more introspective]\n[Final Chorus: Most intense]\n[Outro: Return to atmospheric sounds]",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_5",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "An emotional alternative rock song about the weight of carrying other people's \npain and stories, with heavy guitar, intense drums, and vocals that convey both \nstrength and vulnerability. Building to a cathartic release.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_6",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Style: alternative rock with emotional hardcore elements\nMood: heavy, cathartic, emotionally intense\nInstruments: heavy electric guitar, driving bass, powerful drums\nVocals: deep, emotionally charged, building intensity\nTempo: medium to fast, with dynamic changes\nStructure: builds to emotional climax",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_7",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 2.1457672119140625e-06,
+      "input_text": "A hopeful alternative rock song about learning to care for yourself while caring \nfor others, with uplifting guitar melodies, steady rhythm, and vocals that show \ngrowth and determination. Emotional but ultimately positive.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_narrative_8",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Style: alternative rock, more melodic and hopeful\nMood: determined, healing, optimistic\nInstruments: melodic electric guitar, supportive bass and drums\nVocals: deep but warmer, showing growth\nTempo: medium, steady and grounding\nKey: moves from minor to major\nStructure: clear verse-chorus with uplifting bridge",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_expected_1",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 0.0,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_expected_1",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 0.0,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "night_shift_nurse_expected_1",
+      "file_path": "examples/character_driven_albums/night_shift_nurse.md",
+      "validation_status": "failed",
+      "execution_time": 0.0,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_1",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 4.0531158447265625e-06,
+      "input_text": "Grandma Rose had been the keeper of family stories for as long as anyone could \nremember. Every Sunday dinner, every holiday gathering, every quiet evening \nwhen the grandchildren visited, she would weave tales that connected the present \nto a past that felt both distant and immediate. Her voice carried the weight \nof generations—stories of immigration, of love found and lost, of hardships \novercome and dreams deferred.\n\nAt eighty-three, Rose realized that she was the last living link to many of \nthese stories. Her siblings had passed, her parents' generation was gone, and \nthe younger family members were busy with their own lives, their own stories \nto create. The thought of these tales dying with her felt like a betrayal of \neveryone who had lived them.\n\nRose had never considered herself musical, but she remembered her grandmother \nhumming old songs while she worked, melodies that seemed to carry stories in \ntheir very notes. She began to notice that her own storytelling had a rhythm, \na cadence that rose and fell like music. The stories wanted to be sung, not \njust told.\n\nWith the help of her great-nephew Marcus, who played guitar, Rose began setting \nher family stories to simple melodies. She wasn't trying to be a performer—she \nwas trying to be a bridge. Each song became a vessel for memory, a way to ensure \nthat the voices of the past could still be heard by the voices of the future.\n\nThe first time she sang \"The Crossing Song\" about her grandfather's journey to \nAmerica, Rose felt something shift. She wasn't just telling a story; she was \nchanneling the hopes and fears of everyone who had come before her. The music \nmade the stories immortal in a way that words alone never could.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_2",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "A gentle traditional folk song about an elderly woman who keeps family stories \nalive, with acoustic guitar, warm female vocals, and the feeling of sitting \naround a kitchen table listening to beloved tales.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_3",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Style: traditional folk, storytelling ballad\nMood: warm, nostalgic, reverent\nInstruments: acoustic guitar, subtle harmonica\nVocals: elderly female, conversational, storytelling style\nTempo: slow to medium, unhurried\nKey: major key, comfortable and familiar\nStructure: verse-chorus with story-telling verses",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_4",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "[Intro: Solo acoustic guitar, gentle fingerpicking]\n[Verse 1: Story introduction]\n[Chorus: The keeper's responsibility]\n[Verse 2: Family history]\n[Chorus]\n[Bridge: Reflection on the importance of stories]\n[Final Chorus: Commitment to preservation]\n[Outro: Guitar fading like a story ending]",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_5",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "A traditional folk ballad about immigration and hope, with acoustic guitar, \ngentle fiddle, and vocals that carry the weight of family history. Like an \nold song passed down through generations.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_6",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Style: traditional folk ballad, Americana influences\nMood: hopeful but melancholic, historical\nInstruments: acoustic guitar, fiddle, subtle percussion\nVocals: storytelling style, carrying emotional weight\nTempo: medium, steady like a walking pace\nKey: minor to major progression (journey theme)\nStructure: narrative verses with emotional chorus",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_7",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "An uplifting traditional folk song about how stories live forever when shared \nwith love, with acoustic guitar, warm harmonies, and vocals that feel like \na blessing passed from grandmother to grandchild.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_narrative_8",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 2.1457672119140625e-06,
+      "input_text": "Style: traditional folk, uplifting and resolved\nMood: hopeful, blessing-like, eternal\nInstruments: acoustic guitar, gentle harmonies, subtle strings\nVocals: warm, wise, like a benediction\nTempo: medium, steady and grounding\nKey: major key, resolved and peaceful\nStructure: builds to include family voices (harmonies)",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_expected_1",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 0.0,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_expected_1",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 0.0,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_storyteller_expected_1",
+      "file_path": "examples/genre_specific_examples/folk_storyteller.md",
+      "validation_status": "failed",
+      "execution_time": 0.0,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "README_narrative_1",
+      "file_path": "examples/genre_specific_examples/README.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Professional life → Electronic/Pop (modern, efficient)\nPersonal struggles → Alternative Rock (intense, emotional)\nCultural background → Folk elements (traditional, rooted)\nCreative expression → Jazz influences (improvisational, sophisticated)",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "README_narrative_2",
+      "file_path": "examples/genre_specific_examples/README.md",
+      "validation_status": "failed",
+      "execution_time": 1.9073486328125e-06,
+      "input_text": "Young character → Pop/Rock (energetic, searching)\nMature character → Folk/Jazz (reflective, experienced)\nTransformed character → Fusion (integrated, complex)",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "thematic_album_narrative_1",
+      "file_path": "examples/prompt_templates/thematic_album.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "The theme of [CENTRAL_THEME] manifests differently in each person's life. For some, \nit's [THEME_VARIATION_1], while others experience it as [THEME_VARIATION_2]. \nThis exploration follows [NUMBER_OF_CHARACTERS] individuals whose lives illustrate \nthe [COMPLEXITY_OR_UNIVERSALITY] of [CENTRAL_THEME].",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "thematic_album_narrative_2",
+      "file_path": "examples/prompt_templates/thematic_album.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "[CHARACTER_1_NAME] embodies [THEME_ASPECT_1] through [SPECIFIC_SITUATION]. \n[CHARACTER_1_BACKGROUND] shaped their understanding of [CENTRAL_THEME] as \n[PERSONAL_INTERPRETATION]. When [CHALLENGING_MOMENT], [CHARACTER_1_NAME] \n[SPECIFIC_RESPONSE] because [PSYCHOLOGICAL_MOTIVATION].\n\n[DAILY_EXAMPLE] shows how [CENTRAL_THEME] affects [CHARACTER_1_NAME]'s \n[LIFE_AREA]. [INTERNAL_STRUGGLE] reveals [DEEPER_RELATIONSHIP_TO_THEME]. \n[MOMENT_OF_INSIGHT] leads to [CHARACTER_GROWTH_RELATED_TO_THEME].",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "thematic_album_narrative_3",
+      "file_path": "examples/prompt_templates/thematic_album.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "In contrast, [CHARACTER_2_NAME] experiences [CENTRAL_THEME] as [DIFFERENT_INTERPRETATION]. \n[CHARACTER_2_BACKGROUND] created [OPPOSING_OR_COMPLEMENTARY_VIEWPOINT]. \n[SPECIFIC_SCENARIO] demonstrates how [CHARACTER_2_NAME] [DIFFERENT_APPROACH] \nto [CENTRAL_THEME].\n\n[RELATIONSHIP_TO_CHARACTER_1] highlights [THEME_COMPLEXITY] through \n[INTERACTION_EXAMPLE]. [CHARACTER_2_INTERNAL_CONFLICT] shows [ALTERNATIVE_STRUGGLE]. \n[CHARACTER_2_RESOLUTION] offers [DIFFERENT_WISDOM_ABOUT_THEME].",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "thematic_album_narrative_4",
+      "file_path": "examples/prompt_templates/thematic_album.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "[CHARACTER_3_NAME] represents [INTEGRATION_OR_BALANCE] of [CENTRAL_THEME]. \n[UNIQUE_PERSPECTIVE] allows them to [BRIDGE_OR_TRANSCEND] the different \napproaches of [CHARACTER_1_NAME] and [CHARACTER_2_NAME]. [SYNTHESIS_EXAMPLE] \nshows [MATURE_UNDERSTANDING] of [CENTRAL_THEME].",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "thematic_album_narrative_5",
+      "file_path": "examples/prompt_templates/thematic_album.md",
+      "validation_status": "failed",
+      "execution_time": 2.1457672119140625e-06,
+      "input_text": "Together, these perspectives reveal that [CENTRAL_THEME] is not [SIMPLE_INTERPRETATION] \nbut rather [COMPLEX_TRUTH]. Each person's relationship to [CENTRAL_THEME] \nreflects [UNIVERSAL_INSIGHT] while remaining [INDIVIDUALLY_AUTHENTIC]. \nThe journey through these different experiences suggests [FINAL_WISDOM_OR_ACCEPTANCE].",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "thematic_album_narrative_6",
+      "file_path": "examples/prompt_templates/thematic_album.md",
+      "validation_status": "failed",
+      "execution_time": 2.6226043701171875e-06,
+      "input_text": "The theme of \"home\" manifests differently in each person's life. For some, \nit's a physical place filled with memory and tradition, while others experience \nit as a feeling of belonging that transcends geography. This exploration follows \nthree individuals whose lives illustrate the complexity and deeply personal \nnature of what it means to find home.\n\nMarcus embodies the search for home through displacement and longing. His \nchildhood as a military kid, moving every two years, shaped his understanding \nof home as something always temporary and just out of reach. When his father \nretired and asked where Marcus wanted to \"settle down,\" Marcus realized he \nhad no answer because he had learned to carry home inside himself rather \nthan find it in any place.\n\nHis daily ritual of unpacking and repacking a small box of meaningful objects \nshows how home affects Marcus's sense of stability and identity. His internal \nstruggle with commitment to places and people reveals his deeper fear that \nhome might not exist for someone like him. The moment he realizes that his \ngirlfriend's apartment feels more like home than anywhere he's lived leads \nto his understanding that home might be about people, not places.\n\nIn contrast, Elena experiences home as a burden of expectation and tradition. \nHer immigrant grandmother's house, filled with cultural artifacts and family \nobligations, created her view of home as something that demands sacrifice \nof individual identity. When she moves across the country for graduate school, \nElena struggles with guilt about leaving while simultaneously feeling free \nfor the first time.\n\nHer relationship with Marcus highlights the complexity of home through their \ndifferent needs—his desire for belonging clashing with her need for independence. \nElena's internal conflict between honoring her heritage and creating her own \nidentity shows how home can be both anchor and chain. Her resolution to create \na new kind of home that honors her past while embracing her future offers \na different wisdom about belonging.\n\nSam represents the integration of different concepts of home. Their experience \nas a community organizer allows them to see home as something created through \nconnection and mutual care rather than inherited or discovered. Sam's work \nbuilding affordable housing shows their mature understanding that home is \nboth deeply personal and fundamentally communal.\n\nTogether, these perspectives reveal that home is not simply a place or feeling \nbut rather a complex relationship between belonging, identity, and connection. \nEach person's relationship to home reflects their deepest needs and fears while \nremaining individually authentic. The journey through these different experiences \nsuggests that home is something we both find and create, inherit and choose, \ncarry within us and build with others.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "character_deep_dive_narrative_1",
+      "file_path": "examples/prompt_templates/character_deep_dive.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "[CHARACTER_NAME] [CHARACTER_AGE_CONTEXT] in [SETTING_DESCRIPTION]. [OPENING_SITUATION] \nreveals [PRIMARY_PERSONALITY_TRAIT], but [CONTRASTING_ELEMENT] suggests [DEEPER_COMPLEXITY].\n\n[DAILY_ROUTINE_OR_HABIT] [REVEALS_PSYCHOLOGY]. [SPECIFIC_BEHAVIOR_EXAMPLE] shows \n[CHARACTER_VALUE_OR_FEAR]. When [CHALLENGING_SITUATION], [CHARACTER_NAME] \n[SPECIFIC_REACTION] because [PSYCHOLOGICAL_MOTIVATION].\n\n[RELATIONSHIP_CONTEXT] [AFFECTS_CHARACTER]. [SPECIFIC_INTERACTION_EXAMPLE] demonstrates \n[CHARACTER_GROWTH_OR_CONFLICT]. [INTERNAL_MONOLOGUE_EXAMPLE] reveals [CORE_DESIRE_OR_FEAR].\n\n[FORMATIVE_EXPERIENCE] shaped [CHARACTER_NAME]'s [WORLDVIEW_OR_BEHAVIOR]. \n[SPECIFIC_MEMORY_OR_EVENT] explains why [CURRENT_BEHAVIOR_PATTERN]. This [PAST_INFLUENCE] \ncreates [PRESENT_INTERNAL_CONFLICT].\n\n[MOMENT_OF_REALIZATION_OR_CHANGE] forces [CHARACTER_NAME] to [CONFRONT_SOMETHING]. \n[SPECIFIC_DECISION_OR_ACTION] shows [CHARACTER_GROWTH]. [RESOLUTION_OR_NEW_UNDERSTANDING] \nsuggests [FUTURE_DIRECTION_OR_HOPE].",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "character_deep_dive_narrative_2",
+      "file_path": "examples/prompt_templates/character_deep_dive.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Elena, at twenty-eight and working her third job in two years, lived in a converted \nwarehouse apartment in the arts district. Her carefully curated Instagram feed \nrevealed her eye for beauty and composition, but her habit of deleting posts \nminutes after publishing suggests a perfectionism that borders on self-sabotage.\n\nEvery morning, Elena arranged her coffee cup, notebook, and vintage camera in \nperfect alignment before starting her day, a ritual that calmed her anxiety \nabout the unpredictability ahead. She photographed strangers on the subway, \ncapturing unguarded moments of humanity, because she felt more comfortable \nobserving life than participating in it. When her boss criticized her latest \nproject, Elena smiled and nodded while internally cataloging every word as \nevidence of her inadequacy, because her father's voice still echoed in her \nhead: \"Good enough never got anyone anywhere.\"\n\nHer relationship with her roommate Maya challenged Elena's tendency toward \nisolation. Maya's easy laughter and spontaneous dinner parties forced Elena \nto engage with others, though she often retreated to her room afterward, \nemotionally exhausted. \"I wish I could just disappear sometimes,\" Elena \nconfided to her journal, revealing her core fear of being truly seen and \nfound wanting.\n\nThe divorce of her parents when she was twelve shaped Elena's belief that \nlove was conditional and temporary. She remembered hiding in her closet, \nlistening to her parents argue about her father's \"unrealistic expectations\" \nand her mother's \"lack of ambition.\" This childhood trauma explains why Elena \nsabotages relationships before others can leave her. Her past influence creates \na present internal conflict between her desire for connection and her fear \nof inevitable abandonment.\n\nThe morning Elena's photograph was selected for a gallery showing forced her \nto confront her fear of public recognition and potential failure. Her decision \nto attend the opening, despite her anxiety, shows her growing willingness to \nrisk vulnerability for the sake of her art. This small act of courage suggests \nthat Elena is learning to value her own vision over others' approval, pointing \ntoward a future where she might finally trust her own worth.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "README_narrative_1",
+      "file_path": "examples/prompt_templates/README.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Base Template: Character Deep Dive\n+ Elements from: Professional Identity\n+ Techniques from: Emotional Journey\n= Complex professional character with personal growth arc",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_template_narrative_1",
+      "file_path": "examples/prompt_templates/folk_template.md",
+      "validation_status": "failed",
+      "execution_time": 5.245208740234375e-06,
+      "input_text": "[CHARACTER_NAME], [AGE_AND_LIFE_STAGE], [CONNECTION_TO_TRADITION] in [RURAL_OR_TRADITIONAL_SETTING]. \n[STORYTELLING_ROLE] makes them [KEEPER_OF_STORIES] for [COMMUNITY_OR_FAMILY]. \n[ORAL_TRADITION_EXAMPLE] shows their [NATURAL_STORYTELLING_ABILITY].\n\n[CULTURAL_HERITAGE_BACKGROUND] shaped [CHARACTER_NAME]'s [WORLDVIEW_OR_VALUES]. \n[SPECIFIC_TRADITION_EXAMPLE] connects them to [ANCESTRAL_WISDOM]. When [TRADITION_THREATENED_MOMENT], \n[CHARACTER_NAME] [PRESERVATION_ACTION] because [CULTURAL_RESPONSIBILITY_MOTIVATION].\n\n[SIMPLE_LIFE_EXAMPLE] reflects [CHARACTER_NAME]'s [AUTHENTIC_VALUES]. [COMMUNITY_CONNECTION] \ndemonstrates their [ROLE_IN_COMMUNITY]. [INTERGENERATIONAL_RELATIONSHIP] shows how \n[CHARACTER_NAME] [BRIDGES_PAST_AND_PRESENT].\n\n[NATURAL_WORLD_CONNECTION] influences [CHARACTER_NAME]'s [PERSPECTIVE_ON_LIFE]. \n[SEASONAL_OR_NATURAL_RHYTHM] guides their [DAILY_LIFE_PATTERN]. [NATURE_WISDOM_EXAMPLE] \nreveals [DEEPER_UNDERSTANDING].\n\n[MOMENT_OF_SHARING_STORY] demonstrates [CHARACTER_NAME]'s [GIFT_FOR_NARRATIVE]. \n[LISTENER_REACTION] shows [POWER_OF_STORY]. [REALIZATION_ABOUT_STORIES] leads to \n[COMMITMENT_TO_PRESERVATION] and [HOPE_FOR_CONTINUATION].",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_template_narrative_2",
+      "file_path": "examples/prompt_templates/folk_template.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Abuela Rosa, at seventy-eight and the last fluent speaker of her grandmother's \ndialect, serves as the keeper of family stories in her small mountain village. \nHer role as the unofficial family historian makes her the bridge between the \nold country and the new world for three generations of descendants. Every \nSunday after dinner, she weaves tales of migration, love, and survival that \ntransform the kitchen table into a portal to the past.\n\nHer Mexican-Indigenous heritage shaped Rosa's understanding of stories as \nliving things that must be fed with telling and retelling. The tradition of \nconsejos—wisdom stories passed from grandmother to granddaughter—connects \nher to centuries of women who used narrative to teach and heal. When her \nyoungest granddaughter announced she was \"too busy\" for Sunday stories, \nRosa began writing them down for the first time because she realized that \noral tradition needed new vessels to survive in a digital world.\n\nRosa's simple life of tending her herb garden and cooking traditional meals \nreflects her belief that wisdom lives in everyday actions, not grand gestures. \nHer role as the neighborhood curandera demonstrates how she serves her community \nthrough both healing herbs and healing stories. Her relationship with her \ngreat-granddaughter Sofia shows how Rosa bridges past and present by teaching \nancient remedies alongside modern understanding.\n\nRosa's deep connection to the mountain seasons influences her understanding \nthat all life moves in cycles of growth, rest, and renewal. The rhythm of \nplanting, tending, and harvesting guides her daily pattern of morning prayers, \nafternoon storytelling, and evening reflection. Her knowledge that certain \nherbs must be gathered at specific moon phases reveals her integration of \nnatural wisdom with cultural practice.\n\nThe evening Rosa told the story of her own grandmother's journey across the \ndesert demonstrated her gift for making the past feel immediate and real. \nSofia's tears at the story's end showed the power of narrative to create \nempathy across generations. Rosa's realization that stories don't just preserve \nthe past but create the future leads to her commitment to teaching Sofia not \njust the stories, but the art of storytelling itself, ensuring hope for \ncontinuation of their family's narrative tradition.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_template_narrative_3",
+      "file_path": "examples/prompt_templates/folk_template.md",
+      "validation_status": "failed",
+      "execution_time": 3.4809112548828125e-05,
+      "input_text": "Replace cultural elements with:\n- Mountain heritage and coal mining history\n- Bluegrass and old-time music traditions\n- Connection to land and family homesteads\n- Stories of hardship and resilience\n- Banjo, fiddle, and mountain dulcimer",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_template_narrative_4",
+      "file_path": "examples/prompt_templates/folk_template.md",
+      "validation_status": "failed",
+      "execution_time": 5.0067901611328125e-06,
+      "input_text": "Adapt template with:\n- Celtic heritage and storytelling traditions\n- Connection to Irish landscape and history\n- Pub sessions and community gatherings\n- Stories of emigration and homeland\n- Traditional Irish instruments (bodhrán, tin whistle, fiddle)",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_template_narrative_5",
+      "file_path": "examples/prompt_templates/folk_template.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Modify template for:\n- Southern heritage and oral tradition\n- Stories of struggle, survival, and triumph\n- Church and community connections\n- Work songs and field hollers tradition\n- Guitar, harmonica, and vocal emphasis",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "folk_template_narrative_6",
+      "file_path": "examples/prompt_templates/folk_template.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Adapt respectfully with:\n- Tribal heritage and traditional stories\n- Connection to land and natural cycles\n- Ceremonial and spiritual traditions\n- Stories of ancestors and cultural preservation\n- Traditional drums, flutes, and chanting",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_1",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "After thirty years in corporate law, David sold everything and moved to a cabin \nin the mountains. His colleagues called it a breakdown, but David knew it was \nthe opposite—a breakthrough to the person he had always been underneath the suits \nand meetings. The silence wasn't empty; it was full of thoughts he had never had \ntime to think, books he had never had space to read, and a version of himself \nhe was finally meeting.\n\nThe loneliness here was different from the loneliness he had felt in crowded \nconference rooms. This was chosen, purposeful, like a meditation that lasted \nmonths instead of minutes. He wrote letters he never sent, had conversations \nwith the mountains, and discovered that solitude and loneliness weren't the \nsame thing at all.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_2",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Maya had moved to the city for graduate school, leaving behind everything familiar. \nHer apartment was a studio on the fourth floor of a building where no one made \neye contact in the hallways. The loneliness here was sharp and immediate—the \nkind that made grocery shopping feel like an expedition to a foreign country.\n\nShe tried coffee shops and study groups, but every interaction felt like \nperforming a role she hadn't learned yet. At night, she would call her mother \nand pretend everything was fine, then hang up and feel more isolated than before. \nThe city was full of people, but Maya felt invisible, like she was watching \nlife through glass.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_3",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Elena had been caring for her mother with dementia for three years. The woman \nwho had raised her was still there physically, but the person who knew Elena's \nchildhood stories, who remembered her first heartbreak, who had been her closest \nconfidant—that person was disappearing piece by piece.\n\nThe loneliness of caregiving was unique—surrounded by medical professionals \nand family members offering help, but carrying a grief that no one else could \nfully understand. Elena loved her mother fiercely, but she mourned her daily, \nand that contradiction created a solitude that felt both necessary and unbearable.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_4",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "James was everyone's favorite person at parties—funny, charming, always ready \nwith a story or a joke. His phone buzzed constantly with invitations, and his \ncalendar was packed with social events. But driving home from another gathering \nwhere he had entertained everyone, James felt the familiar hollow ache that \nno amount of laughter could fill.\n\nHe was surrounded by people who knew his humor but not his heart, who enjoyed \nhis company but didn't really see him. The loneliness of being known but not \nunderstood was perhaps the cruelest kind—close enough to connection to see \nwhat was missing, but not close enough to bridge the gap.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_5",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "After years of different types of loneliness—the isolation of depression, the \nsolitude of creative work, the disconnection of failed relationships—Sam had \nlearned something important: loneliness wasn't a problem to be solved but a \nlandscape to be navigated. Some days required solitude, others demanded connection.\n\nSam started a weekly gathering in the community center—not a support group or \na social club, but something in between. A place where people could bring their \nloneliness and discover it wasn't as unique or as permanent as they had thought. \nThe architecture of loneliness, Sam realized, could be remodeled, room by room.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_6",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "A contemplative ambient folk song about choosing solitude in the mountains, \nwith acoustic guitar, subtle strings, and peaceful male vocals. Spacious \nand meditative, capturing the beauty of chosen silence.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_7",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Style: ambient folk, minimalist\nMood: contemplative, peaceful, introspective\nInstruments: acoustic guitar, subtle strings, nature sounds\nVocals: calm male, thoughtful, unhurried\nTempo: slow, meditative\nKey: major key, open and spacious\nStructure: verse-chorus with extended instrumental sections",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_8",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "A melancholic indie pop song about feeling invisible in a new city, with \ngentle electric guitar, soft drums, and vulnerable female vocals. Urban \nbut lonely, like watching life through apartment windows.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_9",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 5.0067901611328125e-06,
+      "input_text": "Style: indie pop, melancholic\nMood: vulnerable, displaced, yearning\nInstruments: electric guitar (clean), soft drums, subtle synths\nVocals: soft female, vulnerable, slightly distant\nTempo: medium-slow, steady\nKey: minor key, possibly F# minor\nStructure: verse-chorus with introspective bridge",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_10",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 3.814697265625e-06,
+      "input_text": "A hopeful folk-rock song about finding belonging and understanding different \ntypes of loneliness, with warm acoustic and electric guitars, gentle drums, \nand vocals that bring together all the previous themes. Healing and complete.",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_narrative_11",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Style: folk-rock, warm and resolved\nMood: hopeful, integrative, healing\nInstruments: acoustic and electric guitar, full band, subtle orchestration\nVocals: warm and inclusive, bringing themes together\nTempo: medium, steady and grounding\nKey: major key resolution\nStructure: builds to include musical elements from previous tracks",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "architecture_of_loneliness_expected_1",
+      "file_path": "examples/concept_albums/architecture_of_loneliness.md",
+      "validation_status": "failed",
+      "execution_time": 1.1920928955078125e-06,
+      "input_text": "",
+      "expected_output": {
+        "required_sections": [
+          "Character Profile",
+          "Musical Identity",
+          "Sample"
+        ]
+      },
+      "actual_output": {
+        "found_sections": []
+      },
+      "error_message": null,
+      "confidence_scores": {
+        "section_coverage": 0.0
+      },
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "README_narrative_1",
+      "file_path": "examples/concept_albums/README.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Abstract Concept: \"The Architecture of Loneliness\"\n↓\nCharacter Experience: Different people experiencing isolation\n↓\nMusical Translation: Various sonic representations of solitude\n↓\nAlbum Structure: Journey through types of loneliness to connection",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "README_narrative_2",
+      "file_path": "examples/concept_albums/README.md",
+      "validation_status": "failed",
+      "execution_time": 2.86102294921875e-06,
+      "input_text": "Philosophical Theme: \"The Paradox of Choice\"\n↓\nCharacter Psychology: Someone paralyzed by too many options\n↓\nMusical Choices: Genre-blending reflecting indecision\n↓\nSonic Resolution: Finding clarity through musical focus",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    },
+    {
+      "example_name": "README_narrative_3",
+      "file_path": "examples/concept_albums/README.md",
+      "validation_status": "failed",
+      "execution_time": 3.0994415283203125e-06,
+      "input_text": "Theme Introduction: Brief statement of the abstract concept\n↓\nCharacter Vignettes: 3-5 short character stories embodying the theme\n↓\nThematic Connections: How the characters relate to each other and the concept\n↓\nResolution or Synthesis: How the exploration concludes or evolves",
+      "expected_output": null,
+      "actual_output": null,
+      "error_message": "'FunctionTool' object is not callable",
+      "confidence_scores": {},
+      "completeness_score": 0.0,
+      "accuracy_score": 0.0
+    }
+  ],
+  "missing_examples": [
+    "single_character_analysis",
+    "multi_character_analysis",
+    "album_creation_workflow",
+    "prompt_template_usage",
+    "error_handling_examples"
+  ],
+  "outdated_examples": [
+    "lyric_generation_narrative_1",
+    "lyric_generation_narrative_2",
+    "lyric_generation_narrative_3",
+    "lyric_generation_narrative_6",
+    "lyric_generation_narrative_8",
+    "lyric_generation_narrative_10",
+    "lyric_generation_narrative_11",
+    "lyric_generation_narrative_14",
+    "lyric_generation_narrative_15",
+    "lyric_generation_code_1",
+    "lyric_generation_code_2",
+    "lyric_generation_code_3",
+    "prompt_engineering_narrative_1",
+    "prompt_engineering_narrative_2",
+    "prompt_engineering_narrative_3",
+    "prompt_engineering_narrative_4",
+    "prompt_engineering_narrative_5",
+    "prompt_engineering_narrative_6",
+    "prompt_engineering_narrative_7",
+    "prompt_engineering_narrative_8",
+    "prompt_engineering_narrative_9",
+    "prompt_engineering_narrative_10",
+    "prompt_engineering_narrative_11",
+    "prompt_engineering_narrative_12",
+    "prompt_engineering_narrative_13",
+    "prompt_engineering_narrative_14",
+    "prompt_engineering_narrative_15",
+    "prompt_engineering_narrative_16",
+    "prompt_engineering_narrative_17",
+    "prompt_engineering_narrative_18",
+    "prompt_engineering_narrative_19",
+    "prompt_engineering_narrative_20",
+    "prompt_engineering_narrative_21",
+    "prompt_engineering_narrative_22",
+    "prompt_engineering_narrative_23",
+    "troubleshooting_narrative_1",
+    "troubleshooting_narrative_2",
+    "troubleshooting_narrative_3",
+    "troubleshooting_narrative_4",
+    "troubleshooting_narrative_5",
+    "troubleshooting_narrative_6",
+    "troubleshooting_narrative_7",
+    "troubleshooting_narrative_8",
+    "troubleshooting_narrative_9",
+    "troubleshooting_narrative_10",
+    "troubleshooting_narrative_11",
+    "troubleshooting_narrative_12",
+    "troubleshooting_narrative_13",
+    "troubleshooting_narrative_14",
+    "troubleshooting_narrative_15",
+    "troubleshooting_narrative_16",
+    "troubleshooting_narrative_17",
+    "troubleshooting_narrative_18",
+    "troubleshooting_narrative_19",
+    "troubleshooting_narrative_20",
+    "troubleshooting_narrative_21",
+    "troubleshooting_narrative_22",
+    "troubleshooting_narrative_23",
+    "troubleshooting_narrative_24",
+    "troubleshooting_narrative_25",
+    "troubleshooting_narrative_26",
+    "troubleshooting_code_2",
+    "getting_started_narrative_1",
+    "getting_started_narrative_2",
+    "getting_started_narrative_3",
+    "getting_started_narrative_4",
+    "getting_started_narrative_5",
+    "getting_started_narrative_6",
+    "getting_started_narrative_7",
+    "getting_started_code_1",
+    "getting_started_code_2",
+    "getting_started_code_3",
+    "getting_started_code_4",
+    "getting_started_code_5",
+    "album_creation_guide_narrative_1",
+    "album_creation_guide_narrative_2",
+    "album_creation_guide_narrative_3",
+    "album_creation_guide_narrative_4",
+    "album_creation_guide_narrative_5",
+    "album_creation_guide_narrative_6",
+    "album_creation_guide_code_1",
+    "album_creation_guide_code_2",
+    "album_creation_guide_code_3",
+    "album_creation_guide_code_4",
+    "album_creation_guide_code_5",
+    "album_creation_guide_code_6",
+    "lighthouse_keeper_daughter_narrative_1",
+    "lighthouse_keeper_daughter_narrative_2",
+    "lighthouse_keeper_daughter_narrative_3",
+    "lighthouse_keeper_daughter_narrative_4",
+    "lighthouse_keeper_daughter_narrative_5",
+    "lighthouse_keeper_daughter_narrative_6",
+    "lighthouse_keeper_daughter_narrative_7",
+    "lighthouse_keeper_daughter_narrative_8",
+    "lighthouse_keeper_daughter_expected_1",
+    "lighthouse_keeper_daughter_expected_1",
+    "lighthouse_keeper_daughter_expected_1",
+    "night_shift_nurse_narrative_1",
+    "night_shift_nurse_narrative_2",
+    "night_shift_nurse_narrative_3",
+    "night_shift_nurse_narrative_4",
+    "night_shift_nurse_narrative_5",
+    "night_shift_nurse_narrative_6",
+    "night_shift_nurse_narrative_7",
+    "night_shift_nurse_narrative_8",
+    "night_shift_nurse_expected_1",
+    "night_shift_nurse_expected_1",
+    "night_shift_nurse_expected_1",
+    "folk_storyteller_narrative_1",
+    "folk_storyteller_narrative_2",
+    "folk_storyteller_narrative_3",
+    "folk_storyteller_narrative_4",
+    "folk_storyteller_narrative_5",
+    "folk_storyteller_narrative_6",
+    "folk_storyteller_narrative_7",
+    "folk_storyteller_narrative_8",
+    "folk_storyteller_expected_1",
+    "folk_storyteller_expected_1",
+    "folk_storyteller_expected_1",
+    "README_narrative_1",
+    "README_narrative_2",
+    "thematic_album_narrative_1",
+    "thematic_album_narrative_2",
+    "thematic_album_narrative_3",
+    "thematic_album_narrative_4",
+    "thematic_album_narrative_5",
+    "thematic_album_narrative_6",
+    "character_deep_dive_narrative_1",
+    "character_deep_dive_narrative_2",
+    "README_narrative_1",
+    "folk_template_narrative_1",
+    "folk_template_narrative_2",
+    "folk_template_narrative_3",
+    "folk_template_narrative_4",
+    "folk_template_narrative_5",
+    "folk_template_narrative_6",
+    "architecture_of_loneliness_narrative_1",
+    "architecture_of_loneliness_narrative_2",
+    "architecture_of_loneliness_narrative_3",
+    "architecture_of_loneliness_narrative_4",
+    "architecture_of_loneliness_narrative_5",
+    "architecture_of_loneliness_narrative_6",
+    "architecture_of_loneliness_narrative_7",
+    "architecture_of_loneliness_narrative_8",
+    "architecture_of_loneliness_narrative_9",
+    "architecture_of_loneliness_narrative_10",
+    "architecture_of_loneliness_narrative_11",
+    "architecture_of_loneliness_expected_1",
+    "README_narrative_1",
+    "README_narrative_2",
+    "README_narrative_3"
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "total_templates": 3,
+  "passed_templates": 0,
+  "failed_templates": 3,
+  "warning_templates": 0,
+  "average_effectiveness": 0.0,
+  "average_execution_time": 7.708867390950521e-06,
+  "validation_timestamp": "2025-08-23T09:50:37.536986",
+  "detailed_results": [
+    {
+      "template_name": "Thematic Album Template",
+      "test_status": "failed",
+      "execution_time": 7.152557373046875e-06,
+      "filled_template": "The theme of [CENTRAL_THEME] manifests differently in each person's life. For some, \nit's [THEME_VARIATION_1], while others experience it as [THEME_VARIATION_2]. \nThis exploration follows [NUMBER_OF_CHARACTERS] individuals whose lives illustrate \nthe [COMPLEXITY_OR_UNIVERSALITY] of [CENTRAL_THEME].",
+      "expected_output": {},
+      "actual_output": null,
+      "effectiveness_score": 0.0,
+      "character_confidence": 0.0,
+      "genre_accuracy": 0.0,
+      "completeness_score": 0.0,
+      "error_message": "'FunctionTool' object is not callable",
+      "recommendations": [
+        "Fix template processing errors"
+      ]
+    },
+    {
+      "template_name": "Single Character Deep Dive Template",
+      "test_status": "failed",
+      "execution_time": 1.1205673217773438e-05,
+      "filled_template": "[CHARACTER_NAME] [CHARACTER_AGE_CONTEXT] in [SETTING_DESCRIPTION]. [OPENING_SITUATION] \nreveals [PRIMARY_PERSONALITY_TRAIT], but [CONTRASTING_ELEMENT] suggests [DEEPER_COMPLEXITY].\n\n[DAILY_ROUTINE_OR_HABIT] [REVEALS_PSYCHOLOGY]. [SPECIFIC_BEHAVIOR_EXAMPLE] shows \n[CHARACTER_VALUE_OR_FEAR]. When [CHALLENGING_SITUATION], [CHARACTER_NAME] \n[SPECIFIC_REACTION] because [PSYCHOLOGICAL_MOTIVATION].\n\n[RELATIONSHIP_CONTEXT] [AFFECTS_CHARACTER]. [SPECIFIC_INTERACTION_EXAMPLE] demonstrates \n[CHARACTER_GROWTH_OR_CONFLICT]. [INTERNAL_MONOLOGUE_EXAMPLE] reveals [CORE_DESIRE_OR_FEAR].\n\n[FORMATIVE_EXPERIENCE] shaped [CHARACTER_NAME]'s [WORLDVIEW_OR_BEHAVIOR]. \n[SPECIFIC_MEMORY_OR_EVENT] explains why [CURRENT_BEHAVIOR_PATTERN]. This [PAST_INFLUENCE] \ncreates [PRESENT_INTERNAL_CONFLICT].\n\n[MOMENT_OF_REALIZATION_OR_CHANGE] forces [CHARACTER_NAME] to [CONFRONT_SOMETHING]. \n[SPECIFIC_DECISION_OR_ACTION] shows [CHARACTER_GROWTH]. [RESOLUTION_OR_NEW_UNDERSTANDING] \nsuggests [FUTURE_DIRECTION_OR_HOPE].",
+      "expected_output": {},
+      "actual_output": null,
+      "effectiveness_score": 0.0,
+      "character_confidence": 0.0,
+      "genre_accuracy": 0.0,
+      "completeness_score": 0.0,
+      "error_message": "'FunctionTool' object is not callable",
+      "recommendations": [
+        "Fix template processing errors"
+      ]
+    },
+    {
+      "template_name": "Folk Music Template",
+      "test_status": "failed",
+      "execution_time": 4.76837158203125e-06,
+      "filled_template": "[CHARACTER_NAME], [AGE_AND_LIFE_STAGE], [CONNECTION_TO_TRADITION] in [RURAL_OR_TRADITIONAL_SETTING]. \n[STORYTELLING_ROLE] makes them [KEEPER_OF_STORIES] for [COMMUNITY_OR_FAMILY]. \n[ORAL_TRADITION_EXAMPLE] shows their [NATURAL_STORYTELLING_ABILITY].\n\n[CULTURAL_HERITAGE_BACKGROUND] shaped [CHARACTER_NAME]'s [WORLDVIEW_OR_VALUES]. \n[SPECIFIC_TRADITION_EXAMPLE] connects them to [ANCESTRAL_WISDOM]. When [TRADITION_THREATENED_MOMENT], \n[CHARACTER_NAME] [PRESERVATION_ACTION] because [CULTURAL_RESPONSIBILITY_MOTIVATION].\n\n[SIMPLE_LIFE_EXAMPLE] reflects [CHARACTER_NAME]'s [AUTHENTIC_VALUES]. [COMMUNITY_CONNECTION] \ndemonstrates their [ROLE_IN_COMMUNITY]. [INTERGENERATIONAL_RELATIONSHIP] shows how \n[CHARACTER_NAME] [BRIDGES_PAST_AND_PRESENT].\n\n[NATURAL_WORLD_CONNECTION] influences [CHARACTER_NAME]'s [PERSPECTIVE_ON_LIFE]. \n[SEASONAL_OR_NATURAL_RHYTHM] guides their [DAILY_LIFE_PATTERN]. [NATURE_WISDOM_EXAMPLE] \nreveals [DEEPER_UNDERSTANDING].\n\n[MOMENT_OF_SHARING_STORY] demonstrates [CHARACTER_NAME]'s [GIFT_FOR_NARRATIVE]. \n[LISTENER_REACTION] shows [POWER_OF_STORY]. [REALIZATION_ABOUT_STORIES] leads to \n[COMMITMENT_TO_PRESERVATION] and [HOPE_FOR_CONTINUATION].",
+      "expected_output": {},
+      "actual_output": null,
+      "effectiveness_score": 0.0,
+      "character_confidence": 0.0,
+      "genre_accuracy": 0.0,
+      "completeness_score": 0.0,
+      "error_message": "'FunctionTool' object is not callable",
+      "recommendations": [
+        "Fix template processing errors"
+      ]
+    }
+  ],
+  "template_rankings": [
+    {
+      "name": "Thematic Album Template",
+      "effectiveness_score": 0.0,
+      "character_confidence": 0.0,
+      "status": "failed"
+    },
+    {
+      "name": "Single Character Deep Dive Template",
+      "effectiveness_score": 0.0,
+      "character_confidence": 0.0,
+      "status": "failed"
+    },
+    {
+      "name": "Folk Music Template",
+      "effectiveness_score": 0.0,
+      "character_confidence": 0.0,
+      "status": "failed"
+    }
+  ],
+  "improvement_suggestions": [
+    "High failure rate detected. Review template structure and placeholder definitions.",
+    "Many templates produce low character confidence. Add more psychological depth and specific character details.",
+    "Templates may have unfilled placeholders or insufficient content. Review example values and template structure."
+  ]
+}
