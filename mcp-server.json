@@ -1,0 +1,23 @@
+{
+  "name": "agent_generated_character_music_mcp",
+  "exhibit_name": "Character-Driven Music Generator",
+  "type": 3,
+  "command": "sh /Users/tosinakinosho/workspaces/character-music-mcp/run.sh",
+  "args": [],
+  "env": {},
+  "description": "Advanced MCP server that analyzes narrative text to extract detailed character profiles and generates musical artist personas with optimized Suno AI commands. Transforms literary characters into musical identities using three-layer character bible methodology (Skin, Flesh, Core) and sophisticated psychological-to-musical mapping. Supports unlimited text length, multiple characters, and various music generation approaches including simple prompts, custom mode, and bracket notation commands.",
+  "description_for_agent": "Character analysis and music generation MCP server. Extracts characters from narrative text using three-layer analysis (physical traits, background/relationships, psychology), maps character traits to musical genres and vocal styles, generates artist personas, and creates optimized Suno AI commands. Supports complete workflow from text input to final music commands, creative mode for abstract concepts, and comprehensive character-to-music transformation pipeline.",
+  "user_params": {
+    "args": {},
+    "env": {
+      "SUNO_COOKIE": {
+        "required": false,
+        "description": "Optional Suno AI session cookie for direct API integration. If not provided, server operates in standalone mode generating commands without executing them."
+      },
+      "TWOCAPTCHA_KEY": {
+        "required": false,
+        "description": "Optional 2Captcha API key for solving CAPTCHAs in Suno AI integration. Only needed if using direct Suno API calls."
+      }
+    }
+  }
+}

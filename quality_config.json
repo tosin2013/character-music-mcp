@@ -1,0 +1,59 @@
+{
+  "thresholds": {
+    "test_coverage": 80.0,
+    "test_success_rate": 95.0,
+    "performance_score": 80.0,
+    "documentation_score": 90.0,
+    "security_score": 95.0,
+    "code_quality_score": 85.0
+  },
+  "alerting": {
+    "enabled": true,
+    "email_notifications": false,
+    "slack_notifications": false,
+    "console_alerts": true,
+    "file_alerts": true
+  },
+  "monitoring": {
+    "history_length": 30,
+    "regression_threshold": 0.05,
+    "improvement_threshold": 0.10,
+    "check_interval": 3600,
+    "retention_days": 30
+  },
+  "email": {
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "sender_email": "",
+    "sender_password": "",
+    "recipient_emails": []
+  },
+  "slack": {
+    "webhook_url": "",
+    "channel": "#quality-alerts"
+  },
+  "dashboard": {
+    "auto_refresh": true,
+    "refresh_interval": 300,
+    "show_trends": true,
+    "max_alerts": 10,
+    "chart_history_days": 14
+  },
+  "performance_thresholds": {
+    "character_analysis_time": 5.0,
+    "persona_generation_time": 3.0,
+    "command_generation_time": 2.0,
+    "complete_workflow_time": 10.0,
+    "memory_usage_mb": 500.0,
+    "cpu_usage_percent": 80.0,
+    "response_time_p95": 8.0,
+    "throughput_requests_per_second": 1.0
+  },
+  "quality_gates": {
+    "minimum_coverage": 75.0,
+    "minimum_success_rate": 90.0,
+    "maximum_performance_regression": 0.20,
+    "maximum_security_issues": 5,
+    "maximum_critical_issues": 0
+  }
+}

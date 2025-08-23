@@ -1,0 +1,40 @@
+{
+  "name": "agent_generated_character_music_mcp",
+  "exhibit_name": "Music Production Company - Character-Driven Music Generator",
+  "type": 3,
+  "command": "sh /Users/tosinakinosho/workspaces/character-music-mcp/run.sh",
+  "args": [],
+  "env": {},
+  "description": "Complete music production company MCP server that transforms narrative characters into fully-realized musical artists. Features advanced character analysis (three-layer methodology), introspective artist story generation, AI producer guidance with Suno AI best practices, and comprehensive music bible creation. Generates production-ready Suno AI commands with meta tag optimization, troubleshooting guides, and album narratives. Supports both basic character-to-music workflow and full production company workflow with artist backstories and producer oversight.",
+  "description_for_agent": "Music production company MCP server with 9 tools: analyze_character (three-layer character extraction), generate_artist_story (creates introspective artist narratives from character bibles), generate_musical_persona (maps characters to musical identities), analyze_production (AI producer tool with Suno-specific guidance), create_music_bible (comprehensive production documentation), get_suno_knowledge (fetches Suno AI best practices), create_suno_command (generates optimized prompts), complete_workflow (basic character-to-music), and complete_music_production_workflow (full production company workflow). Transforms narrative text into complete music production packages including artist stories, producer notes, song blueprints, and optimized Suno AI commands.",
+  "user_params": {
+    "args": {},
+    "env": {
+      "SUNO_COOKIE": {
+        "required": false,
+        "description": "Optional Suno AI session cookie for direct API integration. If not provided, server operates in standalone mode generating commands without executing them."
+      },
+      "TWOCAPTCHA_KEY": {
+        "required": false,
+        "description": "Optional 2Captcha API key for solving CAPTCHAs in Suno AI integration. Only needed if using direct Suno API calls."
+      }
+    }
+  },
+  "tools": {
+    "analyze_character": "Extract detailed character profiles using three-layer methodology (Skin/Flesh/Core)",
+    "generate_artist_story": "Create introspective artist backstory from character bible with themes and journey",
+    "generate_musical_persona": "Map character traits to musical genres, vocals, and artistic identity",
+    "analyze_production": "AI producer analysis providing Suno-optimized production guidance",
+    "create_music_bible": "Generate comprehensive production guide with song blueprints and prompts",
+    "get_suno_knowledge": "Fetch current Suno AI best practices, meta tags, and genre tips",
+    "create_suno_command": "Generate optimized Suno AI prompts with meta tags and variations",
+    "complete_workflow": "Basic workflow: character analysis → persona → Suno commands",
+    "complete_music_production_workflow": "Full production: character → story → persona → producer → music bible"
+  },
+  "resources": {
+    "methodology/three_layer_analysis": "Character analysis methodology documentation",
+    "methodology/music_production_workflow": "Complete music production company workflow guide",
+    "prompts/character_analysis": "Guided prompts for character extraction",
+    "prompts/introspective_music_templates": "Templates for creating introspective music from stories"
+  }
+}
