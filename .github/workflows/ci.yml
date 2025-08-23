@@ -1,0 +1,401 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  PYTHON_VERSION: '3.10'
+  UV_VERSION: '0.1.18'
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+      fail-fast: false
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: ${{ env.UV_VERSION }}
+    
+    - name: Create virtual environment
+      run: uv venv --python ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        source .venv/bin/activate
+        uv pip install -e .
+        uv pip install pytest pytest-cov pytest-asyncio pytest-benchmark coverage[toml]
+    
+    - name: Run unit tests
+      run: |
+        source .venv/bin/activate
+        python -m pytest tests/unit/ -v --cov=. --cov-report=xml --cov-report=term-missing --cov-fail-under=80
+      continue-on-error: false
+    
+    - name: Run integration tests
+      run: |
+        source .venv/bin/activate
+        python -m pytest tests/integration/ -v --timeout=300
+      continue-on-error: false
+    
+    - name: Run performance tests
+      run: |
+        source .venv/bin/activate
+        python -m pytest tests/performance/ -v --benchmark-only --benchmark-json=benchmark_results.json
+      continue-on-error: true
+    
+    - name: Run unified test suite
+      run: |
+        source .venv/bin/activate
+        python tests/test_runner.py
+      continue-on-error: false
+    
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.10'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: |
+          test_report_*.json
+          benchmark_results.json
+          coverage.xml
+        retention-days: 30
+
+  documentation-validation:
+    name: Documentation Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: ${{ env.UV_VERSION }}
+    
+    - name: Create virtual environment
+      run: uv venv --python ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        source .venv/bin/activate
+        uv pip install -e .
+    
+    - name: Validate documentation examples
+      run: |
+        source .venv/bin/activate
+        python tests/validation/validate_documentation.py
+      continue-on-error: false
+    
+    - name: Validate prompt templates
+      run: |
+        source .venv/bin/activate
+        python tests/validation/validate_templates.py
+      continue-on-error: false
+    
+    - name: Validate examples
+      run: |
+        source .venv/bin/activate
+        python tests/validation/validate_examples.py
+      continue-on-error: false
+    
+    - name: Upload validation reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: validation-reports
+        path: |
+          tests/validation/reports/*.json
+          tests/validation/reports/*.md
+        retention-days: 30
+
+  quality-checks:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: ${{ env.UV_VERSION }}
+    
+    - name: Create virtual environment
+      run: uv venv --python ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        source .venv/bin/activate
+        uv pip install ruff mypy
+    
+    - name: Run Ruff linting
+      run: |
+        source .venv/bin/activate
+        ruff check . --output-format=github
+      continue-on-error: false
+    
+    - name: Run Ruff formatting check
+      run: |
+        source .venv/bin/activate
+        ruff format --check .
+      continue-on-error: false
+    
+    - name: Run type checking
+      run: |
+        source .venv/bin/activate
+        mypy . --ignore-missing-imports --no-strict-optional
+      continue-on-error: true
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: ${{ env.UV_VERSION }}
+    
+    - name: Create virtual environment
+      run: uv venv --python ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        source .venv/bin/activate
+        uv pip install -e .
+        uv pip install safety bandit
+    
+    - name: Run safety check
+      run: |
+        source .venv/bin/activate
+        safety check --json --output safety_report.json
+      continue-on-error: true
+    
+    - name: Run bandit security scan
+      run: |
+        source .venv/bin/activate
+        bandit -r . -f json -o bandit_report.json
+      continue-on-error: true
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          safety_report.json
+          bandit_report.json
+        retention-days: 30
+
+  performance-benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[benchmark]')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: ${{ env.UV_VERSION }}
+    
+    - name: Create virtual environment
+      run: uv venv --python ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        source .venv/bin/activate
+        uv pip install -e .
+        uv pip install pytest-benchmark memory-profiler
+    
+    - name: Run performance benchmarks
+      run: |
+        source .venv/bin/activate
+        python scripts/run_benchmarks.py --output benchmark_results.json
+    
+    - name: Compare with baseline
+      run: |
+        source .venv/bin/activate
+        python scripts/compare_benchmarks.py benchmark_results.json
+      continue-on-error: true
+    
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmark-results
+        path: |
+          benchmark_results.json
+          benchmark_comparison.json
+        retention-days: 90
+
+  quality-monitoring:
+    name: Quality Monitoring
+    runs-on: ubuntu-latest
+    needs: [test, documentation-validation, quality-checks, security-scan]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: ${{ env.UV_VERSION }}
+    
+    - name: Create virtual environment
+      run: uv venv --python ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        source .venv/bin/activate
+        uv pip install -e .
+        uv pip install jinja2 markdown psutil
+    
+    - name: Run quality monitoring
+      run: |
+        source .venv/bin/activate
+        python scripts/monitor_quality.py
+      continue-on-error: true
+    
+    - name: Run performance monitoring
+      run: |
+        source .venv/bin/activate
+        python scripts/monitor_performance.py
+      continue-on-error: true
+    
+    - name: Create quality dashboard
+      run: |
+        source .venv/bin/activate
+        python scripts/create_quality_dashboard.py
+    
+    - name: Upload quality reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: quality-monitoring-reports
+        path: |
+          quality_report_*.json
+          performance_report_*.json
+          quality_metrics.json
+          performance_metrics.json
+          dashboard/
+        retention-days: 30
+
+  deploy-reports:
+    name: Deploy Reports
+    runs-on: ubuntu-latest
+    needs: [test, documentation-validation, quality-checks, security-scan, quality-monitoring]
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: ${{ env.UV_VERSION }}
+    
+    - name: Create virtual environment
+      run: uv venv --python ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        source .venv/bin/activate
+        uv pip install -e .
+        uv pip install jinja2 markdown psutil
+    
+    - name: Generate comprehensive dashboard
+      run: |
+        source .venv/bin/activate
+        python scripts/generate_dashboard.py
+        python scripts/create_quality_dashboard.py
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dashboard
+        destination_dir: quality-reports
