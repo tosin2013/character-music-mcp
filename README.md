@@ -351,3 +351,4 @@ For issues, questions, or contributions:
 
 *This MCP server represents a breakthrough in automated music creation by systematically bridging narrative content and musical expression through rigorous character psychology analysis.*
 # character-music-mcp
+# character-music-mcp
