@@ -7,16 +7,36 @@ proper genre matching functionality.
 """
 
 import pytest
+import sys
+import os
 import pytest_asyncio
 from unittest.mock import Mock, AsyncMock, patch
 from datetime import datetime
 from typing import List
 
-from enhanced_genre_mapper import (
-    EnhancedGenreMapper,
-    GenreMatch,
-    GenreHierarchy
-)
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+try:
+    from enhanced_genre_mapper import (
+        EnhancedGenreMapper,
+        GenreMatch,
+        GenreHierarchy
+    )
+except ImportError as e:
+    import sys
+    from pathlib import Path
+    # Add project root to path if not already there
+    project_root = Path(__file__).parent.parent.parent
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    
+    # Try import again
+    from enhanced_genre_mapper import (
+        EnhancedGenreMapper,
+        GenreMatch,
+        GenreHierarchy
+    )
 from wiki_data_system import Genre, WikiDataManager
 
 class TestEnhancedGenreMapper:

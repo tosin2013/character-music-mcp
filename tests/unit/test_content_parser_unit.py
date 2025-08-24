@@ -6,12 +6,17 @@ Tests the ContentParser class with sample HTML files to ensure
 proper parsing functionality without external dependencies.
 """
 
+import sys
+import os
 import pytest
 import tempfile
 import shutil
 from pathlib import Path
 from datetime import datetime
 from unittest.mock import Mock, patch
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from wiki_content_parser import (
     ContentParser,

@@ -12,14 +12,30 @@ import tempfile
 import shutil
 import os
 from unittest.mock import Mock, AsyncMock, patch
+import sys
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Import components to test
 from wiki_downloader import WikiDownloader, DownloadResult
 from wiki_cache_manager import WikiCacheManager
 from wiki_content_parser import ContentParser
-from enhanced_genre_mapper import EnhancedGenreMapper, GenreMatch
+try:
+    from enhanced_genre_mapper import EnhancedGenreMapper, GenreMatch
+except ImportError as e:
+    import sys
+    from pathlib import Path
+    # Add project root to path if not already there
+    project_root = Path(__file__).parent.parent.parent
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    
+    # Try import again
+    from enhanced_genre_mapper import EnhancedGenreMapper, GenreMatch
 from source_attribution_manager import SourceAttributionManager, ContentSource
 from wiki_data_system import Genre, MetaTag, Technique, WikiDataManager
 

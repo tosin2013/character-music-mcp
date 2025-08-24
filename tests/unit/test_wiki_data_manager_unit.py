@@ -5,6 +5,8 @@ Unit tests for WikiDataManager
 Tests the WikiDataManager class which coordinates all wiki data operations.
 """
 
+import sys
+import os
 import pytest
 import pytest_asyncio
 import tempfile
@@ -12,6 +14,9 @@ import shutil
 from unittest.mock import Mock, AsyncMock, patch
 from datetime import datetime
 from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from wiki_data_system import (
     WikiDataManager,

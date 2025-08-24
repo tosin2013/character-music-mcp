@@ -3,11 +3,16 @@
 Unit tests for wiki data system infrastructure
 """
 
+import sys
+import os
 import pytest
 import tempfile
 import json
 from pathlib import Path
 from datetime import datetime
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from wiki_data_system import (
     WikiConfig, WikiDataManager, ConfigurationManager,

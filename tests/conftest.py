@@ -17,8 +17,23 @@ import sys
 import os
 from typing import Dict, List, Any, Optional
 
-# Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the project root to Python path
+from pathlib import Path
+project_root = Path(__file__).parent.parent
+project_root_str = str(project_root.resolve())
+
+# Ensure project root is in Python path
+if project_root_str not in sys.path:
+    sys.path.insert(0, project_root_str)
+
+# Also add to PYTHONPATH environment variable
+os.environ['PYTHONPATH'] = project_root_str + ':' + os.environ.get('PYTHONPATH', '')
+
+# Debug: Print path information for CI debugging
+if os.environ.get('CI'):
+    print(f"Project root: {project_root_str}")
+    print(f"Python path: {sys.path[:3]}...")  # First 3 entries
+    print(f"PYTHONPATH: {os.environ.get('PYTHONPATH', 'Not set')}")
 
 from tests.fixtures.mock_contexts import MockContext, create_mock_context
 from tests.fixtures.test_data import TestDataManager, test_data_manager

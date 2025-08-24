@@ -6,6 +6,8 @@ Tests the SourceAttributionManager class with different content types to ensure
 proper source attribution and tracking functionality.
 """
 
+import sys
+import os
 import pytest
 import pytest_asyncio
 import tempfile
@@ -14,6 +16,9 @@ import json
 from pathlib import Path
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from source_attribution_manager import (
     SourceAttributionManager,
