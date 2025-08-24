@@ -2386,13 +2386,15 @@ class MusicPersonaGenerator:
             'determination to contribute': ['classical', 'orchestral', 'progressive']
         }
         
-        # Find best matching genre based on traits
+        # Find best matching genre based on traits with priority weighting
         genre_scores = {}
-        for trait in traits:
+        for i, trait in enumerate(traits):
             trait_lower = trait.lower()
             if trait_lower in trait_genre_map:
+                # Give higher weight to first traits (more important)
+                weight = len(traits) - i
                 for genre in trait_genre_map[trait_lower]:
-                    genre_scores[genre] = genre_scores.get(genre, 0) + 1
+                    genre_scores[genre] = genre_scores.get(genre, 0) + weight
         
         # If no direct matches, use fallback mapping
         if not genre_scores:
@@ -2483,34 +2485,74 @@ class MusicPersonaGenerator:
         """Generate lyrical themes from character profile"""
         themes = []
         
+        # Extract from personality drivers first (most important)
+        for driver in character.personality_drivers:
+            driver_lower = driver.lower()
+            if 'quest for meaning' in driver_lower or 'intellectual' in driver_lower:
+                themes.extend(['existential questions', 'search for truth', 'philosophical inquiry', 'meaning of life'])
+            elif 'creative' in driver_lower or 'artistic' in driver_lower:
+                themes.extend(['artistic expression', 'creative struggle', 'inspiration', 'artistic authenticity'])
+            elif 'duty' in driver_lower or 'responsibility' in driver_lower:
+                themes.extend(['honor and duty', 'responsibility', 'service to others', 'moral obligation'])
+            elif 'courage' in driver_lower or 'brave' in driver_lower:
+                themes.extend(['overcoming fear', 'heroic journey', 'standing up for beliefs', 'courage under pressure'])
+            elif 'love' in driver_lower or 'compassion' in driver_lower:
+                themes.extend(['love transcending boundaries', 'compassion for others', 'human connection', 'empathy'])
+        
         # Extract from motivations
         for motivation in character.motivations:
-            if 'love' in motivation.lower():
+            motivation_lower = motivation.lower()
+            if 'love' in motivation_lower:
                 themes.append('love and relationships')
-            elif 'power' in motivation.lower():
+            elif 'power' in motivation_lower:
                 themes.append('ambition and power')
-            elif 'freedom' in motivation.lower():
+            elif 'freedom' in motivation_lower:
                 themes.append('liberation and independence')
+            elif 'justice' in motivation_lower:
+                themes.append('justice and fairness')
+            elif 'adventure' in motivation_lower:
+                themes.append('exploration and discovery')
         
         # Extract from fears
         for fear in character.fears:
-            if 'death' in fear.lower():
+            fear_lower = fear.lower()
+            if 'death' in fear_lower:
                 themes.append('mortality and existence')
-            elif 'loss' in fear.lower():
+            elif 'loss' in fear_lower:
                 themes.append('loss and separation')
+            elif 'exposure' in fear_lower:
+                themes.append('vulnerability and authenticity')
         
         # Extract from conflicts
         for conflict in character.conflicts:
-            if 'family' in conflict.lower():
+            conflict_lower = conflict.lower()
+            if 'family' in conflict_lower:
                 themes.append('family dynamics')
-            elif 'society' in conflict.lower():
+            elif 'society' in conflict_lower:
                 themes.append('social commentary')
+            elif 'vs' in conflict_lower:
+                # Extract opposing concepts
+                parts = conflict_lower.split(' vs ')
+                if len(parts) == 2:
+                    themes.append(f'tension between {parts[0]} and {parts[1]}')
         
-        # Add default themes if none found
+        # Add character-specific themes based on backstory
+        if hasattr(character, 'backstory') and character.backstory:
+            backstory_lower = character.backstory.lower()
+            if 'mathematical' in backstory_lower or 'science' in backstory_lower:
+                themes.extend(['logic and reason', 'scientific discovery', 'mathematical beauty'])
+            elif 'historical' in backstory_lower:
+                themes.extend(['lessons from history', 'timeless wisdom', 'legacy and tradition'])
+            elif 'magical' in backstory_lower or 'fantasy' in backstory_lower:
+                themes.extend(['magic and mystery', 'supernatural forces', 'hidden worlds'])
+        
+        # Add default themes if none found, but make them richer
         if not themes:
-            themes = ['personal journey', 'emotional expression', 'life experiences']
+            themes = ['personal journey', 'emotional expression', 'life experiences', 'human condition']
         
-        return list(set(themes))[:4]
+        # Remove duplicates and return top themes
+        unique_themes = list(dict.fromkeys(themes))  # Preserves order while removing duplicates
+        return unique_themes[:5]  # Return up to 5 themes for complex characters
 
     def _generate_emotional_palette(self, character: CharacterProfile) -> List[str]:
         """Generate emotional palette from character analysis"""
