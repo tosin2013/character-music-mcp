@@ -190,3 +190,40 @@
     - Create maintenance procedures for wiki data updates
     - Add monitoring and alerting for wiki data freshness
     - _Requirements: System maintenance and operations_
+
+- [ ] 14. Fix hardcoded character issues in create_character_album
+  - [x] 14.1 Fix WorkingUniversalProcessor to use dynamic character descriptions
+    - Remove hardcoded "Marcus" character from WorkingUniversalProcessor
+    - Update processor to accept and use provided character_description parameter
+    - Ensure character traits, location, and genre are derived from input, not hardcoded
+    - _Requirements: Character album generation accuracy_
+
+  - [x] 14.2 Fix hardcoded descriptions in create_character_album function
+    - Remove hardcoded "Philosophical liquid DNB producer" description
+    - Update album response to use actual character description provided
+    - Ensure character_filter reflects the input character, not hardcoded values
+    - _Requirements: Character album generation accuracy_
+
+  - [x] 14.3 Replace hardcoded genre-instrument mappings with dynamic wiki-sourced data
+    - Replace static genre_instruments dictionary (lines 2840-2868) with wiki data
+    - Update _generate_instrumental_preferences to use EnhancedGenreMapper
+    - Ensure instrument selection is based on wiki data, not hardcoded mappings
+    - _Requirements: Dynamic genre and instrument selection_
+
+  - [x] 14.4 Replace hardcoded trait-to-genre mappings with intelligent matching
+    - Replace static trait mappings (lines 2514-2519) with semantic analysis
+    - Update _fallback_map_to_genres to use wiki-sourced genre data
+    - Implement dynamic trait analysis instead of hardcoded brave→rock mappings
+    - _Requirements: Intelligent character trait to genre matching_
+
+  - [x] 14.5 Replace hardcoded style and emotional tags with wiki data
+    - Replace fallback_style_tags, fallback_structure_tags, fallback_vocal_tags
+    - Update all _get_fallback_* methods to use wiki data when available
+    - Ensure emotional mappings (joy→uplifting) are derived from content, not static
+    - _Requirements: Dynamic style and emotional tag generation_
+
+  - [ ] 14.6 Add proper character description parsing and validation
+    - Add validation for character_description parameter across all tools
+    - Extract key character traits (genre, location, personality) from description
+    - Ensure character consistency across all generated tracks and tools
+    - _Requirements: Character album generation accuracy_

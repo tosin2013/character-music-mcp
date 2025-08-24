@@ -844,6 +844,100 @@ class EnhancedGenreMapper:
         matches.sort(key=lambda x: x.confidence, reverse=True)
         return matches[:max_results]
     
+    async def get_genre_instruments(self, genre_name: str, fallback_instruments: Optional[List[str]] = None) -> List[str]:
+        """
+        Get typical instruments for a genre from wiki data
+        
+        Args:
+            genre_name: Name of the genre
+            fallback_instruments: Fallback instruments if genre not found
+            
+        Returns:
+            List of typical instruments for the genre
+        """
+        try:
+            # Get genres from wiki data
+            genres = await self._get_genres()
+            
+            if not genres:
+                logger.warning("No wiki genres available for instrument lookup")
+                return fallback_instruments or ['vocals', 'guitar', 'piano', 'drums']
+            
+            # Find the genre (with fuzzy matching if needed)
+            genre = self._find_genre_by_name(genre_name)
+            if not genre:
+                genre = await self._fuzzy_find_genre(genre_name)
+            
+            if genre and genre.typical_instruments:
+                logger.info(f"Found {len(genre.typical_instruments)} instruments for genre '{genre_name}' from wiki data")
+                return genre.typical_instruments
+            
+            # Try to find similar genres and use their instruments
+            similar_genres = await self.find_similar_genres(genre_name, max_results=3, similarity_threshold=0.3)
+            
+            if similar_genres:
+                # Combine instruments from similar genres
+                combined_instruments = []
+                for similar_genre, similarity in similar_genres:
+                    if similar_genre.typical_instruments:
+                        combined_instruments.extend(similar_genre.typical_instruments)
+                        logger.info(f"Using instruments from similar genre '{similar_genre.name}' (similarity: {similarity:.2f})")
+                
+                if combined_instruments:
+                    # Remove duplicates while preserving order
+                    unique_instruments = []
+                    seen = set()
+                    for instrument in combined_instruments:
+                        if instrument.lower() not in seen:
+                            unique_instruments.append(instrument)
+                            seen.add(instrument.lower())
+                    
+                    return unique_instruments[:8]  # Limit to 8 instruments
+            
+            # If no wiki data found, use fallback
+            logger.info(f"No wiki instrument data found for genre '{genre_name}', using fallback")
+            return fallback_instruments or ['vocals', 'guitar', 'piano', 'drums']
+            
+        except Exception as e:
+            logger.error(f"Error getting instruments for genre '{genre_name}': {e}")
+            return fallback_instruments or ['vocals', 'guitar', 'piano', 'drums']
+    
+    async def _fuzzy_find_genre(self, genre_name: str, threshold: float = 0.6) -> Optional[Genre]:
+        """
+        Find a genre using fuzzy string matching
+        
+        Args:
+            genre_name: Name of the genre to find
+            threshold: Minimum similarity threshold
+            
+        Returns:
+            Best matching Genre or None if no good match found
+        """
+        genres = await self._get_genres()
+        if not genres:
+            return None
+        
+        best_match = None
+        best_ratio = 0.0
+        
+        genre_name_lower = genre_name.lower()
+        
+        for genre in genres:
+            # Check exact match first
+            if genre.name.lower() == genre_name_lower:
+                return genre
+            
+            # Check fuzzy match
+            ratio = SequenceMatcher(None, genre_name_lower, genre.name.lower()).ratio()
+            if ratio > best_ratio and ratio >= threshold:
+                best_ratio = ratio
+                best_match = genre
+        
+        if best_match:
+            logger.info(f"Fuzzy matched '{genre_name}' to '{best_match.name}' (similarity: {best_ratio:.2f})")
+        
+        return best_match
+    
     def _get_fallback_mappings(self) -> Dict[str, List[str]]:
         """Get fallback trait-to-genre mappings for when wiki data is unavailable"""
         return {

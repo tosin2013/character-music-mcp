@@ -20,37 +20,155 @@ class UniversalMusicCommand:
 class WorkingUniversalProcessor:
     """Simplified processor that works with any content through character lens"""
     
-    def __init__(self):
-        self.marcus_worldview = {
-            "filter": "philosophical_rational",
-            "questions": [
-                "How does this demonstrate God and Soul through reason?",
-                "What philosophical arguments does this contain?",
-                "How can I translate this into musical logic?",
-                "What would Dad have believed vs. what I think?"
-            ],
-            "struggles": [
-                "Father's death 3 months ago",
-                "Theological vs. rational approaches to grief", 
-                "34 years old, questioning life direction",
-                "Warehouse studio isolation"
-            ],
+    def __init__(self, character_description: str = None):
+        # Parse character description or use default Marcus for backward compatibility
+        if character_description:
+            self.character_worldview = self._parse_character_description(character_description)
+        else:
+            # Default Marcus character for backward compatibility
+            self.character_worldview = {
+                "name": "Marcus 'Solvent' Thompson",
+                "filter": "philosophical_rational",
+                "questions": [
+                    "How does this demonstrate God and Soul through reason?",
+                    "What philosophical arguments does this contain?",
+                    "How can I translate this into musical logic?",
+                    "What would Dad have believed vs. what I think?"
+                ],
+                "struggles": [
+                    "Father's death 3 months ago",
+                    "Theological vs. rational approaches to grief", 
+                    "34 years old, questioning life direction",
+                    "Warehouse studio isolation"
+                ],
+                "context": {
+                    "age": 34,
+                    "location": "Bristol warehouse studio", 
+                    "time": "3am sessions",
+                    "genre": "liquid drum and bass",
+                    "equipment": "analog/digital hybrid"
+                }
+            }
+    
+    def _parse_character_description(self, description: str) -> Dict:
+        """Parse character description to extract key traits"""
+        desc_lower = description.lower()
+        
+        # Extract name
+        name_match = None
+        lines = description.split('\n')
+        for line in lines[:3]:  # Check first few lines for name
+            if any(word in line.lower() for word in ['name', 'called', 'known as']):
+                # Extract name from line
+                import re
+                name_pattern = r'([A-Z][a-z]+ (?:"[^"]*" )?[A-Z][a-z]+)'
+                match = re.search(name_pattern, line)
+                if match:
+                    name_match = match.group(1)
+                    break
+        
+        if not name_match:
+            # Try to find name at start of description
+            import re
+            name_pattern = r'^([A-Z][a-z]+ (?:"[^"]*" )?[A-Z][a-z]+)'
+            match = re.search(name_pattern, description)
+            name_match = match.group(1) if match else "Unknown Artist"
+        
+        # Extract age
+        age_match = re.search(r'(\d+)[-\s]*year[-\s]*old', desc_lower)
+        age = int(age_match.group(1)) if age_match else 30
+        
+        # Extract location
+        location = "home studio"
+        if "new york" in desc_lower:
+            location = "New York studio"
+        elif "bristol" in desc_lower:
+            location = "Bristol warehouse studio"
+        elif "los angeles" in desc_lower or "la" in desc_lower:
+            location = "Los Angeles studio"
+        elif "nashville" in desc_lower:
+            location = "Nashville studio"
+        elif "detroit" in desc_lower:
+            location = "Detroit studio"
+        
+        # Extract genre
+        genre = "alternative"
+        if "neo-soul" in desc_lower or "neo soul" in desc_lower:
+            genre = "neo-soul"
+        elif "liquid" in desc_lower and ("drum" in desc_lower or "bass" in desc_lower):
+            genre = "liquid drum and bass"
+        elif "jazz" in desc_lower:
+            genre = "jazz"
+        elif "hip-hop" in desc_lower or "hip hop" in desc_lower:
+            genre = "hip-hop"
+        elif "rock" in desc_lower:
+            genre = "rock"
+        elif "electronic" in desc_lower:
+            genre = "electronic"
+        elif "folk" in desc_lower:
+            genre = "folk"
+        elif "r&b" in desc_lower:
+            genre = "R&B"
+        
+        # Extract personality/philosophical approach
+        filter_type = "introspective"
+        questions = ["What does this mean to me?", "How does this connect to my experience?", "What story does this tell?"]
+        
+        if "philosophical" in desc_lower:
+            filter_type = "philosophical_rational"
+            questions = [
+                "What deeper meaning lies beneath this?",
+                "How does this connect to universal truths?",
+                "What questions does this raise about existence?",
+                "How can I express this through music?"
+            ]
+        elif "spiritual" in desc_lower:
+            filter_type = "spiritual_emotional"
+            questions = [
+                "What spiritual truth does this reveal?",
+                "How does this touch the soul?",
+                "What divine connection exists here?",
+                "How can music channel this energy?"
+            ]
+        elif "political" in desc_lower or "social" in desc_lower:
+            filter_type = "social_conscious"
+            questions = [
+                "What injustice does this reveal?",
+                "How does this affect our community?",
+                "What change needs to happen?",
+                "How can music inspire action?"
+            ]
+        
+        # Extract struggles/background
+        struggles = ["Creative challenges", "Personal growth", "Artistic authenticity"]
+        if "grief" in desc_lower or "loss" in desc_lower:
+            struggles.append("Processing loss and grief")
+        if "father" in desc_lower or "dad" in desc_lower:
+            struggles.append("Complex relationship with father")
+        if "theological" in desc_lower or "religious" in desc_lower:
+            struggles.append("Spiritual vs rational worldview")
+        
+        return {
+            "name": name_match,
+            "filter": filter_type,
+            "questions": questions,
+            "struggles": struggles,
             "context": {
-                "age": 34,
-                "location": "Bristol warehouse studio", 
-                "time": "3am sessions",
-                "genre": "liquid drum and bass",
-                "equipment": "analog/digital hybrid"
+                "age": age,
+                "location": location,
+                "genre": genre,
+                "time": "late night sessions",
+                "equipment": "professional studio setup"
             }
         }
     
     def process_any_content(self, content: str, track_title: str) -> UniversalMusicCommand:
-        """Process any content through Marcus's philosophical lens"""
+        """Process any content through character's lens"""
         
-        # Step 1: How Marcus interprets this content
-        character_interpretation = self._interpret_through_marcus_lens(content)
+        # Step 1: How character interprets this content
+        character_interpretation = self._interpret_through_character_lens(content)
         
-        # Step 2: Connect to his personal story
+        # Step 2: Connect to their personal story
         personal_story = self._create_personal_connection(content)
         
         # Step 3: Generate authentic lyrics

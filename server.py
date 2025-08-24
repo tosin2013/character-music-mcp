@@ -2411,7 +2411,7 @@ class MusicPersonaGenerator:
             primary_genre=primary_genre,
             secondary_genres=secondary_genres,
             vocal_style=vocal_style,
-            instrumental_preferences=self._generate_instrumental_preferences(primary_genre),
+            instrumental_preferences=await self._generate_instrumental_preferences(primary_genre),
             lyrical_themes=lyrical_themes,
             emotional_palette=emotional_palette,
             artistic_influences=influences,
@@ -2502,13 +2502,69 @@ class MusicPersonaGenerator:
             except Exception as e:
                 logger.warning(f"Enhanced genre mapping failed: {e}, falling back to hardcoded mapping")
         
-        # Fallback to original hardcoded mapping
-        return self._fallback_map_to_genres(traits)
+        # Fallback to intelligent mapping
+        return await self._fallback_map_to_genres(traits)
     
-    def _fallback_map_to_genres(self, traits: List[str]) -> Tuple[str, List[str]]:
-        """Fallback trait-to-genre mapping using hardcoded mappings"""
+    async def _fallback_map_to_genres(self, traits: List[str]) -> Tuple[str, List[str]]:
+        """Intelligent fallback trait-to-genre mapping using enhanced genre mapper when available"""
         
-        # Define trait-to-genre mappings
+        # Try to use enhanced genre mapper's intelligent fallback first
+        if self.enhanced_genre_mapper:
+            try:
+                logger.info(f"Using enhanced genre mapper fallback for traits: {traits}")
+                
+                # Use the enhanced genre mapper's intelligent fallback matching
+                genre_matches = await self.enhanced_genre_mapper.find_fallback_matches(
+                    traits, max_results=5
+                )
+                
+                if genre_matches and len(genre_matches) > 0:
+                    # Register genre sources for attribution
+                    if self.source_attribution_manager:
+                        for match in genre_matches:
+                            if hasattr(match.genre, 'source_url') and match.genre.source_url:
+                                self.source_attribution_manager.register_source(
+                                    match.genre.source_url,
+                                    'genre',
+                                    f"Genre: {match.genre.name}",
+                                    match.genre.download_date if hasattr(match.genre, 'download_date') else datetime.now()
+                                )
+                    
+                    # Extract primary and secondary genres from matches
+                    primary_genre = genre_matches[0].genre.name
+                    secondary_genres = [match.genre.name for match in genre_matches[1:3]]
+                    
+                    # Ensure we have at least 2 secondary genres
+                    if len(secondary_genres) < 2:
+                        # Add more from matches
+                        for match in genre_matches[3:]:
+                            if len(secondary_genres) >= 2:
+                                break
+                            secondary_genres.append(match.genre.name)
+                        
+                        # If still not enough, use basic fallback genres
+                        if len(secondary_genres) < 2:
+                            fallback_genres = ['indie', 'alternative', 'pop', 'rock']
+                            for genre in fallback_genres:
+                                if genre != primary_genre and genre not in secondary_genres:
+                                    secondary_genres.append(genre)
+                                    if len(secondary_genres) >= 2:
+                                        break
+                    
+                    logger.info(f"Enhanced fallback mapping: {primary_genre} with confidence {genre_matches[0].confidence:.3f}")
+                    return primary_genre, secondary_genres[:2]
+                
+            except Exception as e:
+                logger.warning(f"Enhanced fallback genre mapping failed: {e}, using hardcoded fallback")
+        
+        # Final fallback to hardcoded mappings when enhanced mapper is unavailable
+        return self._hardcoded_fallback_mapping(traits)
+    
+    def _hardcoded_fallback_mapping(self, traits: List[str]) -> Tuple[str, List[str]]:
+        """Final hardcoded fallback when all intelligent methods fail"""
+        logger.info("Using hardcoded fallback trait mappings as last resort")
+        
+        # Define essential trait-to-genre mappings for absolute fallback
         trait_genre_map = {
             'melancholic': ['blues', 'folk', 'indie'],
             'mysterious': ['dark ambient', 'gothic', 'alternative'],
@@ -2834,8 +2890,32 @@ class MusicPersonaGenerator:
         This mapping ensures authentic musical representation of the character's essence.
         """.strip()
 
-    def _generate_instrumental_preferences(self, genre: str) -> List[str]:
-        """Generate instrumental preferences based on genre"""
+    async def _generate_instrumental_preferences(self, genre: str) -> List[str]:
+        """Generate instrumental preferences based on genre using wiki data"""
+        # Try enhanced genre mapper first if available
+        if self.enhanced_genre_mapper:
+            try:
+                # Define fallback instruments for the genre
+                fallback_instruments = self._get_fallback_instruments(genre)
+                
+                # Get instruments from wiki data
+                instruments = await self.enhanced_genre_mapper.get_genre_instruments(
+                    genre, fallback_instruments=fallback_instruments
+                )
+                
+                logger.info(f"Generated {len(instruments)} instrumental preferences for genre '{genre}' using wiki data")
+                return instruments
+                
+            except Exception as e:
+                logger.error(f"Error getting instruments from enhanced genre mapper: {e}")
+                # Fall through to hardcoded fallback
+        
+        # Fallback to hardcoded mappings if wiki integration unavailable
+        logger.info(f"Using fallback instrumental preferences for genre '{genre}'")
+        return self._get_fallback_instruments(genre)
+    
+    def _get_fallback_instruments(self, genre: str) -> List[str]:
+        """Get fallback instrumental preferences for a genre"""
         genre_instruments = {
             'rock': ['electric guitar', 'bass guitar', 'drums', 'synthesizer'],
             'metal': ['distorted guitar', 'bass guitar', 'heavy drums', 'orchestral elements'],
@@ -2879,37 +2959,10 @@ class SunoCommandGenerator:
         # Wiki data integration
         self.wiki_data_manager = wiki_data_manager
         
-        # Fallback hardcoded tags (used when wiki data unavailable)
-        self.fallback_style_tags = {
-            'rock': ['rock', 'electric guitar', 'driving rhythm', 'powerful'],
-            'metal': ['metal', 'heavy', 'distorted', 'aggressive', 'intense'],
-            'jazz': ['jazz', 'smooth', 'improvisation', 'sophisticated'],
-            'electronic': ['electronic', 'synthesized', 'digital', 'rhythmic'],
-            'folk': ['acoustic', 'organic', 'storytelling', 'traditional'],
-            'pop': ['catchy', 'melodic', 'mainstream', 'polished'],
-            'indie': ['alternative', 'independent', 'lo-fi', 'artistic'],
-            'blues': ['blues', 'soulful', 'emotional', 'raw']
-        }
-        
-        self.fallback_structure_tags = {
-            'simple': ['verse-chorus', 'straightforward'],
-            'complex': ['bridge', 'instrumental break', 'dynamic structure'],
-            'narrative': ['storytelling', 'progressive', 'journey'],
-            'emotional': ['building intensity', 'emotional arc', 'dynamic range']
-        }
-        
         # Initialize emotional beat engine for production instructions
         self.emotional_beat_engine = EmotionalBeatEngine()
         # Initialize emotional lyric generator
         self.lyric_generator = EmotionalLyricGenerator()
-        
-        self.fallback_vocal_tags = {
-            'powerful': ['strong vocals', 'commanding voice', 'belting'],
-            'smooth': ['smooth vocals', 'controlled delivery', 'refined'],
-            'emotional': ['emotional vocals', 'expressive', 'heartfelt'],
-            'raw': ['raw vocals', 'unpolished', 'authentic'],
-            'ethereal': ['ethereal vocals', 'floating', 'atmospheric']
-        }
 
     async def get_style_tags_for_genre(self, genre: str) -> List[str]:
         """Get style tags for a genre from wiki data or fallback"""
@@ -2930,8 +2983,8 @@ class SunoCommandGenerator:
             except Exception as e:
                 logger.warning(f"Failed to get wiki style tags for {genre}: {e}")
         
-        # Fallback to hardcoded tags
-        return self.fallback_style_tags.get(genre.lower(), ['melodic', 'expressive'])
+        # Fallback to dynamic style tag generation
+        return await self._get_fallback_style_tags(genre)
 
     async def get_structure_tags_for_complexity(self, complexity: str, character_traits: List[str] = None) -> List[str]:
         """Get structure tags based on complexity and character traits"""
@@ -2963,8 +3016,8 @@ class SunoCommandGenerator:
             except Exception as e:
                 logger.warning(f"Failed to get wiki structure tags for {complexity}: {e}")
         
-        # Fallback to hardcoded tags
-        return self.fallback_structure_tags.get(complexity, ['verse-chorus'])
+        # Fallback to dynamic structure tag generation
+        return await self._get_fallback_structure_tags(complexity, character_traits)
 
     async def get_vocal_tags_for_style(self, vocal_style: str, emotion: str = None) -> List[str]:
         """Get vocal tags based on vocal style and emotion"""
@@ -2993,11 +3046,8 @@ class SunoCommandGenerator:
             except Exception as e:
                 logger.warning(f"Failed to get wiki vocal tags for {vocal_style}: {e}")
         
-        # Fallback to hardcoded tags
-        for style_key, tags in self.fallback_vocal_tags.items():
-            if style_key in vocal_style.lower():
-                return tags
-        return ['expressive vocals']
+        # Fallback to dynamic vocal tag generation
+        return await self._get_fallback_vocal_tags(vocal_style, emotion)
 
     async def get_emotional_meta_tags(self, emotion: str, genre: str = None) -> List[str]:
         """Get meta tags that match specific emotions"""
@@ -3023,15 +3073,8 @@ class SunoCommandGenerator:
             except Exception as e:
                 logger.warning(f"Failed to get wiki emotional tags for {emotion}: {e}")
         
-        # Fallback to emotion-based tags
-        emotion_fallbacks = {
-            'melancholy': ['melancholic', 'sad', 'introspective'],
-            'joy': ['uplifting', 'happy', 'energetic'],
-            'anger': ['aggressive', 'intense', 'powerful'],
-            'contemplation': ['thoughtful', 'reflective', 'meditative'],
-            'nostalgia': ['nostalgic', 'wistful', 'reminiscent']
-        }
-        return emotion_fallbacks.get(emotion.lower(), ['expressive'])
+        # Use dynamic emotion tag generation
+        return await self._get_fallback_emotion_tags(emotion)
 
     async def get_instrumental_meta_tags(self, instruments: List[str], genre: str = None) -> List[str]:
         """Get meta tags for specific instruments"""
@@ -3129,8 +3172,8 @@ class SunoCommandGenerator:
             except Exception as e:
                 logger.warning(f"Failed to get genre-specific meta tags for {genre}: {e}")
         
-        # Fallback to hardcoded genre-specific tags
-        return self._get_fallback_genre_tags(genre)
+        # Fallback to dynamic genre-specific tags
+        return await self._get_fallback_genre_tags(genre)
 
     def _filter_tags_by_context(self, tags: List[str], context: str) -> List[str]:
         """Filter tags based on context (e.g., 'upbeat', 'melancholy', 'energetic')"""
@@ -3165,43 +3208,148 @@ class SunoCommandGenerator:
         # If no matches, return original tags
         return filtered_tags if filtered_tags else tags
 
-    def _get_fallback_genre_tags(self, genre: str) -> Dict[str, List[str]]:
-        """Get fallback genre-specific tags when wiki data is unavailable"""
-        fallback_genre_tags = {
-            'rock': {
-                'style': ['rock', 'electric guitar', 'driving rhythm', 'powerful'],
-                'structural': ['verse-chorus', 'bridge', 'guitar solo'],
-                'emotional': ['energetic', 'rebellious', 'passionate'],
-                'instrumental': ['electric guitar', 'bass', 'drums'],
-                'vocal': ['strong vocals', 'belting', 'raspy'],
-                'production': ['distorted', 'amplified', 'dynamic']
-            },
-            'jazz': {
-                'style': ['jazz', 'smooth', 'improvisation', 'sophisticated'],
-                'structural': ['complex harmony', 'improvisation', 'swing'],
-                'emotional': ['smooth', 'sophisticated', 'expressive'],
-                'instrumental': ['saxophone', 'piano', 'upright bass', 'brushed drums'],
-                'vocal': ['smooth vocals', 'scatting', 'expressive'],
-                'production': ['acoustic', 'live recording', 'natural reverb']
-            },
-            'electronic': {
-                'style': ['electronic', 'synthesized', 'digital', 'rhythmic'],
-                'structural': ['build-up', 'drop', 'loop-based'],
-                'emotional': ['futuristic', 'hypnotic', 'energetic'],
-                'instrumental': ['synthesizer', 'drum machine', 'sampler'],
-                'vocal': ['processed vocals', 'vocoder', 'auto-tune'],
-                'production': ['digital effects', 'compression', 'layered']
+    async def _get_fallback_genre_tags(self, genre: str) -> Dict[str, List[str]]:
+        """Get fallback genre-specific tags using intelligent generation when wiki data unavailable"""
+        try:
+            # Try to get from wiki data first
+            if self.wiki_data_manager:
+                try:
+                    # Get all meta tags and filter by genre compatibility
+                    all_tags = await self.wiki_data_manager.get_meta_tags()
+                    genre_tags = {
+                        'style': [],
+                        'structural': [],
+                        'emotional': [],
+                        'instrumental': [],
+                        'vocal': [],
+                        'production': []
+                    }
+                    
+                    for tag in all_tags:
+                        # Check if tag is compatible with the genre
+                        if not tag.compatible_genres or genre.lower() in [g.lower() for g in tag.compatible_genres]:
+                            category = tag.category.lower()
+                            if category in genre_tags:
+                                genre_tags[category].append(tag.tag)
+                            elif 'style' in category:
+                                genre_tags['style'].append(tag.tag)
+                            elif 'structure' in category:
+                                genre_tags['structural'].append(tag.tag)
+                            elif 'emotion' in category or 'mood' in category:
+                                genre_tags['emotional'].append(tag.tag)
+                            elif 'instrument' in category:
+                                genre_tags['instrumental'].append(tag.tag)
+                            elif 'vocal' in category:
+                                genre_tags['vocal'].append(tag.tag)
+                            elif 'production' in category or 'technical' in category:
+                                genre_tags['production'].append(tag.tag)
+                    
+                    # If we got good wiki data, return it
+                    if any(len(tags) > 0 for tags in genre_tags.values()):
+                        # Limit each category to 4 tags
+                        for category in genre_tags:
+                            genre_tags[category] = genre_tags[category][:4]
+                        return genre_tags
+                        
+                except Exception as e:
+                    logger.debug(f"Wiki genre tags unavailable: {e}")
+            
+            # Try to get from error recovery manager's fallback data
+            if hasattr(self, 'error_recovery_manager') and self.error_recovery_manager:
+                fallback_data = self.error_recovery_manager.get_fallback_data('meta_tags')
+                if fallback_data and fallback_data.data:
+                    genre_tags = {
+                        'style': [],
+                        'structural': [],
+                        'emotional': [],
+                        'instrumental': [],
+                        'vocal': [],
+                        'production': []
+                    }
+                    
+                    for tag_data in fallback_data.data:
+                        tag_text = tag_data.get('tag', '')
+                        category = tag_data.get('category', '').lower()
+                        
+                        # Check if tag is relevant to the genre
+                        if genre.lower() in tag_text.lower() or not tag_data.get('compatible_genres'):
+                            if category in genre_tags:
+                                genre_tags[category].append(tag_text)
+                    
+                    if any(len(tags) > 0 for tags in genre_tags.values()):
+                        return genre_tags
+            
+            # Intelligent fallback based on genre characteristics
+            genre_characteristics = {
+                'rock': {
+                    'style': ['rock', 'electric guitar', 'driving rhythm', 'powerful'],
+                    'structural': ['verse-chorus', 'bridge', 'guitar solo'],
+                    'emotional': ['energetic', 'rebellious', 'passionate'],
+                    'instrumental': ['electric guitar', 'bass', 'drums'],
+                    'vocal': ['strong vocals', 'belting', 'raspy'],
+                    'production': ['distorted', 'amplified', 'dynamic']
+                },
+                'jazz': {
+                    'style': ['jazz', 'smooth', 'improvisation', 'sophisticated'],
+                    'structural': ['complex harmony', 'improvisation', 'swing'],
+                    'emotional': ['smooth', 'sophisticated', 'expressive'],
+                    'instrumental': ['saxophone', 'piano', 'upright bass', 'brushed drums'],
+                    'vocal': ['smooth vocals', 'scatting', 'expressive'],
+                    'production': ['acoustic', 'live recording', 'natural reverb']
+                },
+                'electronic': {
+                    'style': ['electronic', 'synthesized', 'digital', 'rhythmic'],
+                    'structural': ['build-up', 'drop', 'loop-based'],
+                    'emotional': ['futuristic', 'hypnotic', 'energetic'],
+                    'instrumental': ['synthesizer', 'drum machine', 'sampler'],
+                    'vocal': ['processed vocals', 'vocoder', 'auto-tune'],
+                    'production': ['digital effects', 'compression', 'layered']
+                },
+                'pop': {
+                    'style': ['catchy', 'melodic', 'mainstream', 'polished'],
+                    'structural': ['verse-chorus', 'hook', 'bridge'],
+                    'emotional': ['uplifting', 'accessible', 'relatable'],
+                    'instrumental': ['full arrangement', 'balanced mix'],
+                    'vocal': ['clear vocals', 'melodic', 'accessible'],
+                    'production': ['polished', 'radio-ready', 'compressed']
+                },
+                'folk': {
+                    'style': ['acoustic', 'organic', 'storytelling', 'traditional'],
+                    'structural': ['verse-chorus', 'narrative', 'simple'],
+                    'emotional': ['authentic', 'heartfelt', 'nostalgic'],
+                    'instrumental': ['acoustic guitar', 'harmonica', 'fiddle'],
+                    'vocal': ['natural vocals', 'storytelling', 'intimate'],
+                    'production': ['organic', 'minimal', 'natural']
+                },
+                'hip hop': {
+                    'style': ['rhythmic', 'beats', 'urban', 'lyrical'],
+                    'structural': ['verse-chorus', 'rap verses', 'hook'],
+                    'emotional': ['confident', 'expressive', 'authentic'],
+                    'instrumental': ['beats', 'bass', 'samples'],
+                    'vocal': ['rap vocals', 'rhythmic', 'clear'],
+                    'production': ['beats', 'sampling', 'layered']
+                }
             }
-        }
-        
-        return fallback_genre_tags.get(genre.lower(), {
-            'style': ['melodic', 'expressive'],
-            'structural': ['verse-chorus'],
-            'emotional': ['authentic'],
-            'instrumental': ['full arrangement'],
-            'vocal': ['expressive vocals'],
-            'production': ['professional']
-        })
+            
+            return genre_characteristics.get(genre.lower(), {
+                'style': ['melodic', 'expressive'],
+                'structural': ['verse-chorus'],
+                'emotional': ['authentic'],
+                'instrumental': ['full arrangement'],
+                'vocal': ['expressive vocals'],
+                'production': ['professional']
+            })
+            
+        except Exception as e:
+            logger.warning(f"Failed to get fallback genre tags for {genre}: {e}")
+            return {
+                'style': ['melodic', 'expressive'],
+                'structural': ['verse-chorus'],
+                'emotional': ['authentic'],
+                'instrumental': ['full arrangement'],
+                'vocal': ['expressive vocals'],
+                'production': ['professional']
+            }
 
     async def create_emotion_to_meta_tag_mapping(self, emotions: List[str], genre: str = None) -> Dict[str, List[str]]:
         """Create sophisticated emotion-to-meta-tag mapping using wiki data"""
@@ -3239,7 +3387,7 @@ class SunoCommandGenerator:
         # Fill in any missing emotions with fallback mappings
         for emotion in emotions:
             if emotion not in emotion_mapping:
-                emotion_mapping[emotion] = self._get_fallback_emotion_tags(emotion)
+                emotion_mapping[emotion] = await self._get_fallback_emotion_tags(emotion)
         
         return emotion_mapping
 
@@ -3259,20 +3407,213 @@ class SunoCommandGenerator:
         related_words = emotion_relations.get(emotion, [])
         return any(word in tag or word in description for word in related_words)
 
-    def _get_fallback_emotion_tags(self, emotion: str) -> List[str]:
-        """Get fallback emotion tags when wiki data is unavailable"""
-        fallback_emotions = {
-            'joy': ['uplifting', 'happy', 'energetic', 'bright'],
-            'sadness': ['melancholic', 'sad', 'introspective', 'minor'],
-            'anger': ['aggressive', 'intense', 'powerful', 'driving'],
-            'fear': ['tense', 'dark', 'mysterious', 'anxious'],
-            'love': ['romantic', 'warm', 'intimate', 'gentle'],
-            'nostalgia': ['nostalgic', 'wistful', 'reminiscent', 'vintage'],
-            'contemplation': ['thoughtful', 'reflective', 'meditative', 'ambient'],
-            'excitement': ['energetic', 'fast', 'dynamic', 'upbeat']
-        }
-        
-        return fallback_emotions.get(emotion.lower(), ['expressive', 'authentic'])
+    async def _get_fallback_style_tags(self, genre: str) -> List[str]:
+        """Get fallback style tags using intelligent generation when wiki data unavailable"""
+        try:
+            # Try to get from error recovery manager's fallback data
+            if hasattr(self, 'error_recovery_manager') and self.error_recovery_manager:
+                fallback_data = self.error_recovery_manager.get_fallback_data('meta_tags')
+                if fallback_data and fallback_data.data:
+                    style_tags = [tag['tag'] for tag in fallback_data.data 
+                                if tag.get('category') == 'style' or genre.lower() in tag.get('tag', '').lower()]
+                    if style_tags:
+                        return style_tags[:4]
+            
+            # Intelligent fallback based on genre characteristics
+            genre_characteristics = {
+                'rock': ['electric guitar', 'driving rhythm', 'powerful', 'energetic'],
+                'metal': ['heavy', 'distorted', 'aggressive', 'intense'],
+                'jazz': ['smooth', 'improvisation', 'sophisticated', 'complex'],
+                'electronic': ['synthesized', 'digital', 'rhythmic', 'atmospheric'],
+                'folk': ['acoustic', 'organic', 'storytelling', 'traditional'],
+                'pop': ['catchy', 'melodic', 'mainstream', 'polished'],
+                'indie': ['alternative', 'independent', 'lo-fi', 'artistic'],
+                'blues': ['soulful', 'emotional', 'raw', 'expressive'],
+                'hip hop': ['rhythmic', 'beats', 'urban', 'lyrical'],
+                'country': ['storytelling', 'rural', 'acoustic', 'narrative'],
+                'classical': ['orchestral', 'complex', 'refined', 'traditional'],
+                'reggae': ['rhythmic', 'relaxed', 'island', 'groove']
+            }
+            
+            return genre_characteristics.get(genre.lower(), ['melodic', 'expressive'])
+            
+        except Exception as e:
+            logger.warning(f"Failed to get fallback style tags for {genre}: {e}")
+            return ['melodic', 'expressive']
+
+    async def _get_fallback_structure_tags(self, complexity: str, character_traits: List[str] = None) -> List[str]:
+        """Get fallback structure tags using intelligent generation when wiki data unavailable"""
+        try:
+            # Try to get from error recovery manager's fallback data
+            if hasattr(self, 'error_recovery_manager') and self.error_recovery_manager:
+                fallback_data = self.error_recovery_manager.get_fallback_data('meta_tags')
+                if fallback_data and fallback_data.data:
+                    structure_tags = [tag['tag'] for tag in fallback_data.data 
+                                    if tag.get('category') == 'structure']
+                    if structure_tags:
+                        return structure_tags[:3]
+            
+            # Intelligent fallback based on complexity and character traits
+            complexity_mapping = {
+                'simple': ['verse-chorus', 'straightforward', 'basic structure'],
+                'complex': ['bridge', 'instrumental break', 'dynamic structure', 'multiple sections'],
+                'narrative': ['storytelling', 'progressive', 'journey', 'evolving'],
+                'emotional': ['building intensity', 'emotional arc', 'dynamic range', 'climactic']
+            }
+            
+            base_tags = complexity_mapping.get(complexity, ['verse-chorus'])
+            
+            # Enhance based on character traits if provided
+            if character_traits:
+                trait_enhancements = {
+                    'adventurous': ['dynamic transitions', 'unexpected changes'],
+                    'contemplative': ['gradual build', 'reflective passages'],
+                    'energetic': ['fast transitions', 'high energy'],
+                    'melancholic': ['slow build', 'emotional depth']
+                }
+                
+                for trait in character_traits:
+                    trait_lower = trait.lower()
+                    for trait_key, enhancements in trait_enhancements.items():
+                        if trait_key in trait_lower:
+                            base_tags.extend(enhancements[:1])  # Add one enhancement
+                            break
+            
+            return base_tags[:3]  # Limit to 3 tags
+            
+        except Exception as e:
+            logger.warning(f"Failed to get fallback structure tags for {complexity}: {e}")
+            return ['verse-chorus']
+
+    async def _get_fallback_vocal_tags(self, vocal_style: str, emotion: str = None) -> List[str]:
+        """Get fallback vocal tags using intelligent generation when wiki data unavailable"""
+        try:
+            # Try to get from error recovery manager's fallback data
+            if hasattr(self, 'error_recovery_manager') and self.error_recovery_manager:
+                fallback_data = self.error_recovery_manager.get_fallback_data('meta_tags')
+                if fallback_data and fallback_data.data:
+                    vocal_tags = [tag['tag'] for tag in fallback_data.data 
+                                if tag.get('category') == 'vocal' or 'vocal' in tag.get('tag', '').lower()]
+                    if vocal_tags:
+                        return vocal_tags[:3]
+            
+            # Intelligent fallback based on vocal style and emotion
+            style_mapping = {
+                'powerful': ['strong vocals', 'commanding voice', 'belting', 'dynamic'],
+                'smooth': ['smooth vocals', 'controlled delivery', 'refined', 'polished'],
+                'emotional': ['emotional vocals', 'expressive', 'heartfelt', 'passionate'],
+                'raw': ['raw vocals', 'unpolished', 'authentic', 'gritty'],
+                'ethereal': ['ethereal vocals', 'floating', 'atmospheric', 'dreamy'],
+                'aggressive': ['aggressive vocals', 'intense', 'forceful', 'harsh'],
+                'gentle': ['gentle vocals', 'soft', 'tender', 'delicate'],
+                'rhythmic': ['rhythmic vocals', 'percussive', 'syncopated', 'groove-based']
+            }
+            
+            # Find matching style
+            base_tags = []
+            for style_key, tags in style_mapping.items():
+                if style_key in vocal_style.lower():
+                    base_tags = tags
+                    break
+            
+            if not base_tags:
+                base_tags = ['expressive vocals']
+            
+            # Enhance based on emotion if provided
+            if emotion:
+                emotion_enhancements = {
+                    'joy': ['uplifting', 'bright'],
+                    'sadness': ['melancholic', 'somber'],
+                    'anger': ['intense', 'fierce'],
+                    'love': ['warm', 'intimate'],
+                    'fear': ['tense', 'anxious'],
+                    'excitement': ['energetic', 'dynamic']
+                }
+                
+                emotion_lower = emotion.lower()
+                for emotion_key, enhancements in emotion_enhancements.items():
+                    if emotion_key in emotion_lower:
+                        base_tags.extend(enhancements[:1])  # Add one enhancement
+                        break
+            
+            return base_tags[:3]  # Limit to 3 tags
+            
+        except Exception as e:
+            logger.warning(f"Failed to get fallback vocal tags for {vocal_style}: {e}")
+            return ['expressive vocals']
+
+    async def _get_fallback_emotion_tags(self, emotion: str) -> List[str]:
+        """Get fallback emotion tags using intelligent generation when wiki data unavailable"""
+        try:
+            # Try to get from wiki data first (emotional category)
+            if self.wiki_data_manager:
+                try:
+                    emotional_tags = await self.wiki_data_manager.get_meta_tags(category="emotional")
+                    matching_tags = []
+                    
+                    for tag in emotional_tags:
+                        tag_lower = tag.tag.lower()
+                        desc_lower = tag.description.lower()
+                        emotion_lower = emotion.lower()
+                        
+                        # Direct emotion match
+                        if emotion_lower in tag_lower or emotion_lower in desc_lower:
+                            matching_tags.append(tag.tag)
+                        # Semantic emotion matching
+                        elif self._is_emotion_semantically_related(emotion_lower, tag_lower, desc_lower):
+                            matching_tags.append(tag.tag)
+                    
+                    if matching_tags:
+                        return matching_tags[:4]
+                        
+                except Exception as e:
+                    logger.debug(f"Wiki emotional tags unavailable: {e}")
+            
+            # Try to get from error recovery manager's fallback data
+            if hasattr(self, 'error_recovery_manager') and self.error_recovery_manager:
+                fallback_data = self.error_recovery_manager.get_fallback_data('meta_tags')
+                if fallback_data and fallback_data.data:
+                    emotion_tags = [tag['tag'] for tag in fallback_data.data 
+                                  if tag.get('category') == 'mood' or emotion.lower() in tag.get('tag', '').lower()]
+                    if emotion_tags:
+                        return emotion_tags[:4]
+            
+            # Intelligent fallback with semantic emotion mapping
+            emotion_semantic_mapping = {
+                'joy': ['uplifting', 'happy', 'energetic', 'bright', 'cheerful', 'positive'],
+                'happiness': ['uplifting', 'happy', 'energetic', 'bright', 'cheerful', 'positive'],
+                'sadness': ['melancholic', 'sad', 'introspective', 'minor', 'somber', 'mournful'],
+                'melancholy': ['melancholic', 'sad', 'introspective', 'minor', 'somber', 'mournful'],
+                'anger': ['aggressive', 'intense', 'powerful', 'driving', 'fierce', 'harsh'],
+                'rage': ['aggressive', 'intense', 'powerful', 'driving', 'fierce', 'harsh'],
+                'fear': ['tense', 'dark', 'mysterious', 'anxious', 'ominous', 'suspenseful'],
+                'anxiety': ['tense', 'dark', 'mysterious', 'anxious', 'ominous', 'suspenseful'],
+                'love': ['romantic', 'warm', 'intimate', 'gentle', 'tender', 'affectionate'],
+                'romance': ['romantic', 'warm', 'intimate', 'gentle', 'tender', 'affectionate'],
+                'nostalgia': ['nostalgic', 'wistful', 'reminiscent', 'vintage', 'bittersweet', 'longing'],
+                'longing': ['nostalgic', 'wistful', 'reminiscent', 'vintage', 'bittersweet', 'longing'],
+                'contemplation': ['thoughtful', 'reflective', 'meditative', 'ambient', 'introspective', 'philosophical'],
+                'reflection': ['thoughtful', 'reflective', 'meditative', 'ambient', 'introspective', 'philosophical'],
+                'excitement': ['energetic', 'fast', 'dynamic', 'upbeat', 'thrilling', 'exhilarating'],
+                'energy': ['energetic', 'fast', 'dynamic', 'upbeat', 'thrilling', 'exhilarating'],
+                'peace': ['peaceful', 'calm', 'serene', 'tranquil', 'soothing', 'gentle'],
+                'calm': ['peaceful', 'calm', 'serene', 'tranquil', 'soothing', 'gentle'],
+                'hope': ['hopeful', 'uplifting', 'inspiring', 'optimistic', 'bright', 'encouraging'],
+                'optimism': ['hopeful', 'uplifting', 'inspiring', 'optimistic', 'bright', 'encouraging']
+            }
+            
+            # Find best semantic match
+            emotion_lower = emotion.lower()
+            for emotion_key, tags in emotion_semantic_mapping.items():
+                if emotion_key in emotion_lower or emotion_lower in emotion_key:
+                    return tags[:4]
+            
+            # Fallback to generic expressive tags
+            return ['expressive', 'authentic', 'emotional', 'dynamic']
+            
+        except Exception as e:
+            logger.warning(f"Failed to get fallback emotion tags for {emotion}: {e}")
+            return ['expressive', 'authentic']
 
     async def correlate_instruments_to_meta_tags(self, instruments: List[str], genre: str = None, emotion: str = None) -> Dict[str, List[str]]:
         """Create sophisticated instrument-to-meta-tag correlation"""
@@ -3310,7 +3651,7 @@ class SunoCommandGenerator:
         # Fill in any missing instruments with fallback correlations
         for instrument in instruments:
             if instrument not in instrument_correlation:
-                instrument_correlation[instrument] = self._get_fallback_instrument_tags(instrument, genre, emotion)
+                instrument_correlation[instrument] = await self._get_fallback_instrument_tags(instrument, genre, emotion)
         
         return instrument_correlation
 
@@ -3355,28 +3696,108 @@ class SunoCommandGenerator:
         related_words = instrument_families.get(instrument, [])
         return any(word in tag or word in description for word in related_words)
 
-    def _get_fallback_instrument_tags(self, instrument: str, genre: str = None, emotion: str = None) -> List[str]:
-        """Get fallback instrument tags when wiki data is unavailable"""
-        fallback_instruments = {
-            'guitar': ['guitar-driven', 'string-based', 'melodic'],
-            'piano': ['piano-led', 'harmonic', 'melodic'],
-            'drums': ['rhythmic', 'percussive', 'driving'],
-            'bass': ['bass-heavy', 'groove-based', 'rhythmic'],
-            'violin': ['string section', 'orchestral', 'melodic'],
-            'saxophone': ['brass section', 'jazzy', 'smooth'],
-            'synthesizer': ['electronic', 'synthesized', 'digital']
-        }
-        
-        base_tags = fallback_instruments.get(instrument.lower(), [instrument])
-        
-        # Add genre-specific modifiers
-        if genre:
-            if genre.lower() == 'rock' and instrument.lower() == 'guitar':
-                base_tags.extend(['distorted', 'electric'])
-            elif genre.lower() == 'jazz' and instrument.lower() == 'piano':
-                base_tags.extend(['improvised', 'complex harmony'])
-        
-        return base_tags[:3]
+    async def _get_fallback_instrument_tags(self, instrument: str, genre: str = None, emotion: str = None) -> List[str]:
+        """Get fallback instrument tags using intelligent generation when wiki data unavailable"""
+        try:
+            # Try to get from error recovery manager's fallback data
+            if hasattr(self, 'error_recovery_manager') and self.error_recovery_manager:
+                fallback_data = self.error_recovery_manager.get_fallback_data('meta_tags')
+                if fallback_data and fallback_data.data:
+                    instrument_tags = [tag['tag'] for tag in fallback_data.data 
+                                     if tag.get('category') == 'instrument' or instrument.lower() in tag.get('tag', '').lower()]
+                    if instrument_tags:
+                        return instrument_tags[:3]
+            
+            # Intelligent fallback based on instrument characteristics
+            instrument_characteristics = {
+                'guitar': ['guitar-driven', 'string-based', 'melodic', 'harmonic'],
+                'electric guitar': ['electric', 'distorted', 'powerful', 'rock-oriented'],
+                'acoustic guitar': ['acoustic', 'organic', 'warm', 'intimate'],
+                'piano': ['piano-led', 'harmonic', 'melodic', 'expressive'],
+                'drums': ['rhythmic', 'percussive', 'driving', 'dynamic'],
+                'bass': ['bass-heavy', 'groove-based', 'rhythmic', 'foundational'],
+                'violin': ['string section', 'orchestral', 'melodic', 'emotional'],
+                'saxophone': ['brass section', 'jazzy', 'smooth', 'expressive'],
+                'synthesizer': ['electronic', 'synthesized', 'digital', 'atmospheric'],
+                'trumpet': ['brass', 'bright', 'bold', 'triumphant'],
+                'flute': ['woodwind', 'airy', 'delicate', 'melodic'],
+                'cello': ['string', 'deep', 'rich', 'emotional'],
+                'harp': ['ethereal', 'delicate', 'classical', 'angelic']
+            }
+            
+            base_tags = instrument_characteristics.get(instrument.lower(), [instrument]).copy()
+            
+            # Add genre-specific modifiers (prioritized)
+            genre_modifiers = []
+            if genre:
+                genre_lower = genre.lower()
+                instrument_lower = instrument.lower()
+                
+                genre_instrument_modifiers = {
+                    'rock': {
+                        'guitar': ['distorted', 'electric', 'powerful'],
+                        'drums': ['heavy', 'driving', 'intense'],
+                        'bass': ['punchy', 'aggressive']
+                    },
+                    'jazz': {
+                        'piano': ['improvised', 'complex harmony', 'sophisticated'],
+                        'saxophone': ['smooth', 'improvised', 'soulful'],
+                        'bass': ['walking', 'swing', 'upright']
+                    },
+                    'electronic': {
+                        'synthesizer': ['digital', 'programmed', 'atmospheric'],
+                        'drums': ['programmed', 'electronic', 'precise']
+                    },
+                    'folk': {
+                        'guitar': ['acoustic', 'fingerpicked', 'organic'],
+                        'violin': ['fiddle', 'traditional', 'rustic']
+                    },
+                    'classical': {
+                        'piano': ['concert', 'refined', 'technical'],
+                        'violin': ['orchestral', 'precise', 'expressive']
+                    }
+                }
+                
+                if genre_lower in genre_instrument_modifiers:
+                    if instrument_lower in genre_instrument_modifiers[genre_lower]:
+                        genre_modifiers = genre_instrument_modifiers[genre_lower][instrument_lower][:2]
+            
+            # Add emotion-specific modifiers
+            emotion_modifiers = []
+            if emotion:
+                emotion_lower = emotion.lower()
+                emotion_instrument_modifiers = {
+                    'aggressive': ['intense', 'powerful', 'driving'],
+                    'gentle': ['soft', 'delicate', 'tender'],
+                    'energetic': ['dynamic', 'fast', 'lively'],
+                    'melancholic': ['somber', 'mournful', 'introspective'],
+                    'romantic': ['warm', 'intimate', 'expressive']
+                }
+                
+                for emotion_key, modifiers in emotion_instrument_modifiers.items():
+                    if emotion_key in emotion_lower:
+                        emotion_modifiers = modifiers[:1]  # Add one modifier
+                        break
+            
+            # Combine tags with priority: genre modifiers, base tags, emotion modifiers
+            final_tags = []
+            final_tags.extend(genre_modifiers)
+            final_tags.extend(base_tags)
+            final_tags.extend(emotion_modifiers)
+            
+            # Remove duplicates while preserving order
+            seen = set()
+            unique_tags = []
+            for tag in final_tags:
+                if tag not in seen:
+                    seen.add(tag)
+                    unique_tags.append(tag)
+            
+            return unique_tags[:3]  # Limit to 3 tags
+            
+        except Exception as e:
+            logger.warning(f"Failed to get fallback instrument tags for {instrument}: {e}")
+            return [instrument]
 
     async def generate_suno_commands(self, artist_persona: ArtistPersona, character: CharacterProfile, ctx: Context, 
                                    emotional_states: Optional[List[EmotionalState]] = None,
@@ -4436,7 +4857,7 @@ async def process_universal_content(
         )
         
         # Initialize original processor for character filtering
-        processor = WorkingUniversalProcessor()
+        processor = WorkingUniversalProcessor(character_description)
         
         await ctx.info(f"Processing content through character lens with emotional analysis...")
         
@@ -5698,7 +6119,7 @@ async def create_character_album(
         if track_count < 1 or track_count > 12:
             return json.dumps({"error": "Track count must be between 1 and 12"})
         
-        processor = WorkingUniversalProcessor()
+        processor = WorkingUniversalProcessor(character_description)
         
         # Generate track concepts based on content themes
         track_concepts = [
@@ -5745,7 +6166,7 @@ async def create_character_album(
                 "title": album_title,
                 "total_tracks": track_count,
                 "concept": f"Musical exploration of provided content through character's unique perspective",
-                "character_filter": "Philosophical liquid DNB producer processing content through rational/spiritual lens"
+                "character_filter": f"Character-driven interpretation: {character_description[:100]}{'...' if len(character_description) > 100 else ''}"
             },
             "tracks": album_tracks,
             "album_effectiveness": {
