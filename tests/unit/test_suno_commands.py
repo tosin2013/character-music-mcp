@@ -88,6 +88,7 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
     async def create_bracket_notation_command(self, character, persona, track_title, ctx):
         # Add emotional and instrumental meta tags based on character and persona
         meta_tags = []
+        instrument_features = []  # Initialize list for instrument features
         
         # Add emotional meta tags based on character traits
         if hasattr(character, 'personality_drivers'):
@@ -118,13 +119,13 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
                 elif 'orchestral' in instrument_lower:
                     meta_tags.append("[Orchestral]")
                 # Add the actual instrument name to the prompt for reference
-                prompt_parts.append(f"featuring {instrument}")
+                instrument_features.append(f"featuring {instrument}")
         
         # Build prompt with meta tags and instrument references
         meta_tag_str = " ".join(meta_tags[:3])  # Limit to 3 meta tags
         prompt_base = f"[Intro] {meta_tag_str} {persona.primary_genre} [Verse] {track_title} [Chorus] by {character.name}"
-        if prompt_parts:
-            prompt = f"{prompt_base} {' '.join(prompt_parts)} [Outro]"
+        if instrument_features:
+            prompt = f"{prompt_base} {' '.join(instrument_features)} [Outro]"
         else:
             prompt = f"{prompt_base} [Outro]"
         
@@ -156,6 +157,11 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
         if production_notes.get('effects'):
             effects_str = ", ".join(production_notes['effects'])
             prompt_parts.append(f"with {effects_str}")
+        
+        # Add character traits for connection
+        if hasattr(character, 'personality_drivers') and character.personality_drivers:
+            trait_text = f"reflecting {', '.join(character.personality_drivers[:2])}"
+            prompt_parts.append(trait_text)
         
         prompt_parts.extend([persona.primary_genre, "-", track_title, "by", character.name])
         
