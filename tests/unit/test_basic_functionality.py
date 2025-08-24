@@ -141,17 +141,17 @@ class TestBasicServerFunctionality:
         assert command.estimated_effectiveness == 0.8
         assert "Test Song" in command.prompt
     
-    # @asyncio_test  # Marker added conditionally
+    @asyncio_test  # Marker added conditionally
     async def test_character_analyzer_initialization(self, mock_ctx):
         """Test that CharacterAnalyzer can be initialized"""
         analyzer = CharacterAnalyzer()
         assert analyzer is not None
         
         # Test that it has expected methods
-        assert hasattr(analyzer, 'analyze_characters')
-        assert callable(getattr(analyzer, 'analyze_characters'))
+        assert hasattr(analyzer, 'analyze_text')
+        assert callable(getattr(analyzer, 'analyze_text'))
     
-    # @asyncio_test  # Marker added conditionally
+    @asyncio_test  # Marker added conditionally
     async def test_music_persona_generator_initialization(self, mock_ctx):
         """Test that MusicPersonaGenerator can be initialized"""
         generator = MusicPersonaGenerator()
@@ -161,7 +161,7 @@ class TestBasicServerFunctionality:
         assert hasattr(generator, 'generate_artist_persona')
         assert callable(getattr(generator, 'generate_artist_persona'))
     
-    # @asyncio_test  # Marker added conditionally
+    @asyncio_test  # Marker added conditionally
     async def test_suno_command_generator_initialization(self, mock_ctx):
         """Test that SunoCommandGenerator can be initialized"""
         generator = SunoCommandGenerator()
@@ -171,7 +171,7 @@ class TestBasicServerFunctionality:
         assert hasattr(generator, 'generate_suno_commands')
         assert callable(getattr(generator, 'generate_suno_commands'))
     
-    # @asyncio_test  # Marker added conditionally
+    @asyncio_test  # Marker added conditionally
     async def test_mock_context_functionality(self, mock_ctx):
         """Test that mock context works as expected"""
         await mock_ctx.info("Test info message")
@@ -186,7 +186,7 @@ class TestBasicServerFunctionality:
         assert mock_ctx.errors[0].message == "Test error message"
         assert mock_ctx.warnings[0].message == "Test warning message"
     
-    # @asyncio_test  # Marker added conditionally
+    @asyncio_test  # Marker added conditionally
     async def test_persona_generation_basic(self, mock_ctx, sample_character):
         """Test basic persona generation functionality"""
         generator = MusicPersonaGenerator()
@@ -210,7 +210,7 @@ class TestBasicServerFunctionality:
             await mock_ctx.info(f"Persona generation failed as expected: {e}")
             assert True  # Test passes - we're just checking basic functionality
     
-    # @asyncio_test  # Marker added conditionally
+    @asyncio_test  # Marker added conditionally
     async def test_character_analysis_basic(self, mock_ctx):
         """Test basic character analysis functionality"""
         analyzer = CharacterAnalyzer()
@@ -223,8 +223,8 @@ class TestBasicServerFunctionality:
         """
         
         try:
-            # Try to analyze characters
-            result = await analyzer.analyze_characters(test_text, mock_ctx)
+            # Try to analyze text
+            result = await analyzer.analyze_text(test_text, mock_ctx)
             
             # Basic validation - result should be a list or dict
             assert result is not None
@@ -234,7 +234,7 @@ class TestBasicServerFunctionality:
             await mock_ctx.info(f"Character analysis failed as expected: {e}")
             assert True  # Test passes - we're just checking basic functionality
     
-    # @asyncio_test  # Marker added conditionally
+    @asyncio_test  # Marker added conditionally
     async def test_suno_command_generation_basic(self, mock_ctx, sample_character):
         """Test basic Suno command generation functionality"""
         # Create a basic persona

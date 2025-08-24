@@ -34,7 +34,6 @@ class TestPersonaCreation:
     """Test basic artist persona creation from character profiles"""
     
     @asyncio_test
-    @asyncio_test
     async def test_persona_from_simple_character(self, ctx: MockContext, data_manager: TestDataManager):
         """Test persona generation from simple character profile"""
         expected_char = data_manager.get_expected_character("Sarah Chen")
