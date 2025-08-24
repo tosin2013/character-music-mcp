@@ -1,0 +1,30 @@
+{
+  "enabled": true,
+  "local_storage_path": "./data/wiki",
+  "refresh_interval_hours": 24,
+  "fallback_to_hardcoded": true,
+  "genre_pages": [
+    "https://sunoaiwiki.com/resources/2024-05-03-list-of-music-genres-and-styles/"
+  ],
+  "meta_tag_pages": [
+    "https://sunoaiwiki.com/resources/2024-05-13-list-of-metatags/"
+  ],
+  "tip_pages": [
+    "https://sunoaiwiki.com/tips/2024-05-02-how-to-enhance-song-production-using-suno-ai/",
+    "https://sunoaiwiki.com/tips/2024-04-16-how-to-make-suno-ai-sing-with-spoken-word/",
+    "https://sunoaiwiki.com/tips/2024-05-04-how-to-structure-prompts-for-suno-ai/",
+    "https://sunoaiwiki.com/tips/2024-05-04-how-to-use-meta-tags-in-suno-ai-for-song-creation/",
+    "https://sunoaiwiki.com/tips/2024-05-07-how-to-get-specific-vocal-styles-in-suno-ai/",
+    "https://sunoaiwiki.com/tips/2024-05-08-how-to-bypass-explicit-lyric-restrictions/",
+    "https://sunoaiwiki.com/tips/2024-05-09-how-to-end-a-song-naturally/",
+    "https://sunoaiwiki.com/tips/2024-05-18-how-to-optimize-prompts-in-suno-ai-with-letter-case/",
+    "https://sunoaiwiki.com/tips/2024-05-22-how-to-prompt-suno-ai-to-use-animal-sounds-and-noises/",
+    "https://sunoaiwiki.com/tips/2024-05-22-how-to-solve-suno-ai-sampling-detection-issues/",
+    "https://sunoaiwiki.com/tips/2024-05-25-how-to-handle-producer-tags-in-suno-ai/",
+    "https://sunoaiwiki.com/tips/2024-07-08-how-to-create-better-lyrics-for-suno/",
+    "https://sunoaiwiki.com/tips/2024-07-08-improve-suno-hiphop-rap-trap/"
+  ],
+  "request_timeout": 30,
+  "max_retries": 3,
+  "retry_delay": 1.0
+}

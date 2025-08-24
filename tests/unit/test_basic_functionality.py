@@ -9,7 +9,16 @@ These tests focus on actually exercising the server code rather than complex sce
 import asyncio
 import sys
 import os
-import pytest
+
+try:
+    import pytest
+    PYTEST_AVAILABLE = True
+    def asyncio_test(func):
+        return pytest.mark.asyncio(func) if PYTEST_AVAILABLE else func
+except ImportError:
+    PYTEST_AVAILABLE = False
+    def asyncio_test(func):
+        return func
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -21,38 +30,64 @@ from tests.fixtures.mock_contexts import MockContext, create_mock_context
 class TestBasicServerFunctionality:
     """Test basic server functionality to increase coverage"""
     
-    @pytest.fixture
-    def mock_ctx(self):
-        """Create a mock context for testing"""
-        return create_mock_context("basic", session_id="basic_test")
-    
-    @pytest.fixture
-    def sample_character(self):
-        """Create a sample character for testing"""
-        return CharacterProfile(
-            name="Test Character",
-            aliases=["TC", "Tester"],
-            physical_description="A test character with basic traits",
-            mannerisms=["thoughtful", "creative"],
-            speech_patterns=["articulate", "passionate"],
-            behavioral_traits=["introspective", "artistic"],
-            backstory="A character created for testing purposes",
-            relationships=["friend of the developer"],
-            formative_experiences=["learning to code", "discovering music"],
-            social_connections=["tech community"],
-            motivations=["create great software", "help others"],
-            fears=["bugs in production", "letting users down"],
-            desires=["clean code", "happy users"],
-            personality_drivers=["perfectionist", "helpful", "creative"],
-            internal_conflicts=["speed vs quality", "features vs simplicity"],
-            worldview="Technology should serve humanity",
-            moral_compass="Do no harm, help when possible",
-            emotional_patterns=["excited about new ideas", "stressed by deadlines"],
-            coping_mechanisms=["music", "walks", "deep work"],
-            growth_trajectory="becoming a better developer and person",
-            confidence_score=0.85,
-            importance_rank=1
-        )
+    if PYTEST_AVAILABLE:
+        @pytest.fixture
+        def mock_ctx(self):
+            """Create a mock context for testing"""
+            return create_mock_context("basic", session_id="basic_test")
+        
+        @pytest.fixture
+        def sample_character(self):
+            """Create a sample character for testing"""
+            return CharacterProfile(
+                name="Test Character",
+                aliases=["TC", "Tester"],
+                physical_description="A test character with basic traits",
+                mannerisms=["thoughtful", "creative"],
+                speech_patterns=["articulate", "passionate"],
+                behavioral_traits=["introspective", "artistic"],
+                backstory="A character created for testing purposes",
+                relationships=["friend of the developer"],
+                formative_experiences=["learning to code", "discovering music"],
+                social_connections=["tech community"],
+                motivations=["create great software", "help others"],
+                fears=["bugs in production", "letting users down"],
+                desires=["clean code", "happy users"],
+                conflicts=["speed vs quality", "features vs simplicity"],
+                personality_drivers=["perfectionist", "helpful", "creative"],
+                confidence_score=0.85,
+                text_references=["Sample text about the character"],
+                first_appearance="In the beginning of the test",
+                importance_score=0.9
+            )
+    else:
+        def mock_ctx(self):
+            """Create a mock context for testing"""
+            return create_mock_context("basic", session_id="basic_test")
+        
+        def sample_character(self):
+            """Create a sample character for testing"""
+            return CharacterProfile(
+                name="Test Character",
+                aliases=["TC", "Tester"],
+                physical_description="A test character with basic traits",
+                mannerisms=["thoughtful", "creative"],
+                speech_patterns=["articulate", "passionate"],
+                behavioral_traits=["introspective", "artistic"],
+                backstory="A character created for testing purposes",
+                relationships=["friend of the developer"],
+                formative_experiences=["learning to code", "discovering music"],
+                social_connections=["tech community"],
+                motivations=["create great software", "help others"],
+                fears=["bugs in production", "letting users down"],
+                desires=["clean code", "happy users"],
+                conflicts=["speed vs quality", "features vs simplicity"],
+                personality_drivers=["perfectionist", "helpful", "creative"],
+                confidence_score=0.85,
+                text_references=["Sample text about the character"],
+                first_appearance="In the beginning of the test",
+                importance_score=0.9
+            )
     
     def test_character_profile_creation(self, sample_character):
         """Test that CharacterProfile can be created and has expected attributes"""
@@ -65,45 +100,58 @@ class TestBasicServerFunctionality:
     def test_artist_persona_creation(self):
         """Test that ArtistPersona can be created"""
         persona = ArtistPersona(
+            character_name="Test Character",
             artist_name="Test Artist",
             primary_genre="indie rock",
-            personality_traits=["creative", "authentic"],
-            artistic_influences=["The Beatles", "Radiohead"],
-            lyrical_themes=["personal growth", "technology"],
+            secondary_genres=["folk", "alternative"],
             vocal_style="heartfelt and clear",
             instrumental_preferences=["guitar", "piano"],
+            lyrical_themes=["personal growth", "technology"],
+            emotional_palette=["vulnerability", "hope"],
+            artistic_influences=["The Beatles", "Radiohead"],
             collaboration_style="open and supportive",
-            genre_justification="Indie rock allows for creative expression and authenticity"
+            character_mapping_confidence=0.8,
+            genre_justification="Indie rock allows for creative expression and authenticity",
+            persona_description="An authentic indie artist expressing creativity through music"
         )
         
         assert persona.artist_name == "Test Artist"
         assert persona.primary_genre == "indie rock"
-        assert "creative" in persona.personality_traits
+        assert "personal growth" in persona.lyrical_themes
         assert "guitar" in persona.instrumental_preferences
     
     def test_suno_command_creation(self):
         """Test that SunoCommand can be created"""
         command = SunoCommand(
-            title="Test Song",
             command_type="simple",
-            formatted_command="Create an indie rock song called 'Test Song'",
-            effectiveness_score=0.8
+            prompt="Create an indie rock song called 'Test Song'",
+            style_tags=["indie", "rock"],
+            structure_tags=["verse", "chorus"],
+            sound_effect_tags=["reverb"],
+            vocal_tags=["clear", "emotional"],
+            character_source="Test Character",
+            artist_persona="Test Artist",
+            command_rationale="Testing command creation",
+            estimated_effectiveness=0.8,
+            variations=["Alternative mix", "Acoustic version"]
         )
         
-        assert command.title == "Test Song"
         assert command.command_type == "simple"
-        assert command.effectiveness_score == 0.8
-        assert "Test Song" in command.formatted_command
+        assert command.character_source == "Test Character"
+        assert command.estimated_effectiveness == 0.8
+        assert "Test Song" in command.prompt
     
+    @asyncio_test  # Marker added conditionally
     async def test_character_analyzer_initialization(self, mock_ctx):
         """Test that CharacterAnalyzer can be initialized"""
         analyzer = CharacterAnalyzer()
         assert analyzer is not None
         
         # Test that it has expected methods
-        assert hasattr(analyzer, 'analyze_characters')
-        assert callable(getattr(analyzer, 'analyze_characters'))
+        assert hasattr(analyzer, 'analyze_text')
+        assert callable(getattr(analyzer, 'analyze_text'))
     
+    @asyncio_test  # Marker added conditionally
     async def test_music_persona_generator_initialization(self, mock_ctx):
         """Test that MusicPersonaGenerator can be initialized"""
         generator = MusicPersonaGenerator()
@@ -113,6 +161,7 @@ class TestBasicServerFunctionality:
         assert hasattr(generator, 'generate_artist_persona')
         assert callable(getattr(generator, 'generate_artist_persona'))
     
+    @asyncio_test  # Marker added conditionally
     async def test_suno_command_generator_initialization(self, mock_ctx):
         """Test that SunoCommandGenerator can be initialized"""
         generator = SunoCommandGenerator()
@@ -122,6 +171,7 @@ class TestBasicServerFunctionality:
         assert hasattr(generator, 'generate_suno_commands')
         assert callable(getattr(generator, 'generate_suno_commands'))
     
+    @asyncio_test  # Marker added conditionally
     async def test_mock_context_functionality(self, mock_ctx):
         """Test that mock context works as expected"""
         await mock_ctx.info("Test info message")
@@ -136,6 +186,7 @@ class TestBasicServerFunctionality:
         assert mock_ctx.errors[0].message == "Test error message"
         assert mock_ctx.warnings[0].message == "Test warning message"
     
+    @asyncio_test  # Marker added conditionally
     async def test_persona_generation_basic(self, mock_ctx, sample_character):
         """Test basic persona generation functionality"""
         generator = MusicPersonaGenerator()
@@ -152,13 +203,14 @@ class TestBasicServerFunctionality:
             # Should have generated some content
             if hasattr(persona, 'artist_name') and persona.artist_name:
                 assert len(persona.artist_name) > 0
-            
+        
         except Exception as e:
             # If the actual implementation fails, that's okay for now
             # We're just testing that the classes can be instantiated
             await mock_ctx.info(f"Persona generation failed as expected: {e}")
             assert True  # Test passes - we're just checking basic functionality
     
+    @asyncio_test  # Marker added conditionally
     async def test_character_analysis_basic(self, mock_ctx):
         """Test basic character analysis functionality"""
         analyzer = CharacterAnalyzer()
@@ -171,8 +223,8 @@ class TestBasicServerFunctionality:
         """
         
         try:
-            # Try to analyze characters
-            result = await analyzer.analyze_characters(test_text, mock_ctx)
+            # Try to analyze text
+            result = await analyzer.analyze_text(test_text, mock_ctx)
             
             # Basic validation - result should be a list or dict
             assert result is not None
@@ -182,19 +234,24 @@ class TestBasicServerFunctionality:
             await mock_ctx.info(f"Character analysis failed as expected: {e}")
             assert True  # Test passes - we're just checking basic functionality
     
+    @asyncio_test  # Marker added conditionally
     async def test_suno_command_generation_basic(self, mock_ctx, sample_character):
         """Test basic Suno command generation functionality"""
         # Create a basic persona
         persona = ArtistPersona(
+            character_name="Test Character",
             artist_name="Test Artist",
             primary_genre="indie",
-            personality_traits=["creative", "authentic"],
-            artistic_influences=["indie artists"],
-            lyrical_themes=["personal growth"],
+            secondary_genres=["folk", "alternative"],
             vocal_style="heartfelt",
             instrumental_preferences=["guitar", "piano"],
+            lyrical_themes=["personal growth"],
+            emotional_palette=["vulnerability", "hope"],
+            artistic_influences=["indie artists"],
             collaboration_style="supportive",
-            genre_justification="Allows creative expression"
+            character_mapping_confidence=0.8,
+            genre_justification="Allows creative expression",
+            persona_description="An authentic indie artist"
         )
         
         generator = SunoCommandGenerator()

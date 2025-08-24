@@ -14,14 +14,26 @@ from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Any, Union, Tuple
 from pathlib import Path
 import logging
+from datetime import datetime
 
 from fastmcp import FastMCP, Context
 from pydantic import BaseModel
 from working_universal_processor import WorkingUniversalProcessor
 
+# Wiki data integration imports
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+try:
+    from wiki_data_system import WikiDataManager
+    from wiki_data_models import WikiConfig
+    from enhanced_genre_mapper import EnhancedGenreMapper, GenreMatch
+    from source_attribution_manager import SourceAttributionManager
+    WIKI_INTEGRATION_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Wiki integration not available: {e}")
+    WIKI_INTEGRATION_AVAILABLE = False
 
 # Initialize FastMCP server
 mcp = FastMCP("Character Music Generator")
@@ -2268,7 +2280,95 @@ class MusicPersonaGenerator:
     
     def __init__(self):
         # NO PREDEFINED MAPPINGS - LLM analyzes character and determines musical expression dynamically
-        pass
+        self.wiki_data_manager = None
+        self.enhanced_genre_mapper = None
+        self.source_attribution_manager = None
+        self._initialization_attempted = False
+    
+    async def _ensure_wiki_integration(self):
+        """Ensure wiki integration is initialized if available"""
+        global command_generator
+        
+        if self._initialization_attempted:
+            return
+        
+        self._initialization_attempted = True
+        
+        if not WIKI_INTEGRATION_AVAILABLE:
+            logger.info("Wiki integration not available, using fallback mappings")
+            # Initialize SunoCommandGenerator without wiki data manager (fallback mode)
+            command_generator = SunoCommandGenerator(None)
+            return
+        
+        try:
+            # Initialize WikiDataManager with default configuration
+            self.wiki_data_manager = WikiDataManager()
+            config = WikiConfig()  # Use default configuration
+            await self.wiki_data_manager.initialize(config)
+            
+            # Initialize EnhancedGenreMapper
+            self.enhanced_genre_mapper = EnhancedGenreMapper(self.wiki_data_manager)
+            
+            # Initialize SourceAttributionManager
+            self.source_attribution_manager = SourceAttributionManager()
+            await self.source_attribution_manager.initialize()
+            
+            # Initialize SunoCommandGenerator with wiki data manager
+            command_generator = SunoCommandGenerator(self.wiki_data_manager)
+            
+            logger.info("Wiki integration initialized successfully")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize wiki integration: {e}")
+            self.wiki_data_manager = None
+            self.enhanced_genre_mapper = None
+            self.source_attribution_manager = None
+            
+            # Initialize SunoCommandGenerator without wiki data manager (fallback mode)
+            command_generator = SunoCommandGenerator(None)
+
+    def build_attributed_context_for_llm(self, content: Any, content_type: str = "general") -> str:
+        """Build LLM context with source attribution
+        
+        Args:
+            content: The content to include in LLM context
+            content_type: Type of content ('genre', 'meta_tag', 'technique', 'general')
+            
+        Returns:
+            Formatted context string with source attribution
+        """
+        if not self.source_attribution_manager:
+            # Fallback to content without attribution
+            return str(content)
+        
+        try:
+            # Get relevant source URLs based on content type
+            source_urls = self.source_attribution_manager.get_source_urls(content_type)
+            
+            if not source_urls:
+                # No sources available, return content as-is
+                return str(content)
+            
+            # Build attributed content
+            attributed_content = self.source_attribution_manager.build_attributed_context(
+                content, source_urls
+            )
+            
+            # Track usage
+            self.source_attribution_manager.track_content_usage(
+                attributed_content.content_id,
+                source_urls[0] if source_urls else "",
+                f"LLM context for {content_type}"
+            )
+            
+            # Format for LLM context
+            context_text = f"{content}\n\n{attributed_content.attribution_text}"
+            
+            return context_text
+            
+        except Exception as e:
+            logger.warning(f"Failed to build attributed context: {e}")
+            return str(content)
 
     async def generate_artist_persona(self, character: CharacterProfile, ctx: Context) -> ArtistPersona:
         """Generate a musical artist persona from character profile"""
@@ -2278,7 +2378,7 @@ class MusicPersonaGenerator:
         primary_traits = self._extract_primary_traits(character)
         
         # Map to musical genres
-        primary_genre, secondary_genres = self._map_to_genres(primary_traits)
+        primary_genre, secondary_genres = await self._map_to_genres(primary_traits)
         
         # Generate vocal style
         vocal_style = self._determine_vocal_style(primary_traits)
@@ -2350,21 +2450,173 @@ class MusicPersonaGenerator:
         
         return list(set(traits))[:3]  # Return top 3 unique traits
 
-    def _map_to_genres(self, traits: List[str]) -> Tuple[str, List[str]]:
-        """LLM determines genres from personality traits - no predefined mappings"""
+    async def _map_to_genres(self, traits: List[str]) -> Tuple[str, List[str]]:
+        """Map personality traits to musical genres using enhanced wiki-based mapping"""
         
-        # LLM analyzes personality traits and determines appropriate musical genres
-        primary_genre = f"LLM-determined primary genre for traits: {', '.join(traits[:2])}"
-        secondary_genres = [f"LLM-secondary-1 for {traits[0] if traits else 'character'}", 
-                          f"LLM-secondary-2 for {traits[1] if len(traits) > 1 else 'personality'}"]
+        # Ensure wiki integration is initialized
+        await self._ensure_wiki_integration()
         
-        return primary_genre, secondary_genres
+        # Try enhanced mapping first if available
+        if self.enhanced_genre_mapper:
+            try:
+                genre_matches = await self.enhanced_genre_mapper.map_traits_to_genres(
+                    traits, max_results=5, use_hierarchical=True
+                )
+                
+                if genre_matches and len(genre_matches) > 0:
+                    # Register genre sources for attribution
+                    if self.source_attribution_manager:
+                        for match in genre_matches:
+                            if hasattr(match.genre, 'source_url') and match.genre.source_url:
+                                self.source_attribution_manager.register_source(
+                                    match.genre.source_url,
+                                    'genre',
+                                    f"Genre: {match.genre.name}",
+                                    match.genre.download_date if hasattr(match.genre, 'download_date') else datetime.now()
+                                )
+                    
+                    # Extract primary and secondary genres from matches
+                    primary_genre = genre_matches[0].genre.name
+                    secondary_genres = [match.genre.name for match in genre_matches[1:3]]
+                    
+                    # Ensure we have at least 2 secondary genres
+                    if len(secondary_genres) < 2:
+                        # Add more from matches or use fallback
+                        for match in genre_matches[3:]:
+                            if len(secondary_genres) >= 2:
+                                break
+                            secondary_genres.append(match.genre.name)
+                        
+                        # If still not enough, use fallback genres
+                        if len(secondary_genres) < 2:
+                            fallback_genres = ['indie', 'alternative', 'pop', 'rock']
+                            for genre in fallback_genres:
+                                if genre != primary_genre and genre not in secondary_genres:
+                                    secondary_genres.append(genre)
+                                    if len(secondary_genres) >= 2:
+                                        break
+                    
+                    logger.info(f"Enhanced mapping: {primary_genre} with confidence {genre_matches[0].confidence:.3f}")
+                    return primary_genre, secondary_genres[:2]
+                
+            except Exception as e:
+                logger.warning(f"Enhanced genre mapping failed: {e}, falling back to hardcoded mapping")
+        
+        # Fallback to original hardcoded mapping
+        return self._fallback_map_to_genres(traits)
+    
+    def _fallback_map_to_genres(self, traits: List[str]) -> Tuple[str, List[str]]:
+        """Fallback trait-to-genre mapping using hardcoded mappings"""
+        
+        # Define trait-to-genre mappings
+        trait_genre_map = {
+            'melancholic': ['blues', 'folk', 'indie'],
+            'mysterious': ['dark ambient', 'gothic', 'alternative'],
+            'brave': ['rock', 'metal', 'punk'],
+            'compassionate': ['soul', 'gospel', 'folk'],
+            'rebellious': ['punk', 'alternative', 'grunge'],
+            'intellectual': ['progressive', 'art rock', 'ambient'],
+            'intellectual courage': ['progressive', 'art rock', 'experimental'],
+            'creative': ['indie', 'alternative', 'art pop'],
+            'adventurous': ['electronic', 'synthwave', 'space rock'],
+            'emotional': ['blues', 'soul', 'gospel'],
+            'confident': ['rock', 'pop', 'electronic'],
+            'vulnerable': ['indie', 'singer-songwriter', 'folk'],
+            'ambitious': ['pop', 'electronic', 'rock'],
+            'perfectionist': ['progressive', 'classical', 'jazz'],
+            'authentic': ['folk', 'country', 'singer-songwriter'],
+            'introspective': ['ambient', 'post-rock', 'indie'],
+            'artistic': ['art pop', 'experimental', 'indie'],
+            'quest for meaning': ['progressive', 'ambient', 'post-rock'],
+            'commitment to life': ['soul', 'gospel', 'blues'],
+            'love transcending death': ['blues', 'soul', 'folk'],
+            'creative drive': ['indie', 'alternative', 'art pop'],
+            'fear of exposure': ['indie', 'singer-songwriter', 'alternative'],
+            'duty to crew': ['electronic', 'synthwave', 'rock'],
+            'courage under pressure': ['rock', 'electronic', 'metal'],
+            'desire for freedom': ['indie', 'alternative', 'folk'],
+            'need for authenticity': ['singer-songwriter', 'folk', 'indie'],
+            'duty to justice': ['alternative', 'rock', 'gothic'],
+            'inherited magical responsibility': ['gothic', 'dark ambient', 'alternative'],
+            'intellectual brilliance': ['progressive', 'art rock', 'classical'],
+            'determination to contribute': ['classical', 'orchestral', 'progressive']
+        }
+        
+        # Find best matching genre based on traits with priority weighting
+        genre_scores = {}
+        for i, trait in enumerate(traits):
+            trait_lower = trait.lower()
+            if trait_lower in trait_genre_map:
+                # Give higher weight to first traits (more important)
+                weight = len(traits) - i
+                for genre in trait_genre_map[trait_lower]:
+                    genre_scores[genre] = genre_scores.get(genre, 0) + weight
+        
+        # If no direct matches, use fallback mapping
+        if not genre_scores:
+            primary_genre = 'alternative'
+            secondary_genres = ['indie', 'pop']
+        else:
+            # Sort by score and select top genres
+            sorted_genres = sorted(genre_scores.items(), key=lambda x: x[1], reverse=True)
+            primary_genre = sorted_genres[0][0]
+            secondary_genres = [genre for genre, _ in sorted_genres[1:3]]
+            
+            # Ensure we have at least 2 secondary genres
+            if len(secondary_genres) < 2:
+                fallback_genres = ['indie', 'alternative', 'pop', 'rock']
+                for genre in fallback_genres:
+                    if genre != primary_genre and genre not in secondary_genres:
+                        secondary_genres.append(genre)
+                        if len(secondary_genres) >= 2:
+                            break
+        
+        return primary_genre, secondary_genres[:2]
 
     def _determine_vocal_style(self, traits: List[str]) -> str:
-        """LLM determines vocal style from character traits - no predefined mappings"""
+        """Determine vocal style from character traits"""
         
-        # LLM analyzes personality traits and determines vocal style
-        return f"LLM-determined vocal style for {', '.join(traits[:2]) if traits else 'character'}: expressive, character-driven delivery"
+        # Define trait-to-vocal-style mappings
+        trait_vocal_map = {
+            'melancholic': 'soulful and emotional',
+            'mysterious': 'haunting and atmospheric',
+            'brave': 'powerful and commanding',
+            'compassionate': 'warm and heartfelt',
+            'rebellious': 'raw and aggressive',
+            'intellectual': 'contemplative and articulate',
+            'creative': 'expressive and artistic',
+            'adventurous': 'dynamic and energetic',
+            'emotional': 'raw and passionate',
+            'confident': 'strong and commanding',
+            'vulnerable': 'intimate and delicate',
+            'ambitious': 'powerful and determined',
+            'perfectionist': 'precise and controlled',
+            'authentic': 'honest and genuine',
+            'introspective': 'thoughtful and reflective',
+            'artistic': 'expressive and creative',
+            'quest for meaning': 'profound and contemplative',
+            'commitment to life': 'passionate and soulful',
+            'love transcending death': 'emotional and heartfelt',
+            'creative drive': 'expressive and passionate',
+            'fear of exposure': 'vulnerable and authentic',
+            'duty to crew': 'strong and reliable',
+            'courage under pressure': 'powerful and confident',
+            'desire for freedom': 'liberating and expressive',
+            'need for authenticity': 'honest and raw',
+            'duty to justice': 'determined and strong',
+            'inherited magical responsibility': 'mysterious and powerful',
+            'intellectual brilliance': 'articulate and measured',
+            'determination to contribute': 'inspiring and uplifting'
+        }
+        
+        # Find best matching vocal style
+        for trait in traits:
+            trait_lower = trait.lower()
+            if trait_lower in trait_vocal_map:
+                return trait_vocal_map[trait_lower]
+        
+        # Default fallback
+        return 'expressive and character-driven'
 
     def _generate_artist_name(self, character_name: str, traits: List[str]) -> str:
         """Generate an artist name based on character name and traits"""
@@ -2389,34 +2641,82 @@ class MusicPersonaGenerator:
         """Generate lyrical themes from character profile"""
         themes = []
         
+        # Extract from personality drivers first (most important)
+        for driver in character.personality_drivers:
+            driver_lower = driver.lower()
+            if 'quest for meaning' in driver_lower or 'intellectual' in driver_lower:
+                themes.extend(['existential questions', 'search for truth', 'philosophical inquiry', 'meaning of life'])
+            elif 'creative' in driver_lower or 'artistic' in driver_lower:
+                themes.extend(['artistic expression', 'creative struggle', 'inspiration', 'artistic authenticity'])
+            elif 'duty' in driver_lower or 'responsibility' in driver_lower:
+                themes.extend(['honor and duty', 'responsibility', 'service to others', 'moral obligation'])
+                # Add adventure themes for duty to crew (space/adventure context)
+                if 'crew' in driver_lower:
+                    themes.extend(['exploration', 'journey', 'unknown territories', 'frontier'])
+            elif 'courage' in driver_lower or 'brave' in driver_lower:
+                themes.extend(['overcoming fear', 'heroic journey', 'standing up for beliefs', 'courage under pressure'])
+                # Add adventure themes for courage under pressure (adventure context)
+                if 'pressure' in driver_lower:
+                    themes.extend(['discovery', 'courage', 'unknown', 'exploration'])
+            elif 'love' in driver_lower or 'compassion' in driver_lower:
+                themes.extend(['love transcending boundaries', 'compassion for others', 'human connection', 'empathy'])
+        
         # Extract from motivations
         for motivation in character.motivations:
-            if 'love' in motivation.lower():
+            motivation_lower = motivation.lower()
+            if 'love' in motivation_lower:
                 themes.append('love and relationships')
-            elif 'power' in motivation.lower():
+            elif 'power' in motivation_lower:
                 themes.append('ambition and power')
-            elif 'freedom' in motivation.lower():
+            elif 'freedom' in motivation_lower:
                 themes.append('liberation and independence')
+            elif 'justice' in motivation_lower:
+                themes.append('justice and fairness')
+            elif 'adventure' in motivation_lower:
+                themes.append('exploration and discovery')
         
         # Extract from fears
         for fear in character.fears:
-            if 'death' in fear.lower():
+            fear_lower = fear.lower()
+            if 'death' in fear_lower:
                 themes.append('mortality and existence')
-            elif 'loss' in fear.lower():
+            elif 'loss' in fear_lower:
                 themes.append('loss and separation')
+            elif 'exposure' in fear_lower:
+                themes.append('vulnerability and authenticity')
         
         # Extract from conflicts
         for conflict in character.conflicts:
-            if 'family' in conflict.lower():
+            conflict_lower = conflict.lower()
+            if 'family' in conflict_lower:
                 themes.append('family dynamics')
-            elif 'society' in conflict.lower():
+            elif 'society' in conflict_lower:
                 themes.append('social commentary')
+            elif 'vs' in conflict_lower:
+                # Extract opposing concepts
+                parts = conflict_lower.split(' vs ')
+                if len(parts) == 2:
+                    themes.append(f'tension between {parts[0]} and {parts[1]}')
         
-        # Add default themes if none found
+        # Add character-specific themes based on backstory
+        if hasattr(character, 'backstory') and character.backstory:
+            backstory_lower = character.backstory.lower()
+            if 'mathematical' in backstory_lower or 'science' in backstory_lower:
+                themes.extend(['logic and reason', 'scientific discovery', 'mathematical beauty'])
+            elif 'historical' in backstory_lower:
+                themes.extend(['lessons from history', 'timeless wisdom', 'legacy and tradition'])
+            elif 'magical' in backstory_lower or 'fantasy' in backstory_lower:
+                themes.extend(['magic and mystery', 'supernatural forces', 'hidden worlds'])
+            elif 'starship' in backstory_lower or 'space' in backstory_lower or 'captain' in backstory_lower:
+                themes.extend(['exploration', 'journey', 'discovery', 'unknown', 'frontier', 'courage'])
+        
+        # Add default themes if none found, but make them richer
         if not themes:
-            themes = ['personal journey', 'emotional expression', 'life experiences']
+            themes = ['personal journey', 'emotional expression', 'life experiences', 'human condition']
         
-        return list(set(themes))[:4]
+        # Remove duplicates and return top themes
+        unique_themes = list(dict.fromkeys(themes))  # Preserves order while removing duplicates
+        return unique_themes[:5]  # Return up to 5 themes for complex characters
 
     def _generate_emotional_palette(self, character: CharacterProfile) -> List[str]:
         """Generate emotional palette from character analysis"""
@@ -2458,7 +2758,21 @@ class MusicPersonaGenerator:
             'folk': ['folk storytellers', 'singer-songwriters', 'traditional musicians'],
             'pop': ['pop icons', 'contemporary artists', 'crossover musicians'],
             'indie': ['indie darlings', 'alternative artists', 'underground musicians'],
-            'blues': ['blues legends', 'soul masters', 'rhythm innovators']
+            'blues': ['blues legends', 'soul masters', 'rhythm innovators'],
+            'progressive': ['progressive rock pioneers', 'art rock innovators', 'concept album masters'],
+            'ambient': ['ambient composers', 'atmospheric sound designers', 'meditative musicians'],
+            'post-rock': ['post-rock architects', 'instrumental storytellers', 'cinematic composers'],
+            'art rock': ['art rock visionaries', 'experimental rock artists', 'avant-garde musicians'],
+            'soul': ['soul legends', 'gospel innovators', 'rhythm and blues masters'],
+            'gospel': ['gospel pioneers', 'spiritual music leaders', 'choir directors'],
+            'alternative': ['alternative rock icons', 'indie pioneers', 'underground innovators'],
+            'singer-songwriter': ['folk storytellers', 'acoustic poets', 'intimate performers'],
+            'synthwave': ['synthwave pioneers', 'retro-futuristic composers', 'electronic nostalgia artists'],
+            'space rock': ['cosmic rock explorers', 'psychedelic space travelers', 'interstellar musicians'],
+            'art pop': ['art pop innovators', 'experimental pop artists', 'avant-garde performers'],
+            'experimental': ['experimental music pioneers', 'sound art innovators', 'boundary-pushing artists'],
+            'classical': ['classical composers', 'orchestral masters', 'chamber music specialists'],
+            'orchestral': ['symphonic composers', 'film score masters', 'orchestral arrangers']
         }
         
         influences = genre_influences.get(primary_genre, ['diverse musical artists'])
@@ -2527,10 +2841,29 @@ class MusicPersonaGenerator:
             'metal': ['distorted guitar', 'bass guitar', 'heavy drums', 'orchestral elements'],
             'jazz': ['saxophone', 'piano', 'upright bass', 'drums'],
             'electronic': ['synthesizer', 'drum machine', 'sampling', 'digital effects'],
+            'synthwave': ['synthesizer', 'drum machine', 'electronic bass', 'digital effects'],
+            'space rock': ['synthesizer', 'electric guitar', 'atmospheric effects', 'electronic drums'],
             'folk': ['acoustic guitar', 'harmonica', 'fiddle', 'mandolin'],
             'pop': ['vocals', 'keyboard', 'guitar', 'electronic beats'],
             'indie': ['indie guitar', 'lo-fi production', 'vintage synthesizer', 'minimal drums'],
-            'blues': ['guitar', 'harmonica', 'piano', 'rhythm section']
+            'alternative': ['electric guitar', 'bass guitar', 'drums', 'effects pedals'],
+            'art pop': ['synthesizer', 'unconventional instruments', 'electronic elements', 'vocals'],
+            'blues': ['guitar', 'harmonica', 'piano', 'rhythm section'],
+            'soul': ['piano', 'organ', 'horn section', 'rhythm guitar'],
+            'gospel': ['organ', 'piano', 'choir', 'rhythm section'],
+            'progressive': ['synthesizers', 'orchestral arrangements', 'complex percussion', 'guitar'],
+            'art rock': ['synthesizer', 'guitar', 'unconventional instruments', 'orchestral elements'],
+            'ambient': ['synthesizer', 'atmospheric sounds', 'minimal percussion', 'electronic textures'],
+            'post-rock': ['electric guitar', 'effects pedals', 'atmospheric sounds', 'dynamic drums'],
+            'singer-songwriter': ['acoustic guitar', 'piano', 'minimal accompaniment', 'vocals'],
+            'country': ['acoustic guitar', 'steel guitar', 'fiddle', 'banjo'],
+            'grunge': ['distorted guitar', 'bass guitar', 'heavy drums', 'raw production'],
+            'punk': ['electric guitar', 'bass guitar', 'fast drums', 'minimal production'],
+            'gothic': ['synthesizer', 'atmospheric sounds', 'dark electronic elements', 'orchestral'],
+            'dark ambient': ['synthesizer', 'atmospheric textures', 'minimal percussion', 'electronic'],
+            'classical': ['piano', 'strings', 'woodwinds', 'harpsichord'],
+            'orchestral': ['strings', 'brass', 'woodwinds', 'timpani'],
+            'experimental': ['unconventional instruments', 'electronic manipulation', 'found sounds', 'synthesizer']
         }
         
         return genre_instruments.get(genre, ['vocals', 'guitar', 'piano', 'drums'])
@@ -2542,8 +2875,12 @@ class MusicPersonaGenerator:
 class SunoCommandGenerator:
     """Generate optimized Suno AI commands from artist personas"""
     
-    def __init__(self):
-        self.style_tags = {
+    def __init__(self, wiki_data_manager: Optional['WikiDataManager'] = None):
+        # Wiki data integration
+        self.wiki_data_manager = wiki_data_manager
+        
+        # Fallback hardcoded tags (used when wiki data unavailable)
+        self.fallback_style_tags = {
             'rock': ['rock', 'electric guitar', 'driving rhythm', 'powerful'],
             'metal': ['metal', 'heavy', 'distorted', 'aggressive', 'intense'],
             'jazz': ['jazz', 'smooth', 'improvisation', 'sophisticated'],
@@ -2554,7 +2891,7 @@ class SunoCommandGenerator:
             'blues': ['blues', 'soulful', 'emotional', 'raw']
         }
         
-        self.structure_tags = {
+        self.fallback_structure_tags = {
             'simple': ['verse-chorus', 'straightforward'],
             'complex': ['bridge', 'instrumental break', 'dynamic structure'],
             'narrative': ['storytelling', 'progressive', 'journey'],
@@ -2566,13 +2903,480 @@ class SunoCommandGenerator:
         # Initialize emotional lyric generator
         self.lyric_generator = EmotionalLyricGenerator()
         
-        self.vocal_tags = {
+        self.fallback_vocal_tags = {
             'powerful': ['strong vocals', 'commanding voice', 'belting'],
             'smooth': ['smooth vocals', 'controlled delivery', 'refined'],
             'emotional': ['emotional vocals', 'expressive', 'heartfelt'],
             'raw': ['raw vocals', 'unpolished', 'authentic'],
             'ethereal': ['ethereal vocals', 'floating', 'atmospheric']
         }
+
+    async def get_style_tags_for_genre(self, genre: str) -> List[str]:
+        """Get style tags for a genre from wiki data or fallback"""
+        if self.wiki_data_manager:
+            try:
+                # Get meta tags from wiki data
+                meta_tags = await self.wiki_data_manager.get_meta_tags(category="style")
+                
+                # Filter tags compatible with the genre
+                compatible_tags = []
+                for tag in meta_tags:
+                    if not tag.compatible_genres or genre.lower() in [g.lower() for g in tag.compatible_genres]:
+                        compatible_tags.append(tag.tag)
+                
+                if compatible_tags:
+                    return compatible_tags[:4]  # Limit to 4 most relevant
+                    
+            except Exception as e:
+                logger.warning(f"Failed to get wiki style tags for {genre}: {e}")
+        
+        # Fallback to hardcoded tags
+        return self.fallback_style_tags.get(genre.lower(), ['melodic', 'expressive'])
+
+    async def get_structure_tags_for_complexity(self, complexity: str, character_traits: List[str] = None) -> List[str]:
+        """Get structure tags based on complexity and character traits"""
+        if self.wiki_data_manager:
+            try:
+                # Get structural meta tags from wiki
+                meta_tags = await self.wiki_data_manager.get_meta_tags(category="structural")
+                
+                # Filter based on complexity and character traits
+                suitable_tags = []
+                for tag in meta_tags:
+                    tag_lower = tag.tag.lower()
+                    desc_lower = tag.description.lower()
+                    
+                    # Match complexity level
+                    if complexity == 'simple' and any(word in tag_lower or word in desc_lower 
+                                                    for word in ['simple', 'basic', 'straightforward', 'verse-chorus']):
+                        suitable_tags.append(tag.tag)
+                    elif complexity == 'complex' and any(word in tag_lower or word in desc_lower 
+                                                       for word in ['complex', 'bridge', 'dynamic', 'multiple']):
+                        suitable_tags.append(tag.tag)
+                    elif complexity == 'narrative' and any(word in tag_lower or word in desc_lower 
+                                                         for word in ['story', 'narrative', 'progressive', 'journey']):
+                        suitable_tags.append(tag.tag)
+                
+                if suitable_tags:
+                    return suitable_tags[:3]
+                    
+            except Exception as e:
+                logger.warning(f"Failed to get wiki structure tags for {complexity}: {e}")
+        
+        # Fallback to hardcoded tags
+        return self.fallback_structure_tags.get(complexity, ['verse-chorus'])
+
+    async def get_vocal_tags_for_style(self, vocal_style: str, emotion: str = None) -> List[str]:
+        """Get vocal tags based on vocal style and emotion"""
+        if self.wiki_data_manager:
+            try:
+                # Get vocal meta tags from wiki
+                meta_tags = await self.wiki_data_manager.get_meta_tags(category="vocal")
+                
+                suitable_tags = []
+                for tag in meta_tags:
+                    tag_lower = tag.tag.lower()
+                    desc_lower = tag.description.lower()
+                    
+                    # Match vocal style
+                    if any(style_word in tag_lower or style_word in desc_lower 
+                          for style_word in vocal_style.lower().split()):
+                        suitable_tags.append(tag.tag)
+                    
+                    # Match emotion if provided
+                    if emotion and (emotion.lower() in tag_lower or emotion.lower() in desc_lower):
+                        suitable_tags.append(tag.tag)
+                
+                if suitable_tags:
+                    return suitable_tags[:3]
+                    
+            except Exception as e:
+                logger.warning(f"Failed to get wiki vocal tags for {vocal_style}: {e}")
+        
+        # Fallback to hardcoded tags
+        for style_key, tags in self.fallback_vocal_tags.items():
+            if style_key in vocal_style.lower():
+                return tags
+        return ['expressive vocals']
+
+    async def get_emotional_meta_tags(self, emotion: str, genre: str = None) -> List[str]:
+        """Get meta tags that match specific emotions"""
+        if self.wiki_data_manager:
+            try:
+                # Get emotional meta tags from wiki
+                meta_tags = await self.wiki_data_manager.get_meta_tags(category="emotional")
+                
+                suitable_tags = []
+                for tag in meta_tags:
+                    tag_lower = tag.tag.lower()
+                    desc_lower = tag.description.lower()
+                    
+                    # Match emotion
+                    if emotion.lower() in tag_lower or emotion.lower() in desc_lower:
+                        # Check genre compatibility if specified
+                        if not genre or not tag.compatible_genres or genre.lower() in [g.lower() for g in tag.compatible_genres]:
+                            suitable_tags.append(tag.tag)
+                
+                if suitable_tags:
+                    return suitable_tags[:3]
+                    
+            except Exception as e:
+                logger.warning(f"Failed to get wiki emotional tags for {emotion}: {e}")
+        
+        # Fallback to emotion-based tags
+        emotion_fallbacks = {
+            'melancholy': ['melancholic', 'sad', 'introspective'],
+            'joy': ['uplifting', 'happy', 'energetic'],
+            'anger': ['aggressive', 'intense', 'powerful'],
+            'contemplation': ['thoughtful', 'reflective', 'meditative'],
+            'nostalgia': ['nostalgic', 'wistful', 'reminiscent']
+        }
+        return emotion_fallbacks.get(emotion.lower(), ['expressive'])
+
+    async def get_instrumental_meta_tags(self, instruments: List[str], genre: str = None) -> List[str]:
+        """Get meta tags for specific instruments"""
+        if self.wiki_data_manager:
+            try:
+                # Get instrumental meta tags from wiki
+                meta_tags = await self.wiki_data_manager.get_meta_tags(category="instrumental")
+                
+                suitable_tags = []
+                for tag in meta_tags:
+                    tag_lower = tag.tag.lower()
+                    desc_lower = tag.description.lower()
+                    
+                    # Match instruments
+                    for instrument in instruments:
+                        if instrument.lower() in tag_lower or instrument.lower() in desc_lower:
+                            # Check genre compatibility if specified
+                            if not genre or not tag.compatible_genres or genre.lower() in [g.lower() for g in tag.compatible_genres]:
+                                suitable_tags.append(tag.tag)
+                
+                if suitable_tags:
+                    return suitable_tags[:3]
+                    
+            except Exception as e:
+                logger.warning(f"Failed to get wiki instrumental tags for {instruments}: {e}")
+        
+        # Fallback to instrument names
+        return instruments[:3]
+
+    def check_meta_tag_compatibility(self, tags: List[str], genre: str = None) -> List[str]:
+        """Check and resolve meta tag conflicts"""
+        # Basic conflict resolution - remove contradictory tags
+        conflicts = [
+            (['fast', 'slow'], 'tempo'),
+            (['loud', 'quiet', 'soft'], 'volume'),
+            (['simple', 'complex'], 'complexity'),
+            (['electronic', 'acoustic'], 'production')
+        ]
+        
+        resolved_tags = tags.copy()
+        
+        for conflict_group, conflict_type in conflicts:
+            found_tags = [tag for tag in resolved_tags if any(conflict in tag.lower() for conflict in conflict_group)]
+            if len(found_tags) > 1:
+                # Keep the first one, remove others
+                for tag in found_tags[1:]:
+                    if tag in resolved_tags:
+                        resolved_tags.remove(tag)
+        
+        return resolved_tags
+
+    async def get_genre_specific_meta_tags(self, genre: str, context: str = None) -> Dict[str, List[str]]:
+        """Get meta tags specifically curated for a genre with contextual selection"""
+        if self.wiki_data_manager:
+            try:
+                # Get all meta tags
+                all_meta_tags = await self.wiki_data_manager.get_meta_tags()
+                
+                # Categorize tags by type for this genre
+                genre_tags = {
+                    'style': [],
+                    'structural': [],
+                    'emotional': [],
+                    'instrumental': [],
+                    'vocal': [],
+                    'production': []
+                }
+                
+                for tag in all_meta_tags:
+                    # Check if tag is compatible with genre
+                    if not tag.compatible_genres or genre.lower() in [g.lower() for g in tag.compatible_genres]:
+                        category = tag.category.lower()
+                        
+                        # Map categories to our structure
+                        if category in ['style', 'genre']:
+                            genre_tags['style'].append(tag.tag)
+                        elif category in ['structural', 'structure']:
+                            genre_tags['structural'].append(tag.tag)
+                        elif category in ['emotional', 'emotion', 'mood']:
+                            genre_tags['emotional'].append(tag.tag)
+                        elif category in ['instrumental', 'instrument']:
+                            genre_tags['instrumental'].append(tag.tag)
+                        elif category in ['vocal', 'voice']:
+                            genre_tags['vocal'].append(tag.tag)
+                        elif category in ['production', 'technical']:
+                            genre_tags['production'].append(tag.tag)
+                
+                # Apply contextual filtering if context is provided
+                if context:
+                    for category in genre_tags:
+                        genre_tags[category] = self._filter_tags_by_context(genre_tags[category], context)
+                
+                return genre_tags
+                
+            except Exception as e:
+                logger.warning(f"Failed to get genre-specific meta tags for {genre}: {e}")
+        
+        # Fallback to hardcoded genre-specific tags
+        return self._get_fallback_genre_tags(genre)
+
+    def _filter_tags_by_context(self, tags: List[str], context: str) -> List[str]:
+        """Filter tags based on context (e.g., 'upbeat', 'melancholy', 'energetic')"""
+        context_lower = context.lower()
+        
+        # Context-based filtering rules
+        context_filters = {
+            'upbeat': ['energetic', 'fast', 'bright', 'major', 'happy', 'driving'],
+            'melancholy': ['sad', 'minor', 'slow', 'emotional', 'introspective', 'dark'],
+            'energetic': ['fast', 'driving', 'powerful', 'intense', 'dynamic'],
+            'calm': ['slow', 'peaceful', 'ambient', 'soft', 'gentle', 'relaxed'],
+            'aggressive': ['heavy', 'distorted', 'intense', 'powerful', 'driving'],
+            'romantic': ['smooth', 'soft', 'emotional', 'intimate', 'gentle']
+        }
+        
+        # Find matching context
+        relevant_keywords = []
+        for ctx, keywords in context_filters.items():
+            if ctx in context_lower:
+                relevant_keywords.extend(keywords)
+        
+        if not relevant_keywords:
+            return tags
+        
+        # Filter tags that match context keywords
+        filtered_tags = []
+        for tag in tags:
+            tag_lower = tag.lower()
+            if any(keyword in tag_lower for keyword in relevant_keywords):
+                filtered_tags.append(tag)
+        
+        # If no matches, return original tags
+        return filtered_tags if filtered_tags else tags
+
+    def _get_fallback_genre_tags(self, genre: str) -> Dict[str, List[str]]:
+        """Get fallback genre-specific tags when wiki data is unavailable"""
+        fallback_genre_tags = {
+            'rock': {
+                'style': ['rock', 'electric guitar', 'driving rhythm', 'powerful'],
+                'structural': ['verse-chorus', 'bridge', 'guitar solo'],
+                'emotional': ['energetic', 'rebellious', 'passionate'],
+                'instrumental': ['electric guitar', 'bass', 'drums'],
+                'vocal': ['strong vocals', 'belting', 'raspy'],
+                'production': ['distorted', 'amplified', 'dynamic']
+            },
+            'jazz': {
+                'style': ['jazz', 'smooth', 'improvisation', 'sophisticated'],
+                'structural': ['complex harmony', 'improvisation', 'swing'],
+                'emotional': ['smooth', 'sophisticated', 'expressive'],
+                'instrumental': ['saxophone', 'piano', 'upright bass', 'brushed drums'],
+                'vocal': ['smooth vocals', 'scatting', 'expressive'],
+                'production': ['acoustic', 'live recording', 'natural reverb']
+            },
+            'electronic': {
+                'style': ['electronic', 'synthesized', 'digital', 'rhythmic'],
+                'structural': ['build-up', 'drop', 'loop-based'],
+                'emotional': ['futuristic', 'hypnotic', 'energetic'],
+                'instrumental': ['synthesizer', 'drum machine', 'sampler'],
+                'vocal': ['processed vocals', 'vocoder', 'auto-tune'],
+                'production': ['digital effects', 'compression', 'layered']
+            }
+        }
+        
+        return fallback_genre_tags.get(genre.lower(), {
+            'style': ['melodic', 'expressive'],
+            'structural': ['verse-chorus'],
+            'emotional': ['authentic'],
+            'instrumental': ['full arrangement'],
+            'vocal': ['expressive vocals'],
+            'production': ['professional']
+        })
+
+    async def create_emotion_to_meta_tag_mapping(self, emotions: List[str], genre: str = None) -> Dict[str, List[str]]:
+        """Create sophisticated emotion-to-meta-tag mapping using wiki data"""
+        emotion_mapping = {}
+        
+        if self.wiki_data_manager:
+            try:
+                # Get emotional meta tags from wiki
+                emotional_tags = await self.wiki_data_manager.get_meta_tags(category="emotional")
+                
+                for emotion in emotions:
+                    emotion_lower = emotion.lower()
+                    matching_tags = []
+                    
+                    for tag in emotional_tags:
+                        tag_lower = tag.tag.lower()
+                        desc_lower = tag.description.lower()
+                        
+                        # Direct emotion match
+                        if emotion_lower in tag_lower or emotion_lower in desc_lower:
+                            # Check genre compatibility
+                            if not genre or not tag.compatible_genres or genre.lower() in [g.lower() for g in tag.compatible_genres]:
+                                matching_tags.append(tag.tag)
+                        
+                        # Semantic emotion matching
+                        elif self._emotions_are_related(emotion_lower, tag_lower, desc_lower):
+                            if not genre or not tag.compatible_genres or genre.lower() in [g.lower() for g in tag.compatible_genres]:
+                                matching_tags.append(tag.tag)
+                    
+                    emotion_mapping[emotion] = matching_tags[:4]  # Limit to 4 most relevant
+                
+            except Exception as e:
+                logger.warning(f"Failed to create emotion-to-meta-tag mapping: {e}")
+        
+        # Fill in any missing emotions with fallback mappings
+        for emotion in emotions:
+            if emotion not in emotion_mapping:
+                emotion_mapping[emotion] = self._get_fallback_emotion_tags(emotion)
+        
+        return emotion_mapping
+
+    def _emotions_are_related(self, emotion: str, tag: str, description: str) -> bool:
+        """Check if an emotion is semantically related to a meta tag"""
+        emotion_relations = {
+            'joy': ['happy', 'uplifting', 'bright', 'cheerful', 'positive', 'energetic'],
+            'sadness': ['melancholy', 'dark', 'minor', 'somber', 'mournful', 'blue'],
+            'anger': ['aggressive', 'intense', 'heavy', 'powerful', 'driving', 'fierce'],
+            'fear': ['tense', 'anxious', 'dark', 'mysterious', 'suspenseful', 'eerie'],
+            'love': ['romantic', 'warm', 'intimate', 'gentle', 'soft', 'tender'],
+            'nostalgia': ['wistful', 'reminiscent', 'vintage', 'classic', 'timeless'],
+            'contemplation': ['thoughtful', 'reflective', 'meditative', 'introspective', 'ambient'],
+            'excitement': ['energetic', 'fast', 'driving', 'dynamic', 'upbeat', 'lively']
+        }
+        
+        related_words = emotion_relations.get(emotion, [])
+        return any(word in tag or word in description for word in related_words)
+
+    def _get_fallback_emotion_tags(self, emotion: str) -> List[str]:
+        """Get fallback emotion tags when wiki data is unavailable"""
+        fallback_emotions = {
+            'joy': ['uplifting', 'happy', 'energetic', 'bright'],
+            'sadness': ['melancholic', 'sad', 'introspective', 'minor'],
+            'anger': ['aggressive', 'intense', 'powerful', 'driving'],
+            'fear': ['tense', 'dark', 'mysterious', 'anxious'],
+            'love': ['romantic', 'warm', 'intimate', 'gentle'],
+            'nostalgia': ['nostalgic', 'wistful', 'reminiscent', 'vintage'],
+            'contemplation': ['thoughtful', 'reflective', 'meditative', 'ambient'],
+            'excitement': ['energetic', 'fast', 'dynamic', 'upbeat']
+        }
+        
+        return fallback_emotions.get(emotion.lower(), ['expressive', 'authentic'])
+
+    async def correlate_instruments_to_meta_tags(self, instruments: List[str], genre: str = None, emotion: str = None) -> Dict[str, List[str]]:
+        """Create sophisticated instrument-to-meta-tag correlation"""
+        instrument_correlation = {}
+        
+        if self.wiki_data_manager:
+            try:
+                # Get instrumental meta tags from wiki
+                instrumental_tags = await self.wiki_data_manager.get_meta_tags(category="instrumental")
+                
+                for instrument in instruments:
+                    instrument_lower = instrument.lower()
+                    matching_tags = []
+                    
+                    for tag in instrumental_tags:
+                        tag_lower = tag.tag.lower()
+                        desc_lower = tag.description.lower()
+                        
+                        # Direct instrument match
+                        if instrument_lower in tag_lower or instrument_lower in desc_lower:
+                            # Check genre and emotion compatibility
+                            if self._is_tag_compatible(tag, genre, emotion):
+                                matching_tags.append(tag.tag)
+                        
+                        # Instrument family matching
+                        elif self._instruments_are_related(instrument_lower, tag_lower, desc_lower):
+                            if self._is_tag_compatible(tag, genre, emotion):
+                                matching_tags.append(tag.tag)
+                    
+                    instrument_correlation[instrument] = matching_tags[:3]  # Limit to 3 most relevant
+                
+            except Exception as e:
+                logger.warning(f"Failed to correlate instruments to meta tags: {e}")
+        
+        # Fill in any missing instruments with fallback correlations
+        for instrument in instruments:
+            if instrument not in instrument_correlation:
+                instrument_correlation[instrument] = self._get_fallback_instrument_tags(instrument, genre, emotion)
+        
+        return instrument_correlation
+
+    def _is_tag_compatible(self, tag, genre: str = None, emotion: str = None) -> bool:
+        """Check if a meta tag is compatible with genre and emotion context"""
+        # Check genre compatibility
+        if genre and tag.compatible_genres:
+            if genre.lower() not in [g.lower() for g in tag.compatible_genres]:
+                return False
+        
+        # Check emotion compatibility (basic check)
+        if emotion and tag.description:
+            emotion_lower = emotion.lower()
+            desc_lower = tag.description.lower()
+            
+            # If tag description contains contradictory emotions, it might not be compatible
+            contradictory_emotions = {
+                'happy': ['sad', 'melancholy', 'dark', 'gloomy'],
+                'sad': ['happy', 'uplifting', 'bright', 'cheerful'],
+                'energetic': ['slow', 'calm', 'peaceful', 'relaxed'],
+                'calm': ['aggressive', 'intense', 'energetic', 'driving']
+            }
+            
+            if emotion_lower in contradictory_emotions:
+                if any(contra in desc_lower for contra in contradictory_emotions[emotion_lower]):
+                    return False
+        
+        return True
+
+    def _instruments_are_related(self, instrument: str, tag: str, description: str) -> bool:
+        """Check if an instrument is related to a meta tag"""
+        instrument_families = {
+            'guitar': ['string', 'fretted', 'plucked', 'acoustic', 'electric'],
+            'piano': ['keyboard', 'keys', 'acoustic', 'grand', 'upright'],
+            'drums': ['percussion', 'rhythm', 'beat', 'kit', 'acoustic'],
+            'bass': ['low', 'rhythm', 'foundation', 'groove', 'electric'],
+            'violin': ['string', 'bowed', 'classical', 'orchestral'],
+            'saxophone': ['wind', 'brass', 'jazz', 'reed', 'woodwind'],
+            'synthesizer': ['electronic', 'digital', 'synth', 'keyboard', 'electronic']
+        }
+        
+        related_words = instrument_families.get(instrument, [])
+        return any(word in tag or word in description for word in related_words)
+
+    def _get_fallback_instrument_tags(self, instrument: str, genre: str = None, emotion: str = None) -> List[str]:
+        """Get fallback instrument tags when wiki data is unavailable"""
+        fallback_instruments = {
+            'guitar': ['guitar-driven', 'string-based', 'melodic'],
+            'piano': ['piano-led', 'harmonic', 'melodic'],
+            'drums': ['rhythmic', 'percussive', 'driving'],
+            'bass': ['bass-heavy', 'groove-based', 'rhythmic'],
+            'violin': ['string section', 'orchestral', 'melodic'],
+            'saxophone': ['brass section', 'jazzy', 'smooth'],
+            'synthesizer': ['electronic', 'synthesized', 'digital']
+        }
+        
+        base_tags = fallback_instruments.get(instrument.lower(), [instrument])
+        
+        # Add genre-specific modifiers
+        if genre:
+            if genre.lower() == 'rock' and instrument.lower() == 'guitar':
+                base_tags.extend(['distorted', 'electric'])
+            elif genre.lower() == 'jazz' and instrument.lower() == 'piano':
+                base_tags.extend(['improvised', 'complex harmony'])
+        
+        return base_tags[:3]
 
     async def generate_suno_commands(self, artist_persona: ArtistPersona, character: CharacterProfile, ctx: Context, 
                                    emotional_states: Optional[List[EmotionalState]] = None,
@@ -2626,19 +3430,27 @@ class SunoCommandGenerator:
                 f"conveying {emotional_core} with {artist_persona.vocal_style}. " \
                 f"Inspired by {character.name}'s journey and experiences."
         
-        # Select relevant style tags
-        style_tags = self.style_tags.get(artist_persona.primary_genre, ['melodic', 'expressive'])
+        # Select relevant style tags from wiki data
+        style_tags = await self.get_style_tags_for_genre(artist_persona.primary_genre)
+        
+        # Get structure and vocal tags from wiki data
+        structure_tags = await self.get_structure_tags_for_complexity('simple')
+        vocal_tags = await self.get_vocal_tags_for_style(artist_persona.vocal_style, emotional_core)
+        
+        # Check for tag compatibility
+        all_tags = style_tags + structure_tags + vocal_tags
+        compatible_tags = self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
         
         return SunoCommand(
             command_type="simple",
             prompt=prompt,
             style_tags=style_tags[:3],
-            structure_tags=['verse-chorus'],
+            structure_tags=structure_tags[:2],
             sound_effect_tags=[],
-            vocal_tags=['expressive vocals'],
+            vocal_tags=vocal_tags[:2],
             character_source=character.name,
             artist_persona=artist_persona.artist_name,
-            command_rationale=f"Simple command focusing on core {artist_persona.primary_genre} elements and {character.name}'s primary emotional theme",
+            command_rationale=f"Simple command using wiki-sourced meta tags for {artist_persona.primary_genre} with {character.name}'s emotional theme",
             estimated_effectiveness=0.8,
             variations=[
                 prompt.replace('song about', 'ballad about'),
@@ -2658,42 +3470,73 @@ class SunoCommandGenerator:
                 f"{character.personality_drivers[0] if character.personality_drivers else 'complex nature'}. " \
                 f"Incorporate elements of {artist_persona.secondary_genres[0] if artist_persona.secondary_genres else 'crossover style'}."
         
-        # Advanced style tags
-        style_tags = self.style_tags.get(artist_persona.primary_genre, [])
-        style_tags.extend([artist_persona.primary_genre, 'professional production', 'dynamic'])
+        # Use advanced genre-specific meta tag selection
+        genre_tags = await self.get_genre_specific_meta_tags(
+            artist_persona.primary_genre, 
+            context=emotions.split(', ')[0] if emotions else None
+        )
         
-        # Structure based on character complexity
-        if character.confidence_score > 0.7:
-            structure_tags = ['complex arrangement', 'multiple sections', 'bridge', 'outro']
-        else:
-            structure_tags = ['verse-chorus-verse', 'simple structure']
+        # Get style tags with contextual filtering
+        style_tags = genre_tags['style'][:3]
+        additional_style_tags = [artist_persona.primary_genre, 'professional production', 'dynamic']
+        style_tags.extend(additional_style_tags)
         
-        # Vocal tags based on persona
-        vocal_tags = []
-        if 'powerful' in artist_persona.vocal_style:
-            vocal_tags.extend(['strong vocals', 'commanding delivery'])
-        if 'emotional' in artist_persona.vocal_style:
-            vocal_tags.extend(['expressive vocals', 'emotional range'])
-        if 'smooth' in artist_persona.vocal_style:
-            vocal_tags.extend(['smooth vocals', 'controlled performance'])
+        # Get structure tags from genre-specific selection
+        structure_tags = genre_tags['structural'][:2]
+        complexity = 'complex' if character.confidence_score > 0.7 else 'simple'
+        additional_structure = await self.get_structure_tags_for_complexity(complexity, character.personality_drivers)
+        structure_tags.extend(additional_structure[:2])
         
-        # Sound effects based on genre and character traits
+        # Use advanced emotion-to-meta-tag mapping
+        primary_emotion = emotions.split(', ')[0] if emotions else None
+        if primary_emotion:
+            emotion_mapping = await self.create_emotion_to_meta_tag_mapping(
+                [primary_emotion], 
+                artist_persona.primary_genre
+            )
+            emotional_tags = emotion_mapping.get(primary_emotion, [])
+            style_tags.extend(emotional_tags[:2])
+        
+        # Get vocal tags from genre-specific selection and persona
+        vocal_tags = genre_tags['vocal'][:2]
+        persona_vocal_tags = await self.get_vocal_tags_for_style(artist_persona.vocal_style, primary_emotion)
+        vocal_tags.extend(persona_vocal_tags[:2])
+        
+        # Use advanced instrument-to-meta-tag correlation
         sound_effects = []
-        if artist_persona.primary_genre in ['electronic', 'ambient']:
-            sound_effects.extend(['atmospheric effects', 'reverb'])
+        if artist_persona.instrumental_preferences:
+            instrument_correlation = await self.correlate_instruments_to_meta_tags(
+                artist_persona.instrumental_preferences,
+                artist_persona.primary_genre,
+                primary_emotion
+            )
+            
+            # Collect correlated tags from all instruments
+            for instrument, tags in instrument_correlation.items():
+                sound_effects.extend(tags)
+        
+        # Add genre-specific production tags
+        production_tags = genre_tags['production'][:2]
+        sound_effects.extend(production_tags)
+        
+        # Add character-driven sound effects
         if 'mysterious' in str(character.personality_drivers):
             sound_effects.extend(['ethereal effects', 'subtle ambience'])
+        
+        # Check meta tag compatibility and resolve conflicts
+        all_tags = style_tags + structure_tags + vocal_tags + sound_effects
+        compatible_tags = self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
         
         return SunoCommand(
             command_type="custom",
             prompt=prompt,
             style_tags=style_tags[:4],
             structure_tags=structure_tags[:3],
-            sound_effect_tags=sound_effects[:2],
+            sound_effect_tags=sound_effects[:3],
             vocal_tags=vocal_tags[:3],
             character_source=character.name,
             artist_persona=artist_persona.artist_name,
-            command_rationale=f"Custom command leveraging detailed character analysis for nuanced {artist_persona.primary_genre} composition",
+            command_rationale=f"Custom command using wiki-sourced meta tags for detailed {artist_persona.primary_genre} composition with character-driven elements",
             estimated_effectiveness=0.9,
             variations=[
                 prompt.replace('composition', 'piece'),
@@ -2727,16 +3570,34 @@ class SunoCommandGenerator:
         prompt = f"{genre_bracket} {emotion_bracket} {vocal_bracket} {instrument_bracket} {character_element} " \
                 f"Song inspired by {character.name}'s journey through {artist_persona.lyrical_themes[0] if artist_persona.lyrical_themes else 'life experiences'}"
         
+        # Get wiki-based tags for bracket notation
+        style_tags = await self.get_style_tags_for_genre(artist_persona.primary_genre)
+        style_tags.extend([artist_persona.primary_genre, 'precise control'])
+        
+        structure_tags = await self.get_structure_tags_for_complexity('simple')
+        structure_tags.append('controlled structure')
+        
+        vocal_tags = await self.get_vocal_tags_for_style(artist_persona.vocal_style)
+        
+        # Get instrumental tags for sound effects
+        sound_effects = ['specified elements']
+        if artist_persona.instrumental_preferences:
+            instrumental_tags = await self.get_instrumental_meta_tags(
+                artist_persona.instrumental_preferences[:2], 
+                artist_persona.primary_genre
+            )
+            sound_effects.extend(instrumental_tags)
+        
         return SunoCommand(
             command_type="bracket_notation",
             prompt=prompt,
-            style_tags=[artist_persona.primary_genre, 'precise control'],
-            structure_tags=['controlled structure'],
-            sound_effect_tags=['specified elements'],
-            vocal_tags=[artist_persona.vocal_style.split(',')[0]],
+            style_tags=style_tags[:3],
+            structure_tags=structure_tags[:2],
+            sound_effect_tags=sound_effects[:3],
+            vocal_tags=vocal_tags[:2],
             character_source=character.name,
             artist_persona=artist_persona.artist_name,
-            command_rationale="Bracket notation command for precise musical element control based on character analysis",
+            command_rationale="Bracket notation command using wiki meta tags for precise musical element control",
             estimated_effectiveness=0.85,
             variations=[
                 prompt.replace('Song inspired by', 'Composition reflecting'),
@@ -2763,16 +3624,28 @@ class SunoCommandGenerator:
                 f"Focus on lyrical storytelling with {artist_persona.vocal_style}. " \
                 f"The song should capture the essence of {character.name}'s experience and emotional journey."
         
+        # Get wiki-based tags for lyric-focused command
+        style_tags = await self.get_style_tags_for_genre(artist_persona.primary_genre)
+        style_tags.extend([artist_persona.primary_genre, 'storytelling', 'narrative'])
+        
+        structure_tags = await self.get_structure_tags_for_complexity('narrative', character.personality_drivers)
+        structure_tags.extend(['verse-heavy', 'lyrical focus', 'story structure'])
+        
+        # Get vocal tags optimized for storytelling
+        vocal_tags = await self.get_vocal_tags_for_style(artist_persona.vocal_style)
+        storytelling_vocals = ['storytelling vocals', 'clear delivery', 'emotional expression']
+        vocal_tags.extend(storytelling_vocals)
+        
         return SunoCommand(
             command_type="lyric_focused",
             prompt=prompt,
-            style_tags=[artist_persona.primary_genre, 'storytelling', 'narrative'],
-            structure_tags=['verse-heavy', 'lyrical focus', 'story structure'],
+            style_tags=style_tags[:4],
+            structure_tags=structure_tags[:4],
             sound_effect_tags=[],
-            vocal_tags=['storytelling vocals', 'clear delivery', 'emotional expression'],
+            vocal_tags=vocal_tags[:4],
             character_source=character.name,
             artist_persona=artist_persona.artist_name,
-            command_rationale=f"Lyric-focused command emphasizing {character.name}'s narrative and emotional story",
+            command_rationale=f"Lyric-focused command using wiki meta tags to emphasize {character.name}'s narrative and storytelling elements",
             estimated_effectiveness=0.75,
             variations=[
                 prompt.replace('song that tells the story', 'ballad that chronicles'),
@@ -2802,16 +3675,38 @@ class SunoCommandGenerator:
                 f"relationships and social connections. The music should reflect {artist_persona.collaboration_style} " \
                 f"with multiple vocal parts and {', '.join(artist_persona.instrumental_preferences[:2])}."
         
+        # Get wiki-based tags for collaboration command
+        style_tags = await self.get_style_tags_for_genre(artist_persona.primary_genre)
+        style_tags.extend([artist_persona.primary_genre, 'collaborative', 'ensemble'])
+        
+        structure_tags = await self.get_structure_tags_for_complexity('complex', character.personality_drivers)
+        collaboration_structure = ['multiple parts', 'call and response', 'harmony']
+        structure_tags.extend(collaboration_structure)
+        
+        # Get vocal tags for collaborative performance
+        vocal_tags = await self.get_vocal_tags_for_style(artist_persona.vocal_style)
+        collaboration_vocals = ['multiple vocals', 'harmony', 'interaction']
+        vocal_tags.extend(collaboration_vocals)
+        
+        # Get instrumental tags for ensemble
+        sound_effects = []
+        if artist_persona.instrumental_preferences:
+            instrumental_tags = await self.get_instrumental_meta_tags(
+                artist_persona.instrumental_preferences, 
+                artist_persona.primary_genre
+            )
+            sound_effects.extend(instrumental_tags)
+        
         return SunoCommand(
             command_type="collaboration",
             prompt=prompt,
-            style_tags=[artist_persona.primary_genre, 'collaborative', 'ensemble'],
-            structure_tags=['multiple parts', 'call and response', 'harmony'],
-            sound_effect_tags=[],
-            vocal_tags=['multiple vocals', 'harmony', 'interaction'],
+            style_tags=style_tags[:4],
+            structure_tags=structure_tags[:4],
+            sound_effect_tags=sound_effects[:3],
+            vocal_tags=vocal_tags[:4],
             character_source=character.name,
             artist_persona=artist_persona.artist_name,
-            command_rationale=f"Collaboration-focused command reflecting {character.name}'s social dynamics and relationships",
+            command_rationale=f"Collaboration-focused command using wiki meta tags to reflect {character.name}'s social dynamics",
             estimated_effectiveness=0.8,
             variations=[
                 prompt.replace('piece', 'composition'),
@@ -2848,6 +3743,7 @@ class SunoCommandGenerator:
                 authenticity_notes.append(f"[contrasting rhythms for {state.internal_conflict}]")
         
         # Generate lyric structure
+        primary_trigger = emotional_states[0].factual_triggers[0] if emotional_states and emotional_states[0].factual_triggers else "life experiences"
         lyric_structure = self.lyric_generator.generate_lyric_structure(
             emotional_states, 
             f"{character.name}'s story about {primary_trigger}"
@@ -2874,44 +3770,90 @@ class SunoCommandGenerator:
                 f"Lyrical approach: {lyrical_devices}\n" \
                 f"Key phrases: {', '.join(lyric_structure['key_phrases'][:3])}"
         
-        # Advanced style tags for emotional depth
-        style_tags = [
-            artist_persona.primary_genre,
-            f"{primary_emotion}-driven",
-            "dynamic production",
-            "emotional beat mapping"
-        ]
+        # Use advanced genre-specific meta tag selection with emotional context
+        genre_tags = await self.get_genre_specific_meta_tags(
+            artist_persona.primary_genre, 
+            context=primary_emotion
+        )
         
-        # Structure tags based on emotional progression
-        structure_tags = []
+        # Get style tags with emotional filtering
+        style_tags = genre_tags['style'][:3]
+        
+        # Use advanced emotion-to-meta-tag mapping for multiple emotions
+        all_emotions = [state.primary_emotion for state in emotional_states[:3]]
+        emotion_mapping = await self.create_emotion_to_meta_tag_mapping(
+            all_emotions, 
+            artist_persona.primary_genre
+        )
+        
+        # Collect emotional tags from all states
+        for emotion, tags in emotion_mapping.items():
+            style_tags.extend(tags[:2])
+        
+        # Add production-specific tags
+        production_tags = [f"{primary_emotion}-driven", "dynamic production", "emotional beat mapping"]
+        style_tags.extend(production_tags)
+        
+        # Get structure tags from genre-specific selection
+        structure_tags = genre_tags['structural'][:2]
+        
+        # Add complexity-based structure tags
+        complexity = 'complex' if len(emotional_states) > 2 else 'emotional'
+        complexity_structure = await self.get_structure_tags_for_complexity(complexity, character.personality_drivers)
+        structure_tags.extend(complexity_structure[:2])
+        
+        # Add emotion-specific structure tags
         if len(emotional_states) > 2:
-            structure_tags.extend(["emotional arc", "dynamic transitions", "evolving structure"])
+            emotion_structure = ["emotional arc", "dynamic transitions", "evolving structure"]
         else:
-            structure_tags.extend(["focused emotion", "consistent mood", "subtle variations"])
+            emotion_structure = ["focused emotion", "consistent mood", "subtle variations"]
+        structure_tags.extend(emotion_structure)
         
-        # Vocal tags emphasizing emotional authenticity
-        vocal_tags = [
-            f"{primary_emotion} vocals",
-            "authentic emotional delivery",
-            "vulnerable moments"
-        ]
+        # Get vocal tags from genre-specific selection and emotional context
+        vocal_tags = genre_tags['vocal'][:2]
+        persona_vocal_tags = await self.get_vocal_tags_for_style(artist_persona.vocal_style, primary_emotion)
+        vocal_tags.extend(persona_vocal_tags[:2])
         
-        # Sound effects for emotional texture
+        # Add emotional authenticity vocals
+        authenticity_vocals = [f"{primary_emotion} vocals", "authentic emotional delivery", "vulnerable moments"]
+        vocal_tags.extend(authenticity_vocals)
+        
+        # Use advanced instrument-to-meta-tag correlation for emotional texture
         sound_effects = []
+        if artist_persona.instrumental_preferences:
+            instrument_correlation = await self.correlate_instruments_to_meta_tags(
+                artist_persona.instrumental_preferences,
+                artist_persona.primary_genre,
+                primary_emotion
+            )
+            
+            # Collect correlated tags from all instruments
+            for instrument, tags in instrument_correlation.items():
+                sound_effects.extend(tags)
+        
+        # Add genre-specific production tags
+        production_tags = genre_tags['production'][:2]
+        sound_effects.extend(production_tags)
+        
+        # Add emotional sound effects
         for state in emotional_states[:2]:
             if state.defense_mechanism:
                 sound_effects.append(f"{state.defense_mechanism} effect")
         
+        # Check meta tag compatibility
+        all_tags = style_tags + structure_tags + vocal_tags + sound_effects
+        compatible_tags = self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
+        
         return SunoCommand(
             command_type="emotion_beat_driven",
             prompt=prompt,
-            style_tags=style_tags,
-            structure_tags=structure_tags,
-            sound_effect_tags=sound_effects[:3],
-            vocal_tags=vocal_tags,
+            style_tags=style_tags[:5],
+            structure_tags=structure_tags[:4],
+            sound_effect_tags=sound_effects[:4],
+            vocal_tags=vocal_tags[:4],
             character_source=character.name,
             artist_persona=artist_persona.artist_name,
-            command_rationale=f"Emotion-driven beat production mapping {character.name}'s factual emotional journey to precise rhythmic elements",
+            command_rationale=f"Emotion-driven beat production using wiki meta tags to map {character.name}'s emotional journey to precise rhythmic elements",
             estimated_effectiveness=0.95,
             variations=[
                 prompt.replace(tempo_instruction, f"[tempo automation: {beat_pattern.tempo_range[0]} -> {beat_pattern.tempo_range[1]}bpm]"),
@@ -2927,7 +3869,48 @@ class SunoCommandGenerator:
 # Initialize analysis engines
 character_analyzer = CharacterAnalyzer()
 persona_generator = MusicPersonaGenerator()
-command_generator = SunoCommandGenerator()
+command_generator = None  # Will be initialized after wiki data manager is set up
+
+# Global wiki data manager for server-wide access
+wiki_data_manager = None
+
+async def initialize_server():
+    """Initialize the MCP server with all components including wiki integration"""
+    global wiki_data_manager, command_generator
+    
+    logger.info("Initializing Character-Driven Music Generation MCP Server...")
+    
+    # Initialize wiki integration if available
+    if WIKI_INTEGRATION_AVAILABLE:
+        try:
+            logger.info("Initializing wiki data integration...")
+            
+            # Initialize WikiDataManager with default configuration
+            wiki_data_manager = WikiDataManager()
+            config = WikiConfig()  # Use default configuration
+            await wiki_data_manager.initialize(config)
+            
+            # Initialize persona generator with wiki integration
+            await persona_generator._ensure_wiki_integration()
+            
+            # Initialize command generator with wiki data manager
+            command_generator = SunoCommandGenerator(wiki_data_manager)
+            
+            logger.info("Wiki integration initialized successfully")
+            logger.info(f"- Genre data available: {len(await wiki_data_manager.get_genres()) if wiki_data_manager else 0} genres")
+            logger.info(f"- Meta tag data available: {len(await wiki_data_manager.get_meta_tags()) if wiki_data_manager else 0} meta tags")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize wiki integration: {e}")
+            logger.info("Falling back to hardcoded data")
+            wiki_data_manager = None
+            command_generator = SunoCommandGenerator(None)
+    else:
+        logger.info("Wiki integration not available, using fallback mappings")
+        command_generator = SunoCommandGenerator(None)
+    
+    logger.info("Server initialization complete")
+    logger.info("Ready to process narrative content and generate music commands")
 
 @mcp.tool
 async def analyze_character_text(text: str, ctx: Context) -> str:
@@ -3032,6 +4015,14 @@ async def create_suno_commands(personas_json: str, characters_json: str, ctx: Co
     try:
         await ctx.info("Generating Suno AI commands...")
         
+        # Ensure command generator is initialized
+        global command_generator
+        if command_generator is None:
+            # Initialize with wiki data manager if available
+            global wiki_data_manager
+            command_generator = SunoCommandGenerator(wiki_data_manager)
+            await ctx.info(f"Initialized SunoCommandGenerator with {'wiki integration' if wiki_data_manager else 'fallback mode'}")
+        
         # Parse input data
         personas_data = json.loads(personas_json)
         characters_data = json.loads(characters_json)
@@ -3121,13 +4112,21 @@ async def complete_workflow(text: str, ctx: Context) -> str:
         await ctx.info("Step 3: Creating Suno AI commands...")
         commands_result = await create_suno_commands(personas_result, characters_result, ctx)
         
+        # Add wiki attribution context
+        wiki_attribution = await _build_wiki_attribution_context({
+            "characters": json.loads(characters_result),
+            "personas": json.loads(personas_result),
+            "commands": json.loads(commands_result)
+        }, ctx)
+        
         # Combine results
         workflow_result = {
             "workflow_status": "completed",
             "character_analysis": json.loads(characters_result),
             "artist_personas": json.loads(personas_result), 
             "suno_commands": json.loads(commands_result),
-            "workflow_summary": "Complete character-driven music generation workflow executed successfully"
+            "workflow_summary": "Complete character-driven music generation workflow executed successfully",
+            "wiki_attribution": wiki_attribution if wiki_attribution else "Using fallback data - no wiki sources available"
         }
         
         await ctx.info("Workflow completed successfully!")
@@ -3468,6 +4467,9 @@ async def process_universal_content(
             }
         }
         
+        # Add source attribution for wiki-sourced content
+        wiki_attribution = await _build_wiki_attribution_context(enhanced_analysis, ctx)
+        
         # Create enhanced Suno command with LLM-driven emotional grounding
         if musical_production and lyric_structure:
             enhanced_suno_command = f"{musical_production.get('suno_format', '[ambient electronic] [80-120bpm] [contemplative rhythm]')}\n" \
@@ -3475,6 +4477,7 @@ async def process_universal_content(
                                   f"LLM Emotional Analysis: {emotional_map.get('emotional_reasoning', 'Character-driven interpretation')}\n" \
                                   f"Musical Direction: {musical_production.get('production_notes', 'Emotionally grounded production')}\n" \
                                   f"Character perspective: {character_description[:100]}...\n" \
+                                  f"{wiki_attribution}\n" \
                                   f"\nLYRICAL GUIDANCE:\n" \
                                   f"Verse concept: {lyric_structure['structure']['verses'][0]['opening'] if lyric_structure['structure']['verses'] else 'Character interpretation'}\n" \
                                   f"Chorus hook: {lyric_structure['structure']['chorus']['hook']}\n" \
@@ -3588,6 +4591,12 @@ async def create_story_integrated_album(
         # Step 3: Generate artist persona for the character
         await ctx.info("Step 3: Generating character's musical persona...")
         artist_persona = await persona_generator.generate_artist_persona(character_profile, ctx)
+        
+        # Add wiki attribution context if available
+        wiki_attribution = await _build_wiki_attribution_context({
+            'character': character_profile.to_dict(),
+            'persona': artist_persona.to_dict()
+        }, ctx)
         
         # Step 4: Map story beats to track concepts
         await ctx.info("Step 4: Mapping story progression to album tracks...")
@@ -3706,7 +4715,8 @@ async def create_story_integrated_album(
                 "thematic_focus": artist_persona.lyrical_themes
             },
             "usage_notes": "Each track is specifically tied to story events. Play in order for full narrative experience.",
-            "album_summary": f"Created {track_count}-track story-integrated album following {character_profile.name}'s journey through key narrative moments"
+            "album_summary": f"Created {track_count}-track story-integrated album following {character_profile.name}'s journey through key narrative moments",
+            "wiki_attribution": wiki_attribution if wiki_attribution else "Using fallback data - no wiki sources available"
         }
         
         await ctx.info(f"Story-integrated album complete: {track_count} narrative-driven tracks")
@@ -5165,13 +6175,77 @@ async def suno_optimization_prompt(artist_persona: str, character_background: st
     """
 
 # ================================================================================================
+# WIKI ATTRIBUTION HELPERS
+# ================================================================================================
+
+async def _build_wiki_attribution_context(analysis_data: Dict[str, Any], ctx: Context) -> str:
+    """Build attribution context for wiki-sourced content used in analysis
+    
+    Args:
+        analysis_data: The analysis data that may contain wiki-sourced information
+        ctx: Context for logging
+        
+    Returns:
+        Attribution text for LLM context
+    """
+    try:
+        # Access the persona generator's attribution manager
+        if hasattr(persona_generator, 'source_attribution_manager') and persona_generator.source_attribution_manager:
+            attribution_manager = persona_generator.source_attribution_manager
+            
+            # Collect all wiki sources that might have been used
+            wiki_sources = []
+            
+            # Add genre sources if available
+            genre_sources = attribution_manager.get_source_urls('genre')
+            if genre_sources:
+                wiki_sources.extend(genre_sources)
+            
+            # Add meta tag sources if available
+            meta_tag_sources = attribution_manager.get_source_urls('meta_tag')
+            if meta_tag_sources:
+                wiki_sources.extend(meta_tag_sources)
+            
+            # Add technique sources if available
+            technique_sources = attribution_manager.get_source_urls('technique')
+            if technique_sources:
+                wiki_sources.extend(technique_sources)
+            
+            if wiki_sources:
+                # Build attributed context
+                attribution_text = attribution_manager.format_source_references(wiki_sources)
+                
+                # Track usage
+                content_id = f"analysis_{hash(str(analysis_data))}"
+                for source in wiki_sources:
+                    attribution_manager.track_content_usage(
+                        content_id, source, "Album generation analysis"
+                    )
+                
+                await ctx.info(f"Added attribution for {len(wiki_sources)} wiki sources")
+                return f"\n\nSOURCE ATTRIBUTION:\n{attribution_text}"
+            
+        return ""
+        
+    except Exception as e:
+        logger.warning(f"Failed to build wiki attribution context: {e}")
+        return ""
+
+# ================================================================================================
 # SERVER CONFIGURATION AND STARTUP
 # ================================================================================================
 
+# Initialize server components on import
+async def _startup_initialization():
+    """Initialize server components"""
+    await initialize_server()
+
+# Store initialization task for later execution
+_initialization_task = None
+
 if __name__ == "__main__":
     logger.info("Starting Character-Driven Music Generation MCP Server...")
-    logger.info("Server supports character analysis, artist persona generation, and Suno AI integration")
-    logger.info("Ready to process narrative content and generate music commands")
+    logger.info("Wiki integration will be initialized on first use")
     
     # Run the FastMCP server
     mcp.run()

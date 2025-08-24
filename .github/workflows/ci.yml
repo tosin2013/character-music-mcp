@@ -49,27 +49,37 @@ jobs:
         uv pip install -e .
         uv pip install pytest pytest-cov pytest-asyncio pytest-benchmark coverage[toml]
     
+    - name: Debug imports
+      run: |
+        source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+        python debug_imports.py
+    
     - name: Run unit tests
       run: |
         source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         python -m pytest tests/unit/ -v --cov=. --cov-report=xml --cov-report=term-missing --cov-fail-under=80
       continue-on-error: false
     
     - name: Run integration tests
       run: |
         source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         python -m pytest tests/integration/ -v --timeout=300
       continue-on-error: false
     
     - name: Run performance tests
       run: |
         source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         python -m pytest tests/performance/ -v --benchmark-only --benchmark-json=benchmark_results.json
       continue-on-error: true
     
     - name: Run unified test suite
       run: |
         source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         python tests/test_runner.py
       continue-on-error: false
     
