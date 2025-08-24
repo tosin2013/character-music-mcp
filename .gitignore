@@ -113,7 +113,8 @@ dmypy.json
 cython_debug/
 
 # Project specific
-enhanced_*.py
+enhanced_cache_manager_backup.py
+enhanced_test_*.py
 simple_test.py
 temp_character_input.json
 *_summary.md
