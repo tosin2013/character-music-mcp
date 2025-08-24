@@ -11,6 +11,7 @@ import sys
 import os
 import json
 import pytest
+import pytest_asyncio
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -31,6 +32,8 @@ class TestServerIntegration:
         """Create a mock context for testing"""
         return create_mock_context("basic", session_id="integration_test")
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_character_analysis_tool(self, mock_ctx):
         """Test the character analysis MCP tool"""
         test_text = """
@@ -72,6 +75,8 @@ class TestServerIntegration:
             # Still count as success for coverage purposes
             assert True
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_persona_generation_tool(self, mock_ctx):
         """Test the persona generation MCP tool"""
         # Create sample character data
@@ -130,6 +135,8 @@ class TestServerIntegration:
             print(f"⚠️ Persona generation tool had issues: {e}")
             assert True
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_suno_command_generation_tool(self, mock_ctx):
         """Test the Suno command generation MCP tool"""
         # Create sample data
@@ -207,6 +214,8 @@ class TestServerIntegration:
             print(f"⚠️ Suno command generation tool had issues: {e}")
             assert True
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_end_to_end_workflow(self, mock_ctx):
         """Test complete end-to-end workflow"""
         test_text = """
@@ -245,6 +254,8 @@ class TestServerIntegration:
             print(f"⚠️ End-to-end workflow had issues: {e}")
             assert True
     
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
     async def test_error_handling(self, mock_ctx):
         """Test error handling in server functions"""
         # Test with invalid JSON
