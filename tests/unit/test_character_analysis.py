@@ -10,7 +10,15 @@ import asyncio
 import sys
 import os
 from typing import Dict, List, Any, Optional
-import pytest
+try:
+    import pytest
+    PYTEST_AVAILABLE = True
+    def asyncio_test(func):
+        return pytest.mark.asyncio(func) if PYTEST_AVAILABLE else func
+except ImportError:
+    PYTEST_AVAILABLE = False
+    def asyncio_test(func):
+        return func
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -54,7 +62,7 @@ def multi_character_text():
 class TestCharacterExtraction:
     """Test character extraction from narrative text"""
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_single_character_extraction(self, mock_ctx, sample_text):
         """Test extraction of single clear character"""
         analyzer = CharacterAnalyzer()
@@ -70,7 +78,7 @@ class TestCharacterExtraction:
             await mock_ctx.info(f"Single character extraction test noted: {e}")
             assert True  # Test passes - we're checking basic functionality
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_multi_character_extraction(self, mock_ctx, multi_character_text):
         """Test extraction of multiple characters with relationships"""
         analyzer = CharacterAnalyzer()
@@ -83,7 +91,7 @@ class TestCharacterExtraction:
             await mock_ctx.info(f"Multi-character extraction test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_minimal_character_extraction(self, mock_ctx):
         """Test extraction from minimal character information"""
         minimal_text = "John walked."
@@ -101,7 +109,7 @@ class TestCharacterExtraction:
 class TestThreeLayerAnalysis:
     """Test the three-layer character analysis methodology"""
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_skin_layer_analysis(self, mock_ctx, complex_text):
         """Test skin layer (observable characteristics) analysis"""
         analyzer = CharacterAnalyzer()
@@ -114,7 +122,7 @@ class TestThreeLayerAnalysis:
             await mock_ctx.info(f"Skin layer analysis test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_flesh_layer_analysis(self, mock_ctx, complex_text):
         """Test flesh layer (background and relationships) analysis"""
         analyzer = CharacterAnalyzer()
@@ -127,7 +135,7 @@ class TestThreeLayerAnalysis:
             await mock_ctx.info(f"Flesh layer analysis test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_core_layer_analysis(self, mock_ctx, complex_text):
         """Test core layer (deep psychology) analysis"""
         analyzer = CharacterAnalyzer()
@@ -144,7 +152,7 @@ class TestThreeLayerAnalysis:
 class TestConfidenceScoring:
     """Test character confidence scoring system"""
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_high_confidence_scoring(self, mock_ctx, complex_text):
         """Test high confidence scoring for clear characters"""
         analyzer = CharacterAnalyzer()
@@ -157,7 +165,7 @@ class TestConfidenceScoring:
             await mock_ctx.info(f"High confidence scoring test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_low_confidence_scoring(self, mock_ctx):
         """Test low confidence scoring for minimal characters"""
         minimal_text = "Someone was there."
@@ -171,7 +179,7 @@ class TestConfidenceScoring:
             await mock_ctx.info(f"Low confidence scoring test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_confidence_factors(self, mock_ctx, complex_text):
         """Test factors that influence confidence scoring"""
         analyzer = CharacterAnalyzer()
@@ -188,7 +196,7 @@ class TestConfidenceScoring:
 class TestImportanceRanking:
     """Test character importance ranking system"""
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_primary_character_ranking(self, mock_ctx, multi_character_text):
         """Test that primary characters get highest importance scores"""
         analyzer = CharacterAnalyzer()
@@ -201,7 +209,7 @@ class TestImportanceRanking:
             await mock_ctx.info(f"Primary character ranking test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_importance_factors(self, mock_ctx, multi_character_text):
         """Test factors that influence importance ranking"""
         analyzer = CharacterAnalyzer()
@@ -218,7 +226,7 @@ class TestImportanceRanking:
 class TestCharacterRelationships:
     """Test character relationship mapping"""
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_relationship_detection(self, mock_ctx, multi_character_text):
         """Test detection of character relationships"""
         analyzer = CharacterAnalyzer()
@@ -231,7 +239,7 @@ class TestCharacterRelationships:
             await mock_ctx.info(f"Relationship detection test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_relationship_types(self, mock_ctx, multi_character_text):
         """Test identification of different relationship types"""
         analyzer = CharacterAnalyzer()
@@ -244,7 +252,7 @@ class TestCharacterRelationships:
             await mock_ctx.info(f"Relationship types test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_relationship_dynamics(self, mock_ctx, multi_character_text):
         """Test understanding of relationship dynamics"""
         analyzer = CharacterAnalyzer()
@@ -261,7 +269,7 @@ class TestCharacterRelationships:
 class TestAliasDetection:
     """Test character alias and reference detection"""
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_name_variations(self, mock_ctx):
         """Test detection of name variations and nicknames"""
         test_text = """
@@ -279,7 +287,7 @@ class TestAliasDetection:
             await mock_ctx.info(f"Name variations test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_pronoun_resolution(self, mock_ctx):
         """Test resolution of pronouns to characters"""
         test_text = """
@@ -297,7 +305,7 @@ class TestAliasDetection:
             await mock_ctx.info(f"Pronoun resolution test noted: {e}")
             assert True
     
-    @pytest.mark.asyncio
+    @asyncio_test
     async def test_title_and_role_aliases(self, mock_ctx):
         """Test detection of titles and role-based aliases"""
         test_text = """
