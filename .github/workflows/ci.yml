@@ -55,6 +55,12 @@ jobs:
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         python debug_imports.py
     
+    - name: Simple import test
+      run: |
+        source .venv/bin/activate
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+        python test_simple_import.py
+    
     - name: Run unit tests
       run: |
         source .venv/bin/activate

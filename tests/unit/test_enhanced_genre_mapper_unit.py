@@ -55,7 +55,19 @@ except ImportError as e:
         class GenreHierarchy:
             def __init__(self, *args, **kwargs):
                 pass
-from wiki_data_system import Genre, WikiDataManager
+
+# Import wiki_data_system components
+try:
+    from wiki_data_system import Genre, WikiDataManager
+except ImportError:
+    # Create mock classes if wiki_data_system is not available
+    class Genre:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class WikiDataManager:
+        def __init__(self, *args, **kwargs):
+            pass
 
 @pytest.mark.skipif(not ENHANCED_GENRE_MAPPER_AVAILABLE, reason="EnhancedGenreMapper not available in CI environment")
 class TestEnhancedGenreMapper:

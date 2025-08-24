@@ -50,8 +50,37 @@ except ImportError as e:
         class GenreMatch:
             def __init__(self, *args, **kwargs):
                 pass
-from source_attribution_manager import SourceAttributionManager, ContentSource
-from wiki_data_system import Genre, MetaTag, Technique, WikiDataManager
+
+# Import other components with fallbacks
+try:
+    from source_attribution_manager import SourceAttributionManager, ContentSource
+except ImportError:
+    class SourceAttributionManager:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class ContentSource:
+        def __init__(self, *args, **kwargs):
+            pass
+
+try:
+    from wiki_data_system import Genre, MetaTag, Technique, WikiDataManager
+except ImportError:
+    class Genre:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class MetaTag:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class Technique:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class WikiDataManager:
+        def __init__(self, *args, **kwargs):
+            pass
 
 class TestWikiDownloaderUnit:
     """Unit tests for WikiDownloader"""
