@@ -17,44 +17,60 @@ from typing import List
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-try:
-    from enhanced_genre_mapper import (
-        EnhancedGenreMapper,
-        GenreMatch,
-        GenreHierarchy
-    )
-    ENHANCED_GENRE_MAPPER_AVAILABLE = True
-except ImportError as e:
-    import sys
-    from pathlib import Path
-    # Add project root to path if not already there
-    project_root = Path(__file__).parent.parent.parent
-    if str(project_root) not in sys.path:
-        sys.path.insert(0, str(project_root))
+# Check if we should skip enhanced genre mapper in CI
+if os.environ.get('CI_SKIP_ENHANCED_GENRE_MAPPER'):
+    ENHANCED_GENRE_MAPPER_AVAILABLE = False
     
+    class EnhancedGenreMapper:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class GenreMatch:
+        def __init__(self, *args, **kwargs):
+            pass
+            
+    class GenreHierarchy:
+        def __init__(self, *args, **kwargs):
+            pass
+else:
     try:
-        # Try import again
         from enhanced_genre_mapper import (
             EnhancedGenreMapper,
             GenreMatch,
             GenreHierarchy
         )
         ENHANCED_GENRE_MAPPER_AVAILABLE = True
-    except ImportError:
-        # If still failing, create mock classes for CI
-        ENHANCED_GENRE_MAPPER_AVAILABLE = False
+    except ImportError as e:
+        import sys
+        from pathlib import Path
+        # Add project root to path if not already there
+        project_root = Path(__file__).parent.parent.parent
+        if str(project_root) not in sys.path:
+            sys.path.insert(0, str(project_root))
         
-        class EnhancedGenreMapper:
-            def __init__(self, *args, **kwargs):
-                pass
-        
-        class GenreMatch:
-            def __init__(self, *args, **kwargs):
-                pass
-                
-        class GenreHierarchy:
-            def __init__(self, *args, **kwargs):
-                pass
+        try:
+            # Try import again
+            from enhanced_genre_mapper import (
+                EnhancedGenreMapper,
+                GenreMatch,
+                GenreHierarchy
+            )
+            ENHANCED_GENRE_MAPPER_AVAILABLE = True
+        except ImportError:
+            # If still failing, create mock classes for CI
+            ENHANCED_GENRE_MAPPER_AVAILABLE = False
+            
+            class EnhancedGenreMapper:
+                def __init__(self, *args, **kwargs):
+                    pass
+            
+            class GenreMatch:
+                def __init__(self, *args, **kwargs):
+                    pass
+                    
+            class GenreHierarchy:
+                def __init__(self, *args, **kwargs):
+                    pass
 
 # Import wiki_data_system components
 try:
