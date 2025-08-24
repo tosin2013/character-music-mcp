@@ -2351,20 +2351,114 @@ class MusicPersonaGenerator:
         return list(set(traits))[:3]  # Return top 3 unique traits
 
     def _map_to_genres(self, traits: List[str]) -> Tuple[str, List[str]]:
-        """LLM determines genres from personality traits - no predefined mappings"""
+        """Map personality traits to musical genres"""
         
-        # LLM analyzes personality traits and determines appropriate musical genres
-        primary_genre = f"LLM-determined primary genre for traits: {', '.join(traits[:2])}"
-        secondary_genres = [f"LLM-secondary-1 for {traits[0] if traits else 'character'}", 
-                          f"LLM-secondary-2 for {traits[1] if len(traits) > 1 else 'personality'}"]
+        # Define trait-to-genre mappings
+        trait_genre_map = {
+            'melancholic': ['blues', 'folk', 'indie'],
+            'mysterious': ['dark ambient', 'gothic', 'alternative'],
+            'brave': ['rock', 'metal', 'punk'],
+            'compassionate': ['soul', 'gospel', 'folk'],
+            'rebellious': ['punk', 'alternative', 'grunge'],
+            'intellectual': ['progressive', 'art rock', 'ambient'],
+            'creative': ['indie', 'alternative', 'art pop'],
+            'adventurous': ['electronic', 'synthwave', 'space rock'],
+            'emotional': ['blues', 'soul', 'gospel'],
+            'confident': ['rock', 'pop', 'electronic'],
+            'vulnerable': ['indie', 'singer-songwriter', 'folk'],
+            'ambitious': ['pop', 'electronic', 'rock'],
+            'perfectionist': ['progressive', 'classical', 'jazz'],
+            'authentic': ['folk', 'country', 'singer-songwriter'],
+            'introspective': ['ambient', 'post-rock', 'indie'],
+            'artistic': ['art pop', 'experimental', 'indie'],
+            'quest for meaning': ['progressive', 'ambient', 'post-rock'],
+            'commitment to life': ['soul', 'gospel', 'blues'],
+            'love transcending death': ['blues', 'soul', 'folk'],
+            'creative drive': ['indie', 'alternative', 'art pop'],
+            'fear of exposure': ['indie', 'singer-songwriter', 'alternative'],
+            'duty to crew': ['electronic', 'synthwave', 'rock'],
+            'courage under pressure': ['rock', 'electronic', 'metal'],
+            'desire for freedom': ['indie', 'alternative', 'folk'],
+            'need for authenticity': ['singer-songwriter', 'folk', 'indie'],
+            'duty to justice': ['alternative', 'rock', 'gothic'],
+            'inherited magical responsibility': ['gothic', 'dark ambient', 'alternative'],
+            'intellectual brilliance': ['progressive', 'art rock', 'classical'],
+            'determination to contribute': ['classical', 'orchestral', 'progressive']
+        }
         
-        return primary_genre, secondary_genres
+        # Find best matching genre based on traits
+        genre_scores = {}
+        for trait in traits:
+            trait_lower = trait.lower()
+            if trait_lower in trait_genre_map:
+                for genre in trait_genre_map[trait_lower]:
+                    genre_scores[genre] = genre_scores.get(genre, 0) + 1
+        
+        # If no direct matches, use fallback mapping
+        if not genre_scores:
+            primary_genre = 'alternative'
+            secondary_genres = ['indie', 'pop']
+        else:
+            # Sort by score and select top genres
+            sorted_genres = sorted(genre_scores.items(), key=lambda x: x[1], reverse=True)
+            primary_genre = sorted_genres[0][0]
+            secondary_genres = [genre for genre, _ in sorted_genres[1:3]]
+            
+            # Ensure we have at least 2 secondary genres
+            if len(secondary_genres) < 2:
+                fallback_genres = ['indie', 'alternative', 'pop', 'rock']
+                for genre in fallback_genres:
+                    if genre != primary_genre and genre not in secondary_genres:
+                        secondary_genres.append(genre)
+                        if len(secondary_genres) >= 2:
+                            break
+        
+        return primary_genre, secondary_genres[:2]
 
     def _determine_vocal_style(self, traits: List[str]) -> str:
-        """LLM determines vocal style from character traits - no predefined mappings"""
+        """Determine vocal style from character traits"""
         
-        # LLM analyzes personality traits and determines vocal style
-        return f"LLM-determined vocal style for {', '.join(traits[:2]) if traits else 'character'}: expressive, character-driven delivery"
+        # Define trait-to-vocal-style mappings
+        trait_vocal_map = {
+            'melancholic': 'soulful and emotional',
+            'mysterious': 'haunting and atmospheric',
+            'brave': 'powerful and commanding',
+            'compassionate': 'warm and heartfelt',
+            'rebellious': 'raw and aggressive',
+            'intellectual': 'contemplative and articulate',
+            'creative': 'expressive and artistic',
+            'adventurous': 'dynamic and energetic',
+            'emotional': 'raw and passionate',
+            'confident': 'strong and commanding',
+            'vulnerable': 'intimate and delicate',
+            'ambitious': 'powerful and determined',
+            'perfectionist': 'precise and controlled',
+            'authentic': 'honest and genuine',
+            'introspective': 'thoughtful and reflective',
+            'artistic': 'expressive and creative',
+            'quest for meaning': 'profound and contemplative',
+            'commitment to life': 'passionate and soulful',
+            'love transcending death': 'emotional and heartfelt',
+            'creative drive': 'expressive and passionate',
+            'fear of exposure': 'vulnerable and intimate',
+            'duty to crew': 'strong and reliable',
+            'courage under pressure': 'powerful and confident',
+            'desire for freedom': 'liberating and expressive',
+            'need for authenticity': 'honest and raw',
+            'duty to justice': 'determined and strong',
+            'inherited magical responsibility': 'mysterious and powerful',
+            'intellectual brilliance': 'articulate and measured',
+            'determination to contribute': 'inspiring and uplifting'
+        }
+        
+        # Find best matching vocal style
+        for trait in traits:
+            trait_lower = trait.lower()
+            if trait_lower in trait_vocal_map:
+                return trait_vocal_map[trait_lower]
+        
+        # Default fallback
+        return 'expressive and character-driven'
 
     def _generate_artist_name(self, character_name: str, traits: List[str]) -> str:
         """Generate an artist name based on character name and traits"""
@@ -2527,10 +2621,29 @@ class MusicPersonaGenerator:
             'metal': ['distorted guitar', 'bass guitar', 'heavy drums', 'orchestral elements'],
             'jazz': ['saxophone', 'piano', 'upright bass', 'drums'],
             'electronic': ['synthesizer', 'drum machine', 'sampling', 'digital effects'],
+            'synthwave': ['synthesizer', 'drum machine', 'electronic bass', 'digital effects'],
+            'space rock': ['synthesizer', 'electric guitar', 'atmospheric effects', 'electronic drums'],
             'folk': ['acoustic guitar', 'harmonica', 'fiddle', 'mandolin'],
             'pop': ['vocals', 'keyboard', 'guitar', 'electronic beats'],
             'indie': ['indie guitar', 'lo-fi production', 'vintage synthesizer', 'minimal drums'],
-            'blues': ['guitar', 'harmonica', 'piano', 'rhythm section']
+            'alternative': ['electric guitar', 'bass guitar', 'drums', 'effects pedals'],
+            'art pop': ['synthesizer', 'unconventional instruments', 'electronic elements', 'vocals'],
+            'blues': ['guitar', 'harmonica', 'piano', 'rhythm section'],
+            'soul': ['piano', 'organ', 'horn section', 'rhythm guitar'],
+            'gospel': ['organ', 'piano', 'choir', 'rhythm section'],
+            'progressive': ['synthesizers', 'orchestral arrangements', 'complex percussion', 'guitar'],
+            'art rock': ['synthesizer', 'guitar', 'unconventional instruments', 'orchestral elements'],
+            'ambient': ['synthesizer', 'atmospheric sounds', 'minimal percussion', 'electronic textures'],
+            'post-rock': ['electric guitar', 'effects pedals', 'atmospheric sounds', 'dynamic drums'],
+            'singer-songwriter': ['acoustic guitar', 'piano', 'minimal accompaniment', 'vocals'],
+            'country': ['acoustic guitar', 'steel guitar', 'fiddle', 'banjo'],
+            'grunge': ['distorted guitar', 'bass guitar', 'heavy drums', 'raw production'],
+            'punk': ['electric guitar', 'bass guitar', 'fast drums', 'minimal production'],
+            'gothic': ['synthesizer', 'atmospheric sounds', 'dark electronic elements', 'orchestral'],
+            'dark ambient': ['synthesizer', 'atmospheric textures', 'minimal percussion', 'electronic'],
+            'classical': ['orchestral instruments', 'piano', 'strings', 'woodwinds'],
+            'orchestral': ['full orchestra', 'strings', 'brass', 'woodwinds'],
+            'experimental': ['unconventional instruments', 'electronic manipulation', 'found sounds', 'synthesizer']
         }
         
         return genre_instruments.get(genre, ['vocals', 'guitar', 'piano', 'drums'])

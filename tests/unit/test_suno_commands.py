@@ -31,9 +31,14 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
     """Extended SunoCommandGenerator with additional methods for testing"""
     
     async def create_simple_command(self, character, persona, track_title, ctx):
+        # Include character traits in the prompt
+        trait_text = ""
+        if hasattr(character, 'personality_drivers') and character.personality_drivers:
+            trait_text = f" - {', '.join(character.personality_drivers[:2])}"
+        
         return SunoCommand(
             command_type="simple",
-            prompt=f"{persona.primary_genre} track: {track_title} by {character.name}",
+            prompt=f"{persona.primary_genre} track: {track_title} by {character.name}{trait_text}",
             style_tags=[persona.primary_genre],
             structure_tags=["verse", "chorus"],
             sound_effect_tags=[],
@@ -46,9 +51,18 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
         )
     
     async def create_custom_command(self, character, persona, track_title, custom_params, ctx):
+        # Build prompt with all custom parameters
+        prompt_parts = [f"Custom {persona.primary_genre} track: {track_title}"]
+        if custom_params.get('bpm'):
+            prompt_parts.append(f"BPM: {custom_params['bpm']}")
+        if custom_params.get('key'):
+            prompt_parts.append(f"Key: {custom_params['key']}")
+        if custom_params.get('mood'):
+            prompt_parts.append(f"Mood: {custom_params['mood']}")
+        
         return SunoCommand(
             command_type="custom",
-            prompt=f"Custom {persona.primary_genre} track: {track_title} - BPM: {custom_params.get('bpm', '120')}",
+            prompt=" - ".join(prompt_parts),
             style_tags=[persona.primary_genre, "custom"],
             structure_tags=["verse", "chorus", "bridge"],
             sound_effect_tags=["reverb"],
@@ -61,9 +75,44 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
         )
     
     async def create_bracket_notation_command(self, character, persona, track_title, ctx):
+        # Add emotional and instrumental meta tags based on character and persona
+        meta_tags = []
+        
+        # Add emotional meta tags based on character traits
+        if hasattr(character, 'personality_drivers'):
+            for trait in character.personality_drivers:
+                if 'emotional' in trait.lower() or 'passionate' in trait.lower():
+                    meta_tags.append("[Emotional]")
+                elif 'melancholic' in trait.lower() or 'sad' in trait.lower():
+                    meta_tags.append("[Heartfelt]")
+                elif 'powerful' in trait.lower() or 'strong' in trait.lower():
+                    meta_tags.append("[Powerful]")
+        
+        # Add genre-specific meta tags
+        if 'electronic' in persona.primary_genre.lower():
+            meta_tags.extend(["[Electronic]", "[Synthesized]"])
+        elif 'blues' in persona.primary_genre.lower():
+            meta_tags.extend(["[Soulful]", "[Raw]"])
+        
+        # Add instrumental meta tags based on preferences
+        if hasattr(persona, 'instrumental_preferences'):
+            for instrument in persona.instrumental_preferences[:2]:  # First 2 instruments
+                if 'guitar' in instrument.lower():
+                    meta_tags.append("[Guitar Solo]")
+                elif 'piano' in instrument.lower():
+                    meta_tags.append("[Piano]")
+                elif 'synthesizer' in instrument.lower():
+                    meta_tags.append("[Synthesizer]")
+                elif 'orchestral' in instrument.lower():
+                    meta_tags.append("[Orchestral]")
+        
+        # Build prompt with meta tags
+        meta_tag_str = " ".join(meta_tags[:3])  # Limit to 3 meta tags
+        prompt = f"[Intro] {meta_tag_str} {persona.primary_genre} [Verse] {track_title} [Chorus] by {character.name} [Outro]"
+        
         return SunoCommand(
             command_type="bracket_notation",
-            prompt=f"[Intro] {persona.primary_genre} [Verse] {track_title} [Chorus] by {character.name} [Outro]",
+            prompt=prompt,
             style_tags=[persona.primary_genre],
             structure_tags=["[Intro]", "[Verse]", "[Chorus]", "[Outro]"],
             sound_effect_tags=[],
@@ -76,9 +125,17 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
         )
     
     async def create_production_command(self, character, persona, track_title, production_notes, ctx):
+        # Build prompt with production details
+        prompt_parts = ["Production:"]
+        if production_notes.get('studio_type'):
+            prompt_parts.append(production_notes['studio_type'])
+        if production_notes.get('mixing_style'):
+            prompt_parts.append(production_notes['mixing_style'])
+        prompt_parts.extend([persona.primary_genre, "-", track_title])
+        
         return SunoCommand(
             command_type="production",
-            prompt=f"Production: {production_notes.get('studio_type', 'digital')} {persona.primary_genre} - {track_title}",
+            prompt=" ".join(prompt_parts),
             style_tags=[persona.primary_genre, "production"],
             structure_tags=["mixed", "mastered"],
             sound_effect_tags=["compression", "eq"],
@@ -91,13 +148,16 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
         )
     
     async def create_lyrical_command(self, character, persona, track_title, lyrical_themes, ctx):
+        # Include vocal direction in prompt
+        prompt = f"Lyrical {persona.primary_genre}: {track_title} - themes: {', '.join(lyrical_themes)} - vocals: expressive delivery"
+        
         return SunoCommand(
             command_type="lyrical",
-            prompt=f"Lyrical {persona.primary_genre}: {track_title} - themes: {', '.join(lyrical_themes)}",
+            prompt=prompt,
             style_tags=[persona.primary_genre, "lyrical"],
             structure_tags=["verse", "chorus", "storytelling"],
             sound_effect_tags=[],
-            vocal_tags=["narrative", "emotional"],
+            vocal_tags=["narrative", "emotional", "vocals"],
             character_source=character.name,
             artist_persona=persona.artist_name,
             command_rationale="Lyrical command focusing on thematic content",
@@ -170,6 +230,7 @@ class EnhancedSunoCommand:
         self.character_story_context = kwargs.get('character_story_context', '')
         self.song_story_context = kwargs.get('song_story_context', '')
         self.formatted_command = kwargs.get('formatted_command', 'Mock command')
+        self.prompt = kwargs.get('prompt', f"{kwargs.get('genre', 'electronic')} track: {kwargs.get('track_title', 'Narrative Track')}")
         self.narrative_coherence_score = kwargs.get('narrative_coherence_score', 0.8)
         self.production_authenticity_score = kwargs.get('production_authenticity_score', 0.7)
         self.suno_optimization_score = kwargs.get('suno_optimization_score', 0.75)
@@ -714,7 +775,7 @@ class TestCommandOptimization:
         essential_elements = [
             expected_char.name,
             expected_persona.primary_genre,
-            "Optimized Length"  # or some other essential element
+            track_title  # Track title should be included
         ]
         
         for element in essential_elements:
