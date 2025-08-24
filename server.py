@@ -2442,7 +2442,7 @@ class MusicPersonaGenerator:
             'commitment to life': 'passionate and soulful',
             'love transcending death': 'emotional and heartfelt',
             'creative drive': 'expressive and passionate',
-            'fear of exposure': 'vulnerable and intimate',
+            'fear of exposure': 'vulnerable and authentic',
             'duty to crew': 'strong and reliable',
             'courage under pressure': 'powerful and confident',
             'desire for freedom': 'liberating and expressive',
@@ -2683,8 +2683,8 @@ class MusicPersonaGenerator:
             'punk': ['electric guitar', 'bass guitar', 'fast drums', 'minimal production'],
             'gothic': ['synthesizer', 'atmospheric sounds', 'dark electronic elements', 'orchestral'],
             'dark ambient': ['synthesizer', 'atmospheric textures', 'minimal percussion', 'electronic'],
-            'classical': ['orchestral instruments', 'piano', 'strings', 'woodwinds'],
-            'orchestral': ['full orchestra', 'strings', 'brass', 'woodwinds'],
+            'classical': ['piano', 'strings', 'woodwinds', 'harpsichord'],
+            'orchestral': ['strings', 'brass', 'woodwinds', 'timpani'],
             'experimental': ['unconventional instruments', 'electronic manipulation', 'found sounds', 'synthesizer']
         }
         

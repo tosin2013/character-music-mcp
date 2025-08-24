@@ -108,18 +108,27 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
         # Add instrumental meta tags based on preferences
         if hasattr(persona, 'instrumental_preferences'):
             for instrument in persona.instrumental_preferences[:2]:  # First 2 instruments
-                if 'guitar' in instrument.lower():
+                instrument_lower = instrument.lower()
+                if 'guitar' in instrument_lower:
                     meta_tags.append("[Guitar Solo]")
-                elif 'piano' in instrument.lower():
+                elif 'piano' in instrument_lower:
                     meta_tags.append("[Piano]")
-                elif 'synthesizer' in instrument.lower():
+                elif 'synthesizer' in instrument_lower or 'synthesizers' in instrument_lower:
                     meta_tags.append("[Synthesizer]")
-                elif 'orchestral' in instrument.lower():
+                elif 'orchestral' in instrument_lower:
                     meta_tags.append("[Orchestral]")
+                # Add the actual instrument name to the prompt for reference
+                prompt_parts.append(f"featuring {instrument}")
         
-        # Build prompt with meta tags
+        # Build prompt with meta tags and instrument references
         meta_tag_str = " ".join(meta_tags[:3])  # Limit to 3 meta tags
-        prompt = f"[Intro] {meta_tag_str} {persona.primary_genre} [Verse] {track_title} [Chorus] by {character.name} [Outro]"
+        prompt_base = f"[Intro] {meta_tag_str} {persona.primary_genre} [Verse] {track_title} [Chorus] by {character.name}"
+        if prompt_parts:
+            prompt = f"{prompt_base} {' '.join(prompt_parts)} [Outro]"
+        else:
+            prompt = f"{prompt_base} [Outro]"
+        
+
         
         return SunoCommand(
             command_type="bracket_notation",
@@ -148,7 +157,7 @@ class ExtendedSunoCommandGenerator(SunoCommandGenerator):
             effects_str = ", ".join(production_notes['effects'])
             prompt_parts.append(f"with {effects_str}")
         
-        prompt_parts.extend([persona.primary_genre, "-", track_title])
+        prompt_parts.extend([persona.primary_genre, "-", track_title, "by", character.name])
         
         return SunoCommand(
             command_type="production",
@@ -264,7 +273,8 @@ class EnhancedSunoCommandGenerator:
         if len(track_concept) > 20:
             optimization_factors.append("detailed concept")
         
-        prompt_with_factors = f"[{genre}] {track_title} by {character_name} - {track_concept}"
+        # Build prompt with optimization factors including meta tags, BPM, and production details
+        prompt_with_factors = f"[Intro] [{genre}] {track_title} by {character_name} [Verse] {track_concept} [Chorus] - BPM: 120 - Studio production"
         if optimization_factors:
             prompt_with_factors += f" (optimized for: {', '.join(optimization_factors)})"
         
