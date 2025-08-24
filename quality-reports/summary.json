@@ -1,15 +1,15 @@
 {
-  "timestamp": "2025-08-23 15:02:55 UTC",
+  "timestamp": "2025-08-24 03:20:35 UTC",
   "summary": {
     "overall_success_rate": 0.0,
     "total_tests": 0,
     "coverage_percentage": 15.52,
-    "performance_score": 0.0,
+    "performance_score": 0.8333333333333334,
     "documentation_score": 0.0
   },
   "counts": {
     "test_suites": 0,
-    "benchmarks": 0,
+    "benchmarks": 6,
     "validations": 0,
     "security_scans": 1
   }
