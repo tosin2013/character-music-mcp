@@ -19,47 +19,82 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from server import CharacterProfile, ArtistPersona, SunoCommand, SunoCommandGenerator
 
 # Add missing methods to SunoCommandGenerator for testing
-class TestSunoCommandGenerator(SunoCommandGenerator):
+class ExtendedSunoCommandGenerator(SunoCommandGenerator):
     """Extended SunoCommandGenerator with additional methods for testing"""
     
     async def create_simple_command(self, character, persona, track_title, ctx):
         return SunoCommand(
-            title=track_title,
             command_type="simple",
-            formatted_command=f"{persona.primary_genre} track: {track_title} by {character.name}",
-            effectiveness_score=0.8
+            prompt=f"{persona.primary_genre} track: {track_title} by {character.name}",
+            style_tags=[persona.primary_genre],
+            structure_tags=["verse", "chorus"],
+            sound_effect_tags=[],
+            vocal_tags=["clear"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Simple command for basic track generation",
+            estimated_effectiveness=0.8,
+            variations=[]
         )
     
     async def create_custom_command(self, character, persona, track_title, custom_params, ctx):
         return SunoCommand(
-            title=track_title,
             command_type="custom",
-            formatted_command=f"Custom {persona.primary_genre} track: {track_title} - BPM: {custom_params.get('bpm', '120')}",
-            effectiveness_score=0.85
+            prompt=f"Custom {persona.primary_genre} track: {track_title} - BPM: {custom_params.get('bpm', '120')}",
+            style_tags=[persona.primary_genre, "custom"],
+            structure_tags=["verse", "chorus", "bridge"],
+            sound_effect_tags=["reverb"],
+            vocal_tags=["processed"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Custom command with specific parameters",
+            estimated_effectiveness=0.85,
+            variations=["Alternative mix"]
         )
     
     async def create_bracket_notation_command(self, character, persona, track_title, ctx):
         return SunoCommand(
-            title=track_title,
             command_type="bracket_notation",
-            formatted_command=f"[Intro] {persona.primary_genre} [Verse] {track_title} [Chorus] by {character.name} [Outro]",
-            effectiveness_score=0.9
+            prompt=f"[Intro] {persona.primary_genre} [Verse] {track_title} [Chorus] by {character.name} [Outro]",
+            style_tags=[persona.primary_genre],
+            structure_tags=["[Intro]", "[Verse]", "[Chorus]", "[Outro]"],
+            sound_effect_tags=[],
+            vocal_tags=["structured"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Bracket notation for structured composition",
+            estimated_effectiveness=0.9,
+            variations=["Extended version"]
         )
     
     async def create_production_command(self, character, persona, track_title, production_notes, ctx):
         return SunoCommand(
-            title=track_title,
             command_type="production",
-            formatted_command=f"Production: {production_notes.get('studio_type', 'digital')} {persona.primary_genre} - {track_title}",
-            effectiveness_score=0.85
+            prompt=f"Production: {production_notes.get('studio_type', 'digital')} {persona.primary_genre} - {track_title}",
+            style_tags=[persona.primary_genre, "production"],
+            structure_tags=["mixed", "mastered"],
+            sound_effect_tags=["compression", "eq"],
+            vocal_tags=["professional"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Production-focused command with studio specifications",
+            estimated_effectiveness=0.85,
+            variations=["Raw mix", "Radio edit"]
         )
     
     async def create_lyrical_command(self, character, persona, track_title, lyrical_themes, ctx):
         return SunoCommand(
-            title=track_title,
             command_type="lyrical",
-            formatted_command=f"Lyrical {persona.primary_genre}: {track_title} - themes: {', '.join(lyrical_themes)}",
-            effectiveness_score=0.8
+            prompt=f"Lyrical {persona.primary_genre}: {track_title} - themes: {', '.join(lyrical_themes)}",
+            style_tags=[persona.primary_genre, "lyrical"],
+            structure_tags=["verse", "chorus", "storytelling"],
+            sound_effect_tags=[],
+            vocal_tags=["narrative", "emotional"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Lyrical command focusing on thematic content",
+            estimated_effectiveness=0.8,
+            variations=["Instrumental version"]
         )
     
     async def create_optimized_command(self, character, persona, track_title, max_length, ctx):
@@ -67,18 +102,32 @@ class TestSunoCommandGenerator(SunoCommandGenerator):
         if len(command_text) > max_length:
             command_text = command_text[:max_length-3] + "..."
         return SunoCommand(
-            title=track_title,
             command_type="optimized",
-            formatted_command=command_text,
-            effectiveness_score=0.85
+            prompt=command_text,
+            style_tags=[persona.primary_genre],
+            structure_tags=["optimized"],
+            sound_effect_tags=[],
+            vocal_tags=["clear"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Length-optimized command for efficiency",
+            estimated_effectiveness=0.85,
+            variations=[]
         )
     
     async def create_clear_command(self, character, persona, track_title, ctx):
         return SunoCommand(
-            title=track_title,
             command_type="clear",
-            formatted_command=f"Clear {persona.primary_genre} track: {track_title} by {character.name}",
-            effectiveness_score=0.8
+            prompt=f"Clear {persona.primary_genre} track: {track_title} by {character.name}",
+            style_tags=[persona.primary_genre, "clear"],
+            structure_tags=["verse", "chorus"],
+            sound_effect_tags=[],
+            vocal_tags=["clear", "crisp"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Clear and direct command for crisp output",
+            estimated_effectiveness=0.8,
+            variations=["Enhanced clarity"]
         )
     
     async def create_genre_optimized_command(self, character, persona, track_title, ctx):
@@ -89,14 +138,21 @@ class TestSunoCommandGenerator(SunoCommandGenerator):
         }
         terms = genre_terms.get(persona.primary_genre.lower(), "musical")
         return SunoCommand(
-            title=track_title,
             command_type="genre_optimized",
-            formatted_command=f"{persona.primary_genre} with {terms}: {track_title}",
-            effectiveness_score=0.85
+            prompt=f"{persona.primary_genre} with {terms}: {track_title}",
+            style_tags=[persona.primary_genre, "optimized"],
+            structure_tags=["genre-specific"],
+            sound_effect_tags=terms.split(),
+            vocal_tags=["genre-appropriate"],
+            character_source=character.name,
+            artist_persona=persona.artist_name,
+            command_rationale="Genre-optimized command with specific terminology",
+            estimated_effectiveness=0.85,
+            variations=["Alternative arrangement"]
         )
 
 # Use the extended generator for tests
-SunoCommandGenerator = TestSunoCommandGenerator
+SunoCommandGenerator = ExtendedSunoCommandGenerator
 
 # Enhanced Suno generator is not implemented yet - using mock for tests
 class EnhancedSunoCommand:
@@ -131,6 +187,7 @@ from tests.fixtures.mock_contexts import MockContext, create_mock_context
 class TestBasicCommandGeneration:
     """Test basic Suno command generation functionality"""
     
+    @pytest.mark.asyncio
     async def test_simple_command_generation(self, ctx: MockContext, data_manager: TestDataManager):
         """Test generation of simple Suno commands"""
         expected_char = data_manager.get_expected_character("Sarah Chen")
@@ -148,18 +205,19 @@ class TestBasicCommandGeneration:
         )
         
         # Validate basic command structure
-        assert command.title == "Finding Myself", "Should preserve track title"
+        assert command.character_source == expected_char.name, "Should preserve character source"
         assert command.command_type == "simple", "Should be marked as simple command"
-        assert len(command.formatted_command) > 0, "Should generate formatted command"
+        assert len(command.prompt) > 0, "Should generate command prompt"
         
         # Should include basic elements
-        assert expected_persona.primary_genre.lower() in command.formatted_command.lower(), \
+        assert expected_persona.primary_genre.lower() in command.prompt.lower(), \
             "Should include primary genre"
-        assert any(trait in command.formatted_command.lower() for trait in expected_char.personality_drivers), \
+        assert any(trait in command.prompt.lower() for trait in expected_char.personality_drivers), \
             "Should reference character traits"
         
-        await ctx.info(f"Simple command generated: {len(command.formatted_command)} characters")
+        await ctx.info(f"Simple command generated: {len(command.prompt)} characters")
     
+    @pytest.mark.asyncio
     async def test_custom_command_generation(self, ctx: MockContext, data_manager: TestDataManager):
         """Test generation of custom Suno commands with detailed parameters"""
         expected_char = data_manager.get_expected_character("The Philosopher")
@@ -184,15 +242,16 @@ class TestBasicCommandGeneration:
         
         # Validate custom command structure
         assert command.command_type == "custom", "Should be marked as custom command"
-        assert "120" in command.formatted_command, "Should include custom BPM"
-        assert "D minor" in command.formatted_command, "Should include custom key"
-        assert "contemplative" in command.formatted_command.lower(), "Should include custom mood"
+        assert "120" in command.prompt, "Should include custom BPM"
+        assert "D minor" in command.prompt, "Should include custom key"
+        assert "contemplative" in command.prompt.lower(), "Should include custom mood"
         
         # Should be more detailed than simple command
-        assert len(command.formatted_command) > 200, "Custom command should be detailed"
+        assert len(command.prompt) > 200, "Custom command should be detailed"
         
-        await ctx.info(f"Custom command generated with {len(command.formatted_command)} characters")
+        await ctx.info(f"Custom command generated with {len(command.prompt)} characters")
     
+    @pytest.mark.asyncio
     async def test_bracket_notation_command(self, ctx: MockContext, data_manager: TestDataManager):
         """Test generation of commands with proper bracket notation"""
         expected_char = data_manager.get_expected_character("Marcus")
@@ -214,10 +273,10 @@ class TestBasicCommandGeneration:
         # Should contain proper meta tags
         required_tags = ["[Intro]", "[Verse]", "[Chorus]", "[Outro]"]
         for tag in required_tags:
-            assert tag in command.formatted_command, f"Should contain {tag} meta tag"
+            assert tag in command.prompt, f"Should contain {tag} meta tag"
         
         # Should have structured sections
-        sections = command.formatted_command.split('[')
+        sections = command.prompt.split('[')
         assert len(sections) >= 5, "Should have multiple structured sections"
         
         await ctx.info(f"Bracket notation command generated with {len(sections)} sections")
@@ -226,6 +285,7 @@ class TestBasicCommandGeneration:
 class TestCommandFormats:
     """Test different Suno command formats"""
     
+    @pytest.mark.asyncio
     async def test_narrative_command_format(self, ctx: MockContext, data_manager: TestDataManager):
         """Test narrative-style command format with story integration"""
         enhanced_generator = EnhancedSunoCommandGenerator()
@@ -256,6 +316,7 @@ class TestCommandFormats:
         
         await ctx.info("Narrative command format validated")
     
+    @pytest.mark.asyncio
     async def test_production_focused_format(self, ctx: MockContext, data_manager: TestDataManager):
         """Test production-focused command format with technical details"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")
@@ -278,17 +339,18 @@ class TestCommandFormats:
         )
         
         # Should include production details
-        assert "digital" in command.formatted_command.lower(), "Should reference studio type"
-        assert "cinematic" in command.formatted_command.lower(), "Should reference mixing style"
-        assert any(effect in command.formatted_command.lower() for effect in ["reverb", "delay"]), \
+        assert "digital" in command.prompt.lower(), "Should reference studio type"
+        assert "cinematic" in command.prompt.lower(), "Should reference mixing style"
+        assert any(effect in command.prompt.lower() for effect in ["reverb", "delay"]), \
             "Should reference audio effects"
         
         # Should maintain character connection
-        assert any(trait in command.formatted_command.lower() for trait in expected_char.personality_drivers), \
+        assert any(trait in command.prompt.lower() for trait in expected_char.personality_drivers), \
             "Should maintain character connection in production format"
         
         await ctx.info("Production-focused format validated")
     
+    @pytest.mark.asyncio
     async def test_lyrical_focused_format(self, ctx: MockContext, data_manager: TestDataManager):
         """Test lyrical-focused command format emphasizing vocal content"""
         expected_char = data_manager.get_expected_character("Elena Rodriguez")
@@ -306,16 +368,16 @@ class TestCommandFormats:
         )
         
         # Should emphasize lyrical content
-        assert "artistic" in command.formatted_command.lower(), "Should reference artistic themes"
-        assert "creative" in command.formatted_command.lower(), "Should reference creativity"
+        assert "artistic" in command.prompt.lower(), "Should reference artistic themes"
+        assert "creative" in command.prompt.lower(), "Should reference creativity"
         
         # Should include vocal direction
         vocal_directions = ["vocals", "singing", "voice", "delivery", "expression"]
-        assert any(direction in command.formatted_command.lower() for direction in vocal_directions), \
+        assert any(direction in command.prompt.lower() for direction in vocal_directions), \
             "Should include vocal direction"
         
         # Should reference character's emotional state
-        assert any(emotion in command.formatted_command.lower() for emotion in ["fear", "vulnerable", "authentic"]), \
+        assert any(emotion in command.prompt.lower() for emotion in ["fear", "vulnerable", "authentic"]), \
             "Should reference character's emotional state"
         
         await ctx.info("Lyrical-focused format validated")
@@ -324,6 +386,7 @@ class TestCommandFormats:
 class TestMetaTagStrategy:
     """Test meta tag strategy and implementation"""
     
+    @pytest.mark.asyncio
     async def test_structural_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test proper use of structural meta tags"""
         expected_char = data_manager.get_expected_character("Sarah Chen")
@@ -341,12 +404,12 @@ class TestMetaTagStrategy:
         
         # Should include standard structural tags
         structural_tags = ["[Intro]", "[Verse]", "[Chorus]", "[Bridge]", "[Outro]"]
-        found_tags = [tag for tag in structural_tags if tag in command.formatted_command]
+        found_tags = [tag for tag in structural_tags if tag in command.prompt]
         
         assert len(found_tags) >= 4, f"Should include most structural tags, found {found_tags}"
         
         # Tags should be in logical order
-        tag_positions = {tag: command.formatted_command.find(tag) for tag in found_tags}
+        tag_positions = {tag: command.prompt.find(tag) for tag in found_tags}
         sorted_tags = sorted(tag_positions.items(), key=lambda x: x[1])
         
         # Intro should come before Outro
@@ -356,6 +419,7 @@ class TestMetaTagStrategy:
         
         await ctx.info(f"Structural meta tags validated: {found_tags}")
     
+    @pytest.mark.asyncio
     async def test_emotional_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test use of emotional meta tags based on character"""
         expected_char = data_manager.get_expected_character("Marcus")  # Grief-focused character
@@ -373,20 +437,21 @@ class TestMetaTagStrategy:
         
         # Should include emotion-appropriate meta tags
         emotional_tags = ["[Emotional]", "[Heartfelt]", "[Soulful]", "[Powerful]", "[Raw]"]
-        found_emotional_tags = [tag for tag in emotional_tags if tag in command.formatted_command]
+        found_emotional_tags = [tag for tag in emotional_tags if tag in command.prompt]
         
         assert len(found_emotional_tags) >= 1, \
             f"Should include emotional meta tags for emotional character, found {found_emotional_tags}"
         
         # Should avoid inappropriate emotional tags
         inappropriate_tags = ["[Upbeat]", "[Happy]", "[Cheerful]", "[Playful]"]
-        found_inappropriate = [tag for tag in inappropriate_tags if tag in command.formatted_command]
+        found_inappropriate = [tag for tag in inappropriate_tags if tag in command.prompt]
         
         assert len(found_inappropriate) == 0, \
             f"Should not include inappropriate emotional tags, found {found_inappropriate}"
         
         await ctx.info(f"Emotional meta tags validated: {found_emotional_tags}")
     
+    @pytest.mark.asyncio
     async def test_instrumental_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test instrumental meta tags based on persona preferences"""
         expected_char = data_manager.get_expected_character("The Philosopher")
@@ -411,7 +476,7 @@ class TestMetaTagStrategy:
             found_instrument_tags = [tag for tag in instrument_tags if tag.lower().replace('[', '').replace(']', '') in primary_instrument]
             
             # Should reference preferred instruments in some way
-            instrument_mentioned = any(instrument.lower() in command.formatted_command.lower() 
+            instrument_mentioned = any(instrument.lower() in command.prompt.lower() 
                                      for instrument in expected_persona.instrumental_preferences[:2])
             
             assert instrument_mentioned, \
@@ -419,6 +484,7 @@ class TestMetaTagStrategy:
         
         await ctx.info("Instrumental meta tags validated")
     
+    @pytest.mark.asyncio
     async def test_genre_specific_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test genre-specific meta tag usage"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")  # Electronic genre
@@ -437,7 +503,7 @@ class TestMetaTagStrategy:
         # Should include genre-appropriate tags
         if "electronic" in expected_persona.primary_genre.lower():
             electronic_tags = ["[Synthesized]", "[Digital]", "[Electronic]", "[Ambient]", "[Build]", "[Drop]"]
-            found_electronic_tags = [tag for tag in electronic_tags if tag in command.formatted_command]
+            found_electronic_tags = [tag for tag in electronic_tags if tag in command.prompt]
             
             assert len(found_electronic_tags) >= 1, \
                 f"Should include electronic-specific tags, found {found_electronic_tags}"
@@ -445,7 +511,7 @@ class TestMetaTagStrategy:
         # Should avoid genre-inappropriate tags
         if "electronic" in expected_persona.primary_genre.lower():
             acoustic_tags = ["[Acoustic Guitar]", "[Harmonica]", "[Banjo]", "[Folk]"]
-            found_acoustic_tags = [tag for tag in acoustic_tags if tag in command.formatted_command]
+            found_acoustic_tags = [tag for tag in acoustic_tags if tag in command.prompt]
             
             assert len(found_acoustic_tags) == 0, \
                 f"Should not include acoustic tags for electronic genre, found {found_acoustic_tags}"
@@ -456,6 +522,7 @@ class TestMetaTagStrategy:
 class TestEffectivenessScoring:
     """Test Suno command effectiveness scoring system"""
     
+    @pytest.mark.asyncio
     async def test_narrative_coherence_scoring(self, ctx: MockContext, data_manager: TestDataManager):
         """Test narrative coherence scoring component"""
         enhanced_generator = EnhancedSunoCommandGenerator()
@@ -494,6 +561,7 @@ class TestEffectivenessScoring:
         
         await ctx.info("Narrative coherence scoring validated")
     
+    @pytest.mark.asyncio
     async def test_production_authenticity_scoring(self, ctx: MockContext, data_manager: TestDataManager):
         """Test production authenticity scoring component"""
         enhanced_generator = EnhancedSunoCommandGenerator()
@@ -532,6 +600,7 @@ class TestEffectivenessScoring:
         
         await ctx.info("Production authenticity scoring validated")
     
+    @pytest.mark.asyncio
     async def test_suno_optimization_scoring(self, ctx: MockContext, data_manager: TestDataManager):
         """Test Suno AI optimization scoring component"""
         enhanced_generator = EnhancedSunoCommandGenerator()
@@ -554,7 +623,7 @@ class TestEffectivenessScoring:
             f"Optimized command should score well, got {optimized_command.suno_optimization_score}"
         
         # Score should consider meta tags, BPM, and production details
-        command_text = optimized_command.formatted_command
+        command_text = optimized_command.prompt
         
         # Check for optimization factors
         has_meta_tags = any(tag in command_text for tag in ["[Intro]", "[Verse]", "[Chorus]"])
@@ -567,6 +636,7 @@ class TestEffectivenessScoring:
         
         await ctx.info("Suno optimization scoring validated")
     
+    @pytest.mark.asyncio
     async def test_overall_effectiveness_calculation(self, ctx: MockContext, data_manager: TestDataManager):
         """Test overall effectiveness score calculation"""
         enhanced_generator = EnhancedSunoCommandGenerator()
@@ -605,6 +675,7 @@ class TestEffectivenessScoring:
 class TestCommandOptimization:
     """Test command optimization features"""
     
+    @pytest.mark.asyncio
     async def test_length_optimization(self, ctx: MockContext, data_manager: TestDataManager):
         """Test command length optimization for Suno AI limits"""
         expected_char = data_manager.get_expected_character("The Philosopher")
@@ -623,27 +694,28 @@ class TestCommandOptimization:
         )
         
         # Should respect length limits
-        assert len(command.formatted_command) <= 2000, \
-            f"Command should respect length limit, got {len(command.formatted_command)} characters"
+        assert len(command.prompt) <= 2000, \
+            f"Command should respect length limit, got {len(command.prompt)} characters"
         
         # Should still include essential elements
-        assert command.title in command.formatted_command, "Should include track title"
-        assert expected_persona.primary_genre.lower() in command.formatted_command.lower(), \
+        assert expected_char.name in command.prompt, "Should include character name"
+        assert expected_persona.primary_genre.lower() in command.prompt.lower(), \
             "Should include genre information"
         
         # Should prioritize most important information
         essential_elements = [
             expected_char.name,
             expected_persona.primary_genre,
-            command.title
+            "Optimized Length"  # or some other essential element
         ]
         
         for element in essential_elements:
-            assert element.lower() in command.formatted_command.lower(), \
+            assert element.lower() in command.prompt.lower(), \
                 f"Should include essential element: {element}"
         
-        await ctx.info(f"Length optimization validated: {len(command.formatted_command)} characters")
+        await ctx.info(f"Length optimization validated: {len(command.prompt)} characters")
     
+    @pytest.mark.asyncio
     async def test_clarity_optimization(self, ctx: MockContext, data_manager: TestDataManager):
         """Test command clarity optimization for better Suno AI understanding"""
         expected_char = data_manager.get_expected_character("Maya Patel")
@@ -661,26 +733,27 @@ class TestCommandOptimization:
         
         # Should use clear, direct language
         unclear_phrases = ["perhaps", "maybe", "might be", "could be", "somewhat"]
-        found_unclear = [phrase for phrase in unclear_phrases if phrase in command.formatted_command.lower()]
+        found_unclear = [phrase for phrase in unclear_phrases if phrase in command.prompt.lower()]
         
         assert len(found_unclear) <= 1, \
             f"Should minimize unclear language, found {found_unclear}"
         
         # Should have clear structure
-        sentences = command.formatted_command.split('.')
+        sentences = command.prompt.split('.')
         long_sentences = [s for s in sentences if len(s.strip()) > 150]
         
         assert len(long_sentences) <= 2, \
             f"Should avoid overly long sentences, found {len(long_sentences)}"
         
         # Should use specific rather than generic terms
-        specific_terms = [expected_char.name, expected_persona.primary_genre, command.title]
+        specific_terms = [expected_char.name, expected_persona.primary_genre, command.character_source]
         for term in specific_terms:
-            assert term in command.formatted_command, \
+            assert term in command.prompt, \
                 f"Should use specific term: {term}"
         
         await ctx.info("Command clarity optimization validated")
     
+    @pytest.mark.asyncio
     async def test_genre_optimization(self, ctx: MockContext, data_manager: TestDataManager):
         """Test genre-specific command optimization"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")
@@ -702,21 +775,21 @@ class TestCommandOptimization:
         if "electronic" in genre:
             # Electronic music optimization
             electronic_terms = ["synthesizer", "digital", "electronic", "beats", "production"]
-            found_electronic = [term for term in electronic_terms if term in command.formatted_command.lower()]
+            found_electronic = [term for term in electronic_terms if term in command.prompt.lower()]
             assert len(found_electronic) >= 2, \
                 f"Electronic genre should include electronic terms, found {found_electronic}"
         
         elif "rock" in genre:
             # Rock music optimization
             rock_terms = ["guitar", "drums", "bass", "power", "energy"]
-            found_rock = [term for term in rock_terms if term in command.formatted_command.lower()]
+            found_rock = [term for term in rock_terms if term in command.prompt.lower()]
             assert len(found_rock) >= 2, \
                 f"Rock genre should include rock terms, found {found_rock}"
         
         # Should avoid genre-inappropriate terms
         if "electronic" in genre:
             acoustic_terms = ["acoustic guitar", "harmonica", "banjo", "folk"]
-            found_acoustic = [term for term in acoustic_terms if term in command.formatted_command.lower()]
+            found_acoustic = [term for term in acoustic_terms if term in command.prompt.lower()]
             assert len(found_acoustic) == 0, \
                 f"Electronic genre should avoid acoustic terms, found {found_acoustic}"
         
