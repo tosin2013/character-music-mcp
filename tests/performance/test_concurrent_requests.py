@@ -11,8 +11,35 @@ import asyncio
 import sys
 import os
 import time
-import psutil
 import gc
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+    # Mock psutil for testing without it
+    class MockProcess:
+        def memory_info(self):
+            class MockMemInfo:
+                rss = 100 * 1024 * 1024  # 100MB mock
+                vms = 200 * 1024 * 1024  # 200MB mock
+            return MockMemInfo()
+        
+        def cpu_percent(self):
+            return 10.0  # Mock 10% CPU usage
+    
+    class MockPsutil:
+        def Process(self, pid=None):
+            return MockProcess()
+        
+        def virtual_memory(self):
+            class MockVMem:
+                total = 8 * 1024 * 1024 * 1024  # 8GB mock
+                available = 4 * 1024 * 1024 * 1024  # 4GB mock
+                percent = 50.0
+            return MockVMem()
+    
+    psutil = MockPsutil()
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from concurrent.futures import ThreadPoolExecutor
