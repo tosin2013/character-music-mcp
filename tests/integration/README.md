@@ -50,6 +50,45 @@ Tests all MCP tool validation including parameter validation, error handling, an
 
 **Requirements Covered:** 1.1, 3.5
 
+### 4. Wiki Integration End-to-End Tests (`test_wiki_integration_end_to_end.py`)
+
+Tests complete wiki data integration workflows including download, parse, generate, and attribute flows.
+
+**Key Test Cases:**
+- Complete download → parse → generate → attribute flow
+- Fallback scenarios with unavailable wiki data
+- Configuration changes and system reconfiguration
+- Concurrent access and performance under load
+- Data consistency across wiki integration components
+- Error recovery and resilience testing
+
+**Requirements Covered:** All dynamic Suno data integration requirements
+
+### 5. Wiki Performance and Edge Cases (`test_wiki_performance_and_edge_cases.py`)
+
+Tests performance characteristics, edge cases, and stress scenarios for wiki data integration.
+
+**Key Test Cases:**
+- Large dataset handling and parsing performance
+- Memory usage patterns and cleanup
+- Concurrent stress testing with multiple requests
+- Edge case inputs and boundary conditions
+- Cache performance and efficiency
+- Resource cleanup and limits validation
+
+**Requirements Covered:** Performance validation and edge case handling
+
+### 6. Wiki Integration Test Runner (`test_wiki_integration_runner.py`)
+
+Comprehensive test runner that orchestrates all wiki integration tests with detailed reporting.
+
+**Key Features:**
+- Unified execution of all wiki integration tests
+- Performance metrics collection and analysis
+- Detailed test reporting with JSON output
+- Configurable test categories (end-to-end, performance, all)
+- Error handling and cleanup management
+
 ## Running the Tests
 
 ### Prerequisites
@@ -69,12 +108,37 @@ pytest tests/integration/test_album_creation.py -v
 
 # MCP tools tests
 pytest tests/integration/test_mcp_tools.py -v
+
+# Wiki integration end-to-end tests
+pytest tests/integration/test_wiki_integration_end_to_end.py -v
+
+# Wiki performance and edge case tests
+pytest tests/integration/test_wiki_performance_and_edge_cases.py -v
 ```
 
 ### Running All Integration Tests
 
 ```bash
 pytest tests/integration/ -v
+```
+
+### Running Wiki Integration Tests
+
+```bash
+# Run all wiki integration tests
+python tests/integration/test_wiki_integration_runner.py --category all
+
+# Run only end-to-end wiki tests
+python tests/integration/test_wiki_integration_runner.py --category end_to_end
+
+# Run only performance wiki tests
+python tests/integration/test_wiki_integration_runner.py --category performance
+
+# Run quick wiki tests (no performance tests)
+python tests/integration/test_wiki_integration_runner.py --category quick
+
+# Run with stress tests (longer execution)
+python tests/integration/test_wiki_integration_runner.py --category all --stress
 ```
 
 ### Running with Coverage
