@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """
 Tests for DocumentationValidator class
@@ -140,6 +141,7 @@ from fastmcp import FastMCP
 mcp = FastMCP("test")
 
 @mcp.tool
+@pytest.mark.asyncio
 async def test_mcp_tool(param: str) -> str:
     """This is an MCP tool"""
     return param
@@ -357,6 +359,7 @@ def _private_function():
         # Create test code file
         (self.code_path / "test.py").write_text('''
 @mcp.tool
+@pytest.mark.asyncio
 async def test_tool():
     """Test MCP tool"""
     pass

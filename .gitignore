@@ -118,10 +118,20 @@ enhanced_test_*.py
 simple_test.py
 temp_character_input.json
 *_summary.md
+*_SUMMARY.md
+TASK_*_IMPLEMENTATION_SUMMARY.md
 integration_plan.md
 workflow_analysis_report.md
 README.docx
 CLAUDE.md
+suno_album_compilation.md
+debug_character_detection.py
+character_profile_migration.py
+cleanup_before_push.sh
+
+# Generated reports and validation files
+*_validation_report.json
+standard_character_profile_validation_report.json
 
 # Wiki data cache
 data/wiki/

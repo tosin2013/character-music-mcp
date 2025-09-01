@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """
 Unit Tests for Persona Generation Components
@@ -34,7 +35,8 @@ class TestPersonaCreation:
     """Test basic artist persona creation from character profiles"""
     
     @asyncio_test
-    async def test_persona_from_simple_character(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_persona_from_simple_character(self, ctx: MockContext, data_manager: TestDataManager):
         """Test persona generation from simple character profile"""
         expected_char = data_manager.get_expected_character("Sarah Chen")
         generator = PersonaGenerator()
@@ -59,7 +61,8 @@ class TestPersonaCreation:
         await ctx.info(f"Generated persona for {persona.artist_name} in {persona.primary_genre}")
     
     @asyncio_test
-    async def test_persona_from_complex_character(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_persona_from_complex_character(self, ctx: MockContext, data_manager: TestDataManager):
         """Test persona generation from complex character with rich psychology"""
         expected_char = data_manager.get_expected_character("The Philosopher")
         generator = PersonaGenerator()
@@ -86,7 +89,8 @@ class TestPersonaCreation:
         await ctx.info(f"Complex persona generated: {len(persona.lyrical_themes)} themes, {persona.primary_genre}")
     
     @asyncio_test
-    async def test_persona_consistency(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_persona_consistency(self, ctx: MockContext, data_manager: TestDataManager):
         """Test that persona generation is consistent for same character"""
         expected_char = data_manager.get_expected_character("Marcus")
         generator = PersonaGenerator()
@@ -113,7 +117,8 @@ class TestPersonalityTraitMapping:
     """Test mapping of character personality traits to musical elements"""
     
     @asyncio_test
-    async def test_emotional_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_emotional_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
         """Test mapping of emotional traits to musical characteristics"""
         expected_char = data_manager.get_expected_character("Marcus")  # Grief-focused character
         generator = PersonaGenerator()
@@ -140,7 +145,8 @@ class TestPersonalityTraitMapping:
         await ctx.info("Emotional trait mapping validated")
     
     @asyncio_test
-    async def test_intellectual_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_intellectual_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
         """Test mapping of intellectual traits to musical characteristics"""
         expected_char = data_manager.get_expected_character("The Philosopher")
         generator = PersonaGenerator()
@@ -169,7 +175,8 @@ class TestPersonalityTraitMapping:
         await ctx.info("Intellectual trait mapping validated")
     
     @asyncio_test
-    async def test_creative_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_creative_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
         """Test mapping of creative traits to musical characteristics"""
         expected_char = data_manager.get_expected_character("Elena Rodriguez")  # Artist character
         generator = PersonaGenerator()
@@ -196,7 +203,8 @@ class TestPersonalityTraitMapping:
         await ctx.info("Creative trait mapping validated")
     
     @asyncio_test
-    async def test_adventurous_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_adventurous_trait_mapping(self, ctx: MockContext, data_manager: TestDataManager):
         """Test mapping of adventurous traits to musical characteristics"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")  # Sci-fi adventure character
         generator = PersonaGenerator()
@@ -228,7 +236,8 @@ class TestGenreMapping:
     """Test accuracy of personality trait to genre mapping"""
     
     @asyncio_test
-    async def test_genre_mapping_accuracy(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_genre_mapping_accuracy(self, ctx: MockContext, data_manager: TestDataManager):
         """Test that genre mapping accurately reflects character traits"""
         generator = PersonaGenerator()
         
@@ -257,7 +266,8 @@ class TestGenreMapping:
         await ctx.info("Genre mapping accuracy validated")
     
     @asyncio_test
-    async def test_genre_consistency_with_traits(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_genre_consistency_with_traits(self, ctx: MockContext, data_manager: TestDataManager):
         """Test that selected genres are consistent with character traits"""
         expected_char = data_manager.get_expected_character("Detective Riley Santos")  # Urban fantasy
         generator = PersonaGenerator()
@@ -280,7 +290,8 @@ class TestGenreMapping:
         await ctx.info("Genre consistency validated")
     
     @asyncio_test
-    async def test_cross_genre_influences(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_cross_genre_influences(self, ctx: MockContext, data_manager: TestDataManager):
         """Test handling of characters that could span multiple genres"""
         expected_char = data_manager.get_expected_character("Amelia Hartwell")  # Historical mathematician
         generator = PersonaGenerator()
@@ -313,7 +324,8 @@ class TestVocalStyleDetermination:
     """Test vocal style determination based on character traits"""
     
     @asyncio_test
-    async def test_emotional_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_emotional_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
         """Test vocal style determination for emotional characters"""
         expected_char = data_manager.get_expected_character("Marcus")  # Grief-focused
         generator = PersonaGenerator()
@@ -335,7 +347,8 @@ class TestVocalStyleDetermination:
         await ctx.info(f"Emotional vocal style validated: {persona.vocal_style}")
     
     @asyncio_test
-    async def test_intellectual_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_intellectual_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
         """Test vocal style determination for intellectual characters"""
         expected_char = data_manager.get_expected_character("The Philosopher")
         generator = PersonaGenerator()
@@ -361,7 +374,8 @@ class TestVocalStyleDetermination:
         await ctx.info(f"Intellectual vocal style validated: {persona.vocal_style}")
     
     @asyncio_test
-    async def test_confident_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_confident_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
         """Test vocal style determination for confident characters"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")  # Leadership character
         generator = PersonaGenerator()
@@ -383,7 +397,8 @@ class TestVocalStyleDetermination:
         await ctx.info(f"Confident vocal style validated: {persona.vocal_style}")
     
     @asyncio_test
-    async def test_vulnerable_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_vulnerable_vocal_styles(self, ctx: MockContext, data_manager: TestDataManager):
         """Test vocal style determination for vulnerable characters"""
         expected_char = data_manager.get_expected_character("Elena Rodriguez")  # Fearful artist
         generator = PersonaGenerator()
@@ -410,7 +425,8 @@ class TestInstrumentalPreferences:
     """Test instrumental preference selection based on character traits"""
     
     @asyncio_test
-    async def test_emotional_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_emotional_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
         """Test instrumental preferences for emotional characters"""
         expected_char = data_manager.get_expected_character("Marcus")  # Grief-focused
         generator = PersonaGenerator()
@@ -435,7 +451,8 @@ class TestInstrumentalPreferences:
         await ctx.info(f"Emotional instrumental preferences validated: {persona.instrumental_preferences[:3]}")
     
     @asyncio_test
-    async def test_electronic_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_electronic_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
         """Test instrumental preferences for electronic/futuristic characters"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")  # Sci-fi character
         generator = PersonaGenerator()
@@ -460,7 +477,8 @@ class TestInstrumentalPreferences:
         await ctx.info(f"Electronic instrumental preferences validated: {persona.instrumental_preferences[:3]}")
     
     @asyncio_test
-    async def test_traditional_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_traditional_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
         """Test instrumental preferences for traditional/historical characters"""
         expected_char = data_manager.get_expected_character("Amelia Hartwell")  # Victorian mathematician
         generator = PersonaGenerator()
@@ -485,7 +503,8 @@ class TestInstrumentalPreferences:
         await ctx.info(f"Traditional instrumental preferences validated: {persona.instrumental_preferences[:3]}")
     
     @asyncio_test
-    async def test_versatile_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
+    @pytest.mark.asyncio
+async def test_versatile_instrumental_preferences(self, ctx: MockContext, data_manager: TestDataManager):
         """Test instrumental preferences for versatile/creative characters"""
         expected_char = data_manager.get_expected_character("Elena Rodriguez")  # Artist character
         generator = PersonaGenerator()

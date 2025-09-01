@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """
 Tests for PromptTemplateSystem class
@@ -185,7 +186,8 @@ perfect alignment before starting her day, a ritual that calmed her anxiety.
         short_score = self.system._score_completeness(short_text)
         assert short_score < 0.5
     
-    async def test_test_template_without_mcp_tools(self):
+    @pytest.mark.asyncio
+async def test_test_template_without_mcp_tools(self):
         """Test template testing without MCP tools (heuristic mode)"""
         template = PromptTemplate(
             name="Test Template",
@@ -208,7 +210,8 @@ perfect alignment before starting her day, a ritual that calmed her anxiety.
         assert 0.0 <= result.character_confidence <= 1.0
         assert result.filled_template == template.template_text
     
-    async def test_test_template_with_mock_mcp_tools(self):
+    @pytest.mark.asyncio
+async def test_test_template_with_mock_mcp_tools(self):
         """Test template testing with mocked MCP tools"""
         template = PromptTemplate(
             name="Mock Test Template",
@@ -244,7 +247,8 @@ perfect alignment before starting her day, a ritual that calmed her anxiety.
         assert result.completeness_score == 1.0  # Both required fields present
         assert result.effectiveness_score > 0.8
     
-    async def test_test_all_templates(self):
+    @pytest.mark.asyncio
+async def test_test_all_templates(self):
         """Test comprehensive template testing"""
         # Create test templates
         template1_content = """# Template 1

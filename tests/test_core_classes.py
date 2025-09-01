@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """
 Test suite for Enhanced Music Production Core Classes
@@ -212,6 +213,7 @@ TEST_ARTIST_PERSONA = {
 }
 
 # Test functions
+@pytest.mark.asyncio
 async def test_suno_knowledge_manager():
     print("Testing Suno Knowledge Manager...")
     
@@ -236,6 +238,7 @@ async def test_suno_knowledge_manager():
     
     return True
 
+@pytest.mark.asyncio
 async def test_story_generator():
     print("Testing Story Generator...")
     
@@ -260,6 +263,7 @@ async def test_story_generator():
     
     return True
 
+@pytest.mark.asyncio
 async def test_music_producer():
     print("Testing Music Producer...")
     
@@ -294,6 +298,7 @@ async def test_music_producer():
     
     return True
 
+@pytest.mark.asyncio
 async def test_integration_workflow():
     print("Testing Integration Workflow...")
     
@@ -321,6 +326,7 @@ async def test_integration_workflow():
     print("✅ Integration workflow working")
     return True
 
+@pytest.mark.asyncio
 async def test_error_handling():
     print("Testing Error Handling...")
     

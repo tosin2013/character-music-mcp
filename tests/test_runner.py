@@ -1,3 +1,4 @@
+import pytest
 #!/usr/bin/env python3
 """
 Unified Test Runner for Character-Driven Music Generation
@@ -464,6 +465,7 @@ class TestRunner:
 
 
 # Example test functions for demonstration
+@pytest.mark.asyncio
 async def test_data_manager_scenarios(ctx: MockContext, data_manager: TestDataManager) -> None:
     """Test that test data manager provides expected scenarios"""
     scenarios = data_manager.list_scenarios()
@@ -477,6 +479,7 @@ async def test_data_manager_scenarios(ctx: MockContext, data_manager: TestDataMa
     await ctx.info("Test data manager scenarios validated")
 
 
+@pytest.mark.asyncio
 async def test_mock_context_functionality(ctx: MockContext, data_manager: TestDataManager) -> None:
     """Test that mock context works correctly"""
     await ctx.info("Testing mock context")

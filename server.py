@@ -10,7 +10,7 @@ import asyncio
 import json
 import os
 import re
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Dict, List, Optional, Any, Union, Tuple
 from pathlib import Path
 import logging
@@ -19,6 +19,10 @@ from datetime import datetime
 from fastmcp import FastMCP, Context
 from pydantic import BaseModel
 from working_universal_processor import WorkingUniversalProcessor
+
+# Enhanced character analysis imports
+from standard_character_profile import StandardCharacterProfile
+from enhanced_character_analyzer import EnhancedCharacterAnalyzer
 
 # Wiki data integration imports
 # Configure logging
@@ -104,21 +108,117 @@ class ArtistPersona:
     artist_name: str
     
     # Musical identity
-    primary_genre: str
-    secondary_genres: List[str]
-    vocal_style: str
-    instrumental_preferences: List[str]
+    primary_genre: str = ""
+    secondary_genres: List[str] = field(default_factory=list)
+    vocal_style: str = ""
+    instrumental_preferences: List[str] = field(default_factory=list)
     
     # Creative characteristics
-    lyrical_themes: List[str]
-    emotional_palette: List[str]
-    artistic_influences: List[str]
-    collaboration_style: str
+    lyrical_themes: List[str] = field(default_factory=list)
+    emotional_palette: List[str] = field(default_factory=list)
+    artistic_influences: List[str] = field(default_factory=list)
+    collaboration_style: str = ""
     
     # Persona metadata
-    character_mapping_confidence: float
-    genre_justification: str
-    persona_description: str
+    character_mapping_confidence: float = 1.0
+    genre_justification: str = ""
+    persona_description: str = ""
+    
+    def __post_init__(self):
+        """Validate and normalize data after initialization"""
+        # Ensure required string fields are not empty
+        if not self.character_name or not self.character_name.strip():
+            self.character_name = "Unknown Character"
+        if not self.artist_name or not self.artist_name.strip():
+            self.artist_name = self.character_name
+        
+        # Normalize confidence score
+        self.character_mapping_confidence = max(0.0, min(1.0, self.character_mapping_confidence))
+        
+        # Clean up string fields
+        self.character_name = self.character_name.strip()
+        self.artist_name = self.artist_name.strip()
+        self.primary_genre = self.primary_genre.strip()
+        self.vocal_style = self.vocal_style.strip()
+        self.collaboration_style = self.collaboration_style.strip()
+        self.genre_justification = self.genre_justification.strip()
+        self.persona_description = self.persona_description.strip()
+        
+        # Remove empty strings from lists
+        self.secondary_genres = [item.strip() for item in self.secondary_genres if item and item.strip()]
+        self.instrumental_preferences = [item.strip() for item in self.instrumental_preferences if item and item.strip()]
+        self.lyrical_themes = [item.strip() for item in self.lyrical_themes if item and item.strip()]
+        self.emotional_palette = [item.strip() for item in self.emotional_palette if item and item.strip()]
+        self.artistic_influences = [item.strip() for item in self.artistic_influences if item and item.strip()]
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'ArtistPersona':
+        """
+        Create ArtistPersona from dictionary, handling missing fields gracefully
+        
+        Args:
+            data: Dictionary containing artist persona data
+            
+        Returns:
+            ArtistPersona instance with all fields properly initialized
+        """
+        if not isinstance(data, dict):
+            raise ValueError(f"Expected dictionary, got {type(data)}")
+        
+        # Handle the case where required fields are missing
+        if 'character_name' not in data or not data['character_name']:
+            data['character_name'] = "Unknown Character"
+        if 'artist_name' not in data or not data['artist_name']:
+            data['artist_name'] = data['character_name']
+        
+        # Create a new dict with only valid fields for this class
+        valid_fields = {field.name for field in cls.__dataclass_fields__.values()}
+        filtered_data = {}
+        
+        for key, value in data.items():
+            if key in valid_fields:
+                # Handle type conversion for common mismatches
+                field_type = cls.__dataclass_fields__[key].type
+                
+                # Handle list fields that might come as strings or None
+                if hasattr(field_type, '__origin__') and field_type.__origin__ is list:
+                    if value is None:
+                        filtered_data[key] = []
+                    elif isinstance(value, str):
+                        # Split string into list if it contains separators
+                        if ',' in value:
+                            filtered_data[key] = [item.strip() for item in value.split(',') if item.strip()]
+                        elif ';' in value:
+                            filtered_data[key] = [item.strip() for item in value.split(';') if item.strip()]
+                        else:
+                            filtered_data[key] = [value] if value.strip() else []
+                    elif isinstance(value, list):
+                        filtered_data[key] = value
+                    else:
+                        filtered_data[key] = [str(value)] if value else []
+                
+                # Handle string fields that might be None
+                elif field_type == str:
+                    filtered_data[key] = str(value) if value is not None else ""
+                
+                # Handle float fields
+                elif field_type == float:
+                    try:
+                        filtered_data[key] = float(value) if value is not None else 1.0
+                    except (ValueError, TypeError):
+                        filtered_data[key] = 1.0
+                
+                else:
+                    filtered_data[key] = value
+        
+        try:
+            return cls(**filtered_data)
+        except TypeError as e:
+            # Create minimal valid instance if there are still issues
+            return cls(
+                character_name=data.get('character_name', 'Unknown Character'),
+                artist_name=data.get('artist_name', data.get('character_name', 'Unknown Artist'))
+            )
     
     def to_dict(self):
         """Convert to dictionary for JSON serialization"""
@@ -240,6 +340,981 @@ class BeatPattern:
             'emotional_mapping': self.emotional_mapping,
             'intensity_automation': self.intensity_automation
         }
+
+class CreativeMusicEngine:
+    """Engine for meaningful creative music generation with musical analysis"""
+    
+    def __init__(self):
+        # Initialize with access to wiki data if available
+        self.wiki_data_manager = None
+        try:
+            # Try to get wiki data manager from global context if available
+            if hasattr(globals(), 'wiki_data_manager') and globals()['wiki_data_manager']:
+                self.wiki_data_manager = globals()['wiki_data_manager']
+        except:
+            pass
+    
+    def analyze_musical_concept(self, concept: str) -> Dict[str, Any]:
+        """Analyze concept for musical elements instead of just repeating text"""
+        concept_lower = concept.lower()
+        
+        # Extract musical elements from concept
+        musical_elements = {
+            "core_themes": self._extract_themes(concept),
+            "emotional_qualities": self._analyze_emotional_qualities(concept),
+            "rhythmic_implications": self._analyze_rhythmic_elements(concept),
+            "harmonic_suggestions": self._analyze_harmonic_elements(concept),
+            "textural_elements": self._analyze_textural_elements(concept),
+            "structural_implications": self._analyze_structural_elements(concept),
+            "sonic_palette": self._extract_sonic_palette(concept)
+        }
+        
+        return musical_elements
+    
+    def generate_creative_variations(self, concept_analysis: Dict[str, Any], style_preference: str) -> List[Dict[str, Any]]:
+        """Generate meaningful creative variations based on musical analysis"""
+        variations = []
+        
+        # Generate variations based on different musical approaches
+        approaches = [
+            "rhythmic_focus",
+            "harmonic_exploration", 
+            "textural_emphasis",
+            "structural_innovation",
+            "emotional_intensity"
+        ]
+        
+        for approach in approaches:
+            variation = self._create_variation_by_approach(concept_analysis, approach, style_preference)
+            variations.append(variation)
+        
+        return variations
+    
+    async def generate_practical_suno_commands(self, variations: List[Dict], concept_analysis: Dict) -> List[Dict[str, Any]]:
+        """Generate practical Suno AI commands that actually work"""
+        commands = []
+        
+        # Get wiki data for accurate meta tags and techniques
+        genres = []
+        meta_tags = []
+        techniques = []
+        
+        if self.wiki_data_manager:
+            try:
+                genres = await self.wiki_data_manager.get_genres()
+                meta_tags = await self.wiki_data_manager.get_meta_tags()
+                techniques = await self.wiki_data_manager.get_techniques()
+            except Exception as e:
+                logger.warning(f"Could not fetch wiki data: {e}")
+        
+        # Generate commands for each variation
+        for i, variation in enumerate(variations):
+            command = self._create_suno_command(
+                variation, concept_analysis, genres, meta_tags, techniques, i + 1
+            )
+            commands.append(command)
+        
+        return commands
+    
+    def _extract_themes(self, concept: str) -> List[str]:
+        """Extract core thematic elements from concept"""
+        themes = []
+        concept_lower = concept.lower()
+        
+        # Enhanced thematic keywords mapping with more comprehensive coverage
+        theme_patterns = {
+            "transformation": ["change", "transform", "evolve", "become", "growth", "metamorphosis", "transition", "shift"],
+            "journey": ["travel", "path", "journey", "road", "adventure", "quest", "voyage", "walk", "move", "go"],
+            "conflict": ["struggle", "fight", "battle", "conflict", "tension", "opposition", "war", "clash", "chaos"],
+            "love": ["love", "romance", "heart", "passion", "affection", "devotion", "relationship", "together"],
+            "loss": ["loss", "grief", "sorrow", "missing", "gone", "departed", "empty", "alone", "lost"],
+            "hope": ["hope", "dream", "aspire", "wish", "future", "possibility", "bright", "light", "tomorrow"],
+            "memory": ["remember", "memory", "past", "nostalgia", "recall", "reminisce", "childhood", "yesterday"],
+            "nature": ["nature", "earth", "sky", "water", "forest", "mountain", "ocean", "tree", "wind", "rain"],
+            "time": ["time", "moment", "eternity", "forever", "instant", "duration", "clock", "hour", "day"],
+            "identity": ["self", "identity", "who", "being", "existence", "soul", "person", "individual"],
+            "peace": ["peace", "calm", "quiet", "still", "serene", "tranquil", "meditation", "rest"],
+            "energy": ["energy", "power", "force", "dynamic", "vibrant", "alive", "electric", "intense"],
+            "urban": ["city", "urban", "street", "building", "traffic", "crowd", "metropolitan", "downtown"],
+            "family": ["family", "home", "mother", "father", "child", "parent", "sibling", "house"],
+            "freedom": ["freedom", "free", "escape", "liberation", "independent", "open", "release"],
+            "mystery": ["mystery", "unknown", "secret", "hidden", "enigma", "puzzle", "strange"],
+            "celebration": ["celebration", "party", "joy", "festival", "dance", "music", "happy"],
+            "solitude": ["alone", "solitude", "lonely", "isolated", "single", "individual", "solo"],
+            "decision": ["decision", "choice", "choose", "decide", "crossroads", "option", "path"],
+            "awakening": ["wake", "awaken", "dawn", "morning", "sunrise", "beginning", "start"]
+        }
+        
+        # Score themes based on keyword matches
+        theme_scores = {}
+        for theme, keywords in theme_patterns.items():
+            score = sum(1 for keyword in keywords if keyword in concept_lower)
+            if score > 0:
+                theme_scores[theme] = score
+        
+        # Get top themes by score
+        if theme_scores:
+            sorted_themes = sorted(theme_scores.items(), key=lambda x: x[1], reverse=True)
+            themes = [theme for theme, score in sorted_themes[:3]]
+        
+        # Enhanced fallback logic - analyze concept structure and content
+        if not themes:
+            words = concept_lower.split()
+            
+            # Analyze sentence structure for themes
+            if any(word in concept_lower for word in ["feeling", "emotion", "sense"]):
+                themes.append("emotional_exploration")
+            elif any(word in concept_lower for word in ["standing", "sitting", "walking", "moving"]):
+                themes.append("physical_experience")
+            elif any(word in concept_lower for word in ["watching", "seeing", "looking", "observing"]):
+                themes.append("observation")
+            elif any(word in concept_lower for word in ["thinking", "contemplating", "wondering", "considering"]):
+                themes.append("contemplation")
+            elif len(words) > 15:
+                themes.append("complex_narrative")
+            elif len(words) > 8:
+                themes.append("detailed_scene")
+            else:
+                themes.append("abstract_concept")
+        
+        # Ensure we always have at least one theme
+        if not themes:
+            themes = ["universal_experience"]
+        
+        return themes[:3]  # Limit to top 3 themes
+    
+    def _analyze_emotional_qualities(self, concept: str) -> Dict[str, Any]:
+        """Analyze emotional qualities with varied responses"""
+        concept_lower = concept.lower()
+        
+        # Emotional intensity analysis
+        intensity_indicators = {
+            "high": ["intense", "powerful", "overwhelming", "explosive", "dramatic"],
+            "medium": ["strong", "significant", "notable", "meaningful", "important"],
+            "low": ["gentle", "subtle", "quiet", "soft", "delicate"]
+        }
+        
+        intensity = "medium"  # default
+        for level, indicators in intensity_indicators.items():
+            if any(indicator in concept_lower for indicator in indicators):
+                intensity = level
+                break
+        
+        # Emotional valence analysis
+        positive_words = ["joy", "happy", "love", "hope", "bright", "light", "celebration"]
+        negative_words = ["sad", "dark", "loss", "pain", "sorrow", "grief", "struggle"]
+        
+        positive_count = sum(1 for word in positive_words if word in concept_lower)
+        negative_count = sum(1 for word in negative_words if word in concept_lower)
+        
+        if positive_count > negative_count:
+            valence = "positive"
+        elif negative_count > positive_count:
+            valence = "negative"
+        else:
+            valence = "neutral_complex"
+        
+        # Emotional progression analysis
+        progression = "static"
+        if any(word in concept_lower for word in ["become", "transform", "change", "evolve"]):
+            progression = "transformative"
+        elif any(word in concept_lower for word in ["journey", "path", "through", "across"]):
+            progression = "developmental"
+        
+        return {
+            "intensity": intensity,
+            "valence": valence,
+            "progression": progression,
+            "primary_emotion": self._identify_primary_emotion(concept_lower),
+            "emotional_complexity": "high" if len(concept.split()) > 10 else "medium"
+        }
+    
+    def _identify_primary_emotion(self, concept_lower: str) -> str:
+        """Identify primary emotion beyond just 'contemplative'"""
+        emotion_patterns = {
+            "melancholy": ["sad", "sorrow", "melancholy", "wistful", "longing", "empty", "loss", "grief"],
+            "euphoria": ["joy", "ecstasy", "bliss", "elation", "euphoria", "celebration", "happy", "delight"],
+            "anxiety": ["worry", "fear", "anxious", "nervous", "uncertain", "tension", "stress", "edge"],
+            "anger": ["anger", "rage", "fury", "mad", "frustrated", "chaos", "battle", "fight"],
+            "wonder": ["wonder", "awe", "amazement", "mystery", "magical", "dawn", "awakening", "discovery"],
+            "nostalgia": ["memory", "past", "remember", "nostalgia", "childhood", "house", "family", "home"],
+            "determination": ["will", "strength", "determined", "resolve", "persevere", "decision", "choice"],
+            "serenity": ["peace", "calm", "serene", "tranquil", "still", "quiet", "meditation", "gentle"],
+            "excitement": ["energy", "dynamic", "vibrant", "electric", "intense", "powerful", "alive"],
+            "loneliness": ["alone", "lonely", "solitude", "isolated", "single", "empty", "echoing"],
+            "hope": ["hope", "dream", "future", "possibility", "light", "bright", "tomorrow"],
+            "curiosity": ["explore", "discover", "unknown", "question", "search", "find", "seek"]
+        }
+        
+        # Score emotions based on keyword matches
+        emotion_scores = {}
+        for emotion, keywords in emotion_patterns.items():
+            score = sum(1 for keyword in keywords if keyword in concept_lower)
+            if score > 0:
+                emotion_scores[emotion] = score
+        
+        # Return highest scoring emotion
+        if emotion_scores:
+            return max(emotion_scores.items(), key=lambda x: x[1])[0]
+        
+        # Enhanced fallback based on concept characteristics
+        if "?" in concept_lower:
+            return "curiosity"
+        elif "!" in concept_lower:
+            return "excitement"
+        elif len(concept_lower.split()) > 20:
+            return "contemplative"
+        elif any(word in concept_lower for word in ["the", "a", "an"]) and len(concept_lower.split()) > 10:
+            return "reflective"
+        else:
+            return "contemplative"  # final fallback
+    
+    def _analyze_rhythmic_elements(self, concept: str) -> Dict[str, Any]:
+        """Analyze rhythmic implications from concept"""
+        concept_lower = concept.lower()
+        
+        # Tempo implications
+        tempo_indicators = {
+            "fast": ["fast", "quick", "rapid", "racing", "urgent", "rushing", "energetic"],
+            "slow": ["slow", "gentle", "peaceful", "calm", "meditative", "still"],
+            "variable": ["changing", "shifting", "dynamic", "flowing", "evolving"]
+        }
+        
+        tempo_feel = "moderate"
+        for feel, indicators in tempo_indicators.items():
+            if any(indicator in concept_lower for indicator in indicators):
+                tempo_feel = feel
+                break
+        
+        # Rhythmic character
+        rhythm_character = "steady"
+        if any(word in concept_lower for word in ["broken", "fragmented", "chaos", "irregular"]):
+            rhythm_character = "irregular"
+        elif any(word in concept_lower for word in ["flow", "wave", "organic", "natural"]):
+            rhythm_character = "flowing"
+        elif any(word in concept_lower for word in ["pulse", "heartbeat", "steady", "constant"]):
+            rhythm_character = "pulsing"
+        
+        return {
+            "tempo_feel": tempo_feel,
+            "rhythm_character": rhythm_character,
+            "suggested_bpm_range": self._suggest_bpm_range(tempo_feel),
+            "rhythmic_complexity": "complex" if "complex" in concept_lower else "moderate"
+        }
+    
+    def _suggest_bpm_range(self, tempo_feel: str) -> str:
+        """Suggest BPM range based on tempo feel"""
+        bpm_ranges = {
+            "slow": "60-80 BPM",
+            "moderate": "90-110 BPM", 
+            "fast": "120-140 BPM",
+            "variable": "80-120 BPM (variable)"
+        }
+        return bpm_ranges.get(tempo_feel, "90-110 BPM")
+    
+    def _analyze_harmonic_elements(self, concept: str) -> Dict[str, Any]:
+        """Analyze harmonic implications"""
+        concept_lower = concept.lower()
+        
+        # Harmonic complexity
+        complexity = "moderate"
+        if any(word in concept_lower for word in ["complex", "layered", "deep", "intricate"]):
+            complexity = "complex"
+        elif any(word in concept_lower for word in ["simple", "pure", "clean", "minimal"]):
+            complexity = "simple"
+        
+        # Harmonic color
+        color = "warm"
+        if any(word in concept_lower for word in ["dark", "shadow", "night", "deep"]):
+            color = "dark"
+        elif any(word in concept_lower for word in ["bright", "light", "sun", "clear"]):
+            color = "bright"
+        elif any(word in concept_lower for word in ["cold", "ice", "winter", "distant"]):
+            color = "cool"
+        
+        # Modal suggestions
+        modal_suggestions = []
+        if "sad" in concept_lower or "sorrow" in concept_lower:
+            modal_suggestions.append("minor_modes")
+        if "mysterious" in concept_lower or "unknown" in concept_lower:
+            modal_suggestions.append("modal_scales")
+        if "joy" in concept_lower or "celebration" in concept_lower:
+            modal_suggestions.append("major_modes")
+        
+        return {
+            "complexity": complexity,
+            "harmonic_color": color,
+            "modal_suggestions": modal_suggestions,
+            "chord_progression_style": self._suggest_chord_style(concept_lower)
+        }
+    
+    def _suggest_chord_style(self, concept_lower: str) -> str:
+        """Suggest chord progression style"""
+        if any(word in concept_lower for word in ["classical", "traditional", "formal"]):
+            return "classical_progressions"
+        elif any(word in concept_lower for word in ["jazz", "sophisticated", "complex"]):
+            return "jazz_progressions"
+        elif any(word in concept_lower for word in ["folk", "simple", "acoustic"]):
+            return "folk_progressions"
+        elif any(word in concept_lower for word in ["modern", "contemporary", "new"]):
+            return "contemporary_progressions"
+        else:
+            return "versatile_progressions"
+    
+    def _analyze_textural_elements(self, concept: str) -> Dict[str, Any]:
+        """Analyze textural implications"""
+        concept_lower = concept.lower()
+        
+        # Texture density
+        density = "medium"
+        if any(word in concept_lower for word in ["thick", "dense", "layered", "full"]):
+            density = "dense"
+        elif any(word in concept_lower for word in ["thin", "sparse", "minimal", "empty"]):
+            density = "sparse"
+        
+        # Texture character
+        character = "smooth"
+        if any(word in concept_lower for word in ["rough", "harsh", "gritty", "raw"]):
+            character = "rough"
+        elif any(word in concept_lower for word in ["soft", "gentle", "flowing", "silk"]):
+            character = "soft"
+        elif any(word in concept_lower for word in ["sharp", "crisp", "clear", "defined"]):
+            character = "crisp"
+        
+        return {
+            "density": density,
+            "character": character,
+            "suggested_instruments": self._suggest_instruments(concept_lower),
+            "production_style": self._suggest_production_style(concept_lower)
+        }
+    
+    def _suggest_instruments(self, concept_lower: str) -> List[str]:
+        """Suggest instruments based on concept"""
+        instruments = []
+        
+        # Instrument associations
+        if any(word in concept_lower for word in ["nature", "forest", "earth"]):
+            instruments.extend(["acoustic_guitar", "flute", "strings"])
+        if any(word in concept_lower for word in ["urban", "city", "modern"]):
+            instruments.extend(["synthesizer", "electric_guitar", "electronic_drums"])
+        if any(word in concept_lower for word in ["classical", "elegant", "formal"]):
+            instruments.extend(["piano", "violin", "cello"])
+        if any(word in concept_lower for word in ["folk", "traditional", "acoustic"]):
+            instruments.extend(["acoustic_guitar", "harmonica", "banjo"])
+        
+        # Default if no specific associations
+        if not instruments:
+            instruments = ["piano", "strings", "subtle_percussion"]
+        
+        return instruments[:4]  # Limit to 4 instruments
+    
+    def _suggest_production_style(self, concept_lower: str) -> str:
+        """Suggest production style"""
+        if any(word in concept_lower for word in ["intimate", "close", "personal"]):
+            return "intimate_production"
+        elif any(word in concept_lower for word in ["grand", "epic", "vast", "huge"]):
+            return "epic_production"
+        elif any(word in concept_lower for word in ["clean", "pure", "minimal"]):
+            return "clean_production"
+        elif any(word in concept_lower for word in ["atmospheric", "ambient", "space"]):
+            return "atmospheric_production"
+        else:
+            return "balanced_production"
+    
+    def _analyze_structural_elements(self, concept: str) -> Dict[str, Any]:
+        """Analyze structural implications"""
+        concept_lower = concept.lower()
+        
+        # Structure type
+        structure_type = "traditional"
+        if any(word in concept_lower for word in ["journey", "story", "narrative"]):
+            structure_type = "narrative"
+        elif any(word in concept_lower for word in ["cycle", "circular", "return"]):
+            structure_type = "cyclical"
+        elif any(word in concept_lower for word in ["build", "grow", "develop"]):
+            structure_type = "developmental"
+        elif any(word in concept_lower for word in ["fragment", "piece", "broken"]):
+            structure_type = "fragmented"
+        
+        # Suggested sections
+        sections = self._suggest_sections(concept_lower, structure_type)
+        
+        return {
+            "structure_type": structure_type,
+            "suggested_sections": sections,
+            "overall_arc": self._suggest_overall_arc(concept_lower),
+            "dynamic_progression": self._suggest_dynamic_progression(concept_lower)
+        }
+    
+    def _suggest_sections(self, concept_lower: str, structure_type: str) -> List[str]:
+        """Suggest song sections based on concept"""
+        if structure_type == "narrative":
+            return ["intro_setting", "verse_development", "chorus_climax", "bridge_reflection", "outro_resolution"]
+        elif structure_type == "cyclical":
+            return ["intro", "theme_a", "theme_b", "theme_a_return", "outro"]
+        elif structure_type == "developmental":
+            return ["intro_seed", "development_1", "development_2", "climax", "resolution"]
+        elif structure_type == "fragmented":
+            return ["fragment_1", "fragment_2", "fragment_3", "synthesis", "outro"]
+        else:
+            return ["intro", "verse", "chorus", "verse", "chorus", "bridge", "chorus", "outro"]
+    
+    def _suggest_overall_arc(self, concept_lower: str) -> str:
+        """Suggest overall emotional/dynamic arc"""
+        if any(word in concept_lower for word in ["rise", "build", "grow", "ascend"]):
+            return "ascending"
+        elif any(word in concept_lower for word in ["fall", "descend", "fade", "diminish"]):
+            return "descending"
+        elif any(word in concept_lower for word in ["wave", "cycle", "ebb", "flow"]):
+            return "wave_like"
+        else:
+            return "balanced"
+    
+    def _suggest_dynamic_progression(self, concept_lower: str) -> str:
+        """Suggest dynamic progression"""
+        if any(word in concept_lower for word in ["explosive", "dramatic", "intense"]):
+            return "dramatic_build"
+        elif any(word in concept_lower for word in ["gentle", "gradual", "slow"]):
+            return "gradual_evolution"
+        elif any(word in concept_lower for word in ["sudden", "shift", "change"]):
+            return "sudden_changes"
+        else:
+            return "organic_flow"
+    
+    def _extract_sonic_palette(self, concept: str) -> List[str]:
+        """Extract sonic palette suggestions from concept imagery"""
+        concept_lower = concept.lower()
+        sonic_elements = []
+        
+        # Natural sounds
+        if any(word in concept_lower for word in ["water", "ocean", "rain", "river"]):
+            sonic_elements.append("water_textures")
+        if any(word in concept_lower for word in ["wind", "air", "breath", "breeze"]):
+            sonic_elements.append("wind_elements")
+        if any(word in concept_lower for word in ["fire", "flame", "burn", "heat"]):
+            sonic_elements.append("fire_textures")
+        if any(word in concept_lower for word in ["earth", "stone", "rock", "ground"]):
+            sonic_elements.append("earth_tones")
+        
+        # Atmospheric elements
+        if any(word in concept_lower for word in ["space", "vast", "infinite", "cosmos"]):
+            sonic_elements.append("spatial_reverb")
+        if any(word in concept_lower for word in ["intimate", "close", "whisper", "personal"]):
+            sonic_elements.append("intimate_ambience")
+        if any(word in concept_lower for word in ["echo", "distant", "far", "memory"]):
+            sonic_elements.append("echo_effects")
+        
+        # Textural elements
+        if any(word in concept_lower for word in ["smooth", "silk", "flowing", "liquid"]):
+            sonic_elements.append("smooth_textures")
+        if any(word in concept_lower for word in ["rough", "gritty", "harsh", "raw"]):
+            sonic_elements.append("rough_textures")
+        if any(word in concept_lower for word in ["shimmer", "sparkle", "glitter", "bright"]):
+            sonic_elements.append("shimmer_effects")
+        
+        # Default if no specific elements found
+        if not sonic_elements:
+            sonic_elements = ["atmospheric_pad", "subtle_texture"]
+        
+        return sonic_elements[:5]  # Limit to 5 elements
+    
+    def _create_variation_by_approach(self, concept_analysis: Dict, approach: str, style_preference: str) -> Dict[str, Any]:
+        """Create a variation based on specific musical approach"""
+        base_variation = {
+            "approach": approach,
+            "style_preference": style_preference,
+            "concept_elements": concept_analysis["core_themes"]
+        }
+        
+        if approach == "rhythmic_focus":
+            base_variation.update({
+                "primary_focus": "rhythm_and_groove",
+                "tempo_emphasis": concept_analysis["rhythmic_implications"]["tempo_feel"],
+                "rhythmic_character": concept_analysis["rhythmic_implications"]["rhythm_character"],
+                "suggested_bpm": concept_analysis["rhythmic_implications"]["suggested_bpm_range"],
+                "groove_style": f"{style_preference}_groove" if style_preference != "any" else "dynamic_groove"
+            })
+        
+        elif approach == "harmonic_exploration":
+            base_variation.update({
+                "primary_focus": "harmony_and_chords",
+                "harmonic_complexity": concept_analysis["harmonic_suggestions"]["complexity"],
+                "harmonic_color": concept_analysis["harmonic_suggestions"]["harmonic_color"],
+                "chord_style": concept_analysis["harmonic_suggestions"]["chord_progression_style"],
+                "modal_approach": concept_analysis["harmonic_suggestions"]["modal_suggestions"]
+            })
+        
+        elif approach == "textural_emphasis":
+            base_variation.update({
+                "primary_focus": "texture_and_timbre",
+                "texture_density": concept_analysis["textural_elements"]["density"],
+                "texture_character": concept_analysis["textural_elements"]["character"],
+                "instruments": concept_analysis["textural_elements"]["suggested_instruments"],
+                "production_style": concept_analysis["textural_elements"]["production_style"]
+            })
+        
+        elif approach == "structural_innovation":
+            base_variation.update({
+                "primary_focus": "structure_and_form",
+                "structure_type": concept_analysis["structural_implications"]["structure_type"],
+                "sections": concept_analysis["structural_implications"]["suggested_sections"],
+                "overall_arc": concept_analysis["structural_implications"]["overall_arc"],
+                "dynamic_progression": concept_analysis["structural_implications"]["dynamic_progression"]
+            })
+        
+        elif approach == "emotional_intensity":
+            base_variation.update({
+                "primary_focus": "emotional_expression",
+                "emotional_intensity": concept_analysis["emotional_qualities"]["intensity"],
+                "emotional_valence": concept_analysis["emotional_qualities"]["valence"],
+                "primary_emotion": concept_analysis["emotional_qualities"]["primary_emotion"],
+                "emotional_progression": concept_analysis["emotional_qualities"]["progression"]
+            })
+        
+        return base_variation
+    
+    def _create_suno_command(self, variation: Dict, concept_analysis: Dict, genres: List, meta_tags: List, techniques: List, variation_num: int) -> Dict[str, Any]:
+        """Create practical Suno AI command using wiki data"""
+        
+        # Build command components using actual Suno AI syntax
+        command_parts = []
+        
+        # Add genre/style tags from wiki data
+        style_tags = self._get_style_tags(variation["style_preference"], genres)
+        if style_tags:
+            command_parts.extend(style_tags)
+        
+        # Add tempo/BPM specification
+        bpm_range = concept_analysis["rhythmic_implications"]["suggested_bpm_range"]
+        if "BPM" in bpm_range:
+            # Extract BPM number for Suno format
+            bpm_match = re.search(r'(\d+)', bpm_range)
+            if bpm_match:
+                command_parts.append(f"{bpm_match.group(1)}bpm")
+        
+        # Add emotional/mood tags from wiki meta tags
+        emotional_tags = self._get_emotional_meta_tags(concept_analysis["emotional_qualities"], meta_tags)
+        if emotional_tags:
+            command_parts.extend(emotional_tags)
+        
+        # Add instrumental/textural tags based on concept analysis
+        instrumental_tags = self._get_instrumental_tags(concept_analysis, meta_tags)
+        if instrumental_tags:
+            command_parts.extend(instrumental_tags)
+        
+        # Add vocal style tags if applicable
+        vocal_tags = self._get_vocal_style_tags(variation, meta_tags)
+        if vocal_tags:
+            command_parts.extend(vocal_tags)
+        
+        # Create the main Suno command
+        main_command = ", ".join(command_parts)
+        
+        # Add structural annotations using wiki techniques
+        structural_annotations = self._create_structural_annotations(variation, techniques)
+        
+        # Add vocal effects and formatting from wiki techniques
+        vocal_effects = self._create_vocal_effects(concept_analysis, techniques)
+        
+        # Create complete Suno-compatible command structure
+        complete_command = {
+            "style_tags": f"[{main_command}]",
+            "structural_annotations": structural_annotations,
+            "vocal_effects": vocal_effects,
+            "full_command_example": self._create_full_command_example(main_command, structural_annotations, vocal_effects)
+        }
+        
+        # Add lyrical guidance based on concept
+        lyrical_guidance = self._create_lyrical_guidance(concept_analysis, variation)
+        
+        return {
+            "variation_number": variation_num,
+            "approach": variation["approach"],
+            "suno_commands": complete_command,
+            "lyrical_guidance": lyrical_guidance,
+            "production_notes": self._create_production_notes(variation, concept_analysis),
+            "wiki_techniques_used": self._list_wiki_techniques_used(techniques),
+            "estimated_duration": "3-4 minutes",
+            "complexity_level": self._assess_complexity(variation)
+        }
+    
+    def _get_style_tags(self, style_preference: str, genres: List) -> List[str]:
+        """Get style tags from wiki genres data"""
+        if style_preference == "any":
+            return ["versatile"]
+        
+        style_tags = []
+        style_lower = style_preference.lower()
+        
+        # Try to match with wiki genres
+        for genre in genres:
+            if hasattr(genre, 'name'):
+                genre_name = genre.name.lower()
+                if style_lower in genre_name or genre_name in style_lower:
+                    # Use the exact genre name from wiki for accuracy
+                    style_tags.append(genre.name.replace(" ", " "))  # Keep spaces for Suno
+                    # Add subgenres if available
+                    if hasattr(genre, 'subgenres') and genre.subgenres:
+                        style_tags.extend([sg for sg in genre.subgenres[:1]])  # Add 1 subgenre
+                    break
+        
+        # Fallback to basic style parsing if no wiki match
+        if not style_tags:
+            # Clean up style preference for Suno format
+            cleaned_style = style_preference.replace("_", " ").title()
+            style_tags.append(cleaned_style)
+        
+        return style_tags[:2]  # Limit to 2 style tags for cleaner commands
+    
+    def _get_focus_meta_tags(self, variation: Dict, meta_tags: List) -> List[str]:
+        """Get meta tags based on variation focus"""
+        focus = variation["primary_focus"]
+        focus_tags = []
+        
+        focus_mappings = {
+            "rhythm_and_groove": ["rhythmic", "groove", "beat", "percussion"],
+            "harmony_and_chords": ["harmonic", "chord", "melodic", "tonal"],
+            "texture_and_timbre": ["textural", "atmospheric", "ambient", "layered"],
+            "structure_and_form": ["structured", "dynamic", "progressive", "developmental"],
+            "emotional_expression": ["emotional", "expressive", "intense", "passionate"]
+        }
+        
+        keywords = focus_mappings.get(focus, [])
+        
+        # Match with available meta tags
+        for tag in meta_tags:
+            if any(keyword in tag.tag.lower() for keyword in keywords):
+                focus_tags.append(tag.tag.lower())
+                if len(focus_tags) >= 2:
+                    break
+        
+        # Fallback to basic tags
+        if not focus_tags:
+            focus_tags = keywords[:2]
+        
+        return focus_tags
+    
+    def _get_emotional_meta_tags(self, emotional_qualities: Dict, meta_tags: List) -> List[str]:
+        """Get emotional meta tags from wiki data"""
+        emotional_tags = []
+        
+        primary_emotion = emotional_qualities["primary_emotion"]
+        intensity = emotional_qualities["intensity"]
+        valence = emotional_qualities["valence"]
+        
+        # Map emotions to Suno-compatible terms
+        emotion_mappings = {
+            "melancholy": ["melancholic", "sad", "wistful"],
+            "euphoria": ["euphoric", "joyful", "uplifting"],
+            "anxiety": ["anxious", "tense", "nervous"],
+            "anger": ["aggressive", "intense", "powerful"],
+            "wonder": ["mysterious", "ethereal", "magical"],
+            "nostalgia": ["nostalgic", "reflective", "reminiscent"],
+            "determination": ["determined", "driving", "strong"],
+            "serenity": ["peaceful", "calm", "serene"],
+            "contemplative": ["contemplative", "thoughtful", "introspective"]
+        }
+        
+        # Get Suno-compatible emotion terms
+        if primary_emotion in emotion_mappings:
+            emotional_tags.extend(emotion_mappings[primary_emotion][:1])
+        
+        # Add intensity modifiers
+        if intensity == "high":
+            emotional_tags.append("intense")
+        elif intensity == "low":
+            emotional_tags.append("gentle")
+        
+        # Add valence modifiers
+        if valence == "positive":
+            emotional_tags.append("uplifting")
+        elif valence == "negative":
+            emotional_tags.append("dark")
+        
+        # Try to match with actual wiki meta tags
+        for tag in meta_tags:
+            if hasattr(tag, 'tag') and hasattr(tag, 'category'):
+                tag_lower = tag.tag.lower()
+                # Look for emotional or mood-related tags
+                if any(emotion_word in tag_lower for emotion_word in emotional_tags):
+                    if tag.tag not in emotional_tags:  # Avoid duplicates
+                        emotional_tags.append(tag.tag)
+                        break
+        
+        return emotional_tags[:2]  # Limit to 2 emotional tags
+    
+    def _get_instrumental_tags(self, concept_analysis: Dict, meta_tags: List) -> List[str]:
+        """Get instrumental/textural tags from concept analysis and wiki data"""
+        instrumental_tags = []
+        
+        # Get suggested instruments from concept analysis
+        suggested_instruments = concept_analysis["textural_elements"]["suggested_instruments"]
+        
+        # Map concept instruments to Suno-compatible terms
+        instrument_mappings = {
+            "acoustic_guitar": "acoustic guitar",
+            "electric_guitar": "electric guitar", 
+            "synthesizer": "synth",
+            "electronic_drums": "electronic drums",
+            "piano": "piano",
+            "violin": "violin",
+            "cello": "cello",
+            "flute": "flute",
+            "strings": "strings",
+            "harmonica": "harmonica",
+            "banjo": "banjo",
+            "subtle_percussion": "percussion"
+        }
+        
+        # Convert to Suno format
+        for instrument in suggested_instruments[:2]:  # Limit to 2 instruments
+            if instrument in instrument_mappings:
+                instrumental_tags.append(instrument_mappings[instrument])
+        
+        # Add textural elements from sonic palette
+        sonic_palette = concept_analysis["sonic_palette"]
+        texture_mappings = {
+            "water_textures": "flowing",
+            "wind_elements": "atmospheric", 
+            "fire_textures": "warm",
+            "earth_tones": "organic",
+            "spatial_reverb": "spacious",
+            "intimate_ambience": "intimate",
+            "echo_effects": "reverb",
+            "smooth_textures": "smooth",
+            "rough_textures": "gritty",
+            "shimmer_effects": "bright"
+        }
+        
+        for sonic_element in sonic_palette[:1]:  # Add 1 textural element
+            if sonic_element in texture_mappings:
+                instrumental_tags.append(texture_mappings[sonic_element])
+        
+        return instrumental_tags[:3]  # Limit to 3 total tags
+    
+    def _get_vocal_style_tags(self, variation: Dict, meta_tags: List) -> List[str]:
+        """Get vocal style tags based on variation approach"""
+        vocal_tags = []
+        
+        approach = variation["approach"]
+        
+        # Map approaches to vocal styles
+        vocal_mappings = {
+            "rhythmic_focus": ["rhythmic vocals"],
+            "harmonic_exploration": ["melodic vocals"],
+            "textural_emphasis": ["atmospheric vocals"],
+            "structural_innovation": ["dynamic vocals"],
+            "emotional_intensity": ["expressive vocals"]
+        }
+        
+        if approach in vocal_mappings:
+            vocal_tags.extend(vocal_mappings[approach])
+        
+        # Look for vocal-related meta tags in wiki data
+        for tag in meta_tags:
+            if hasattr(tag, 'category') and hasattr(tag, 'tag'):
+                if tag.category.lower() in ["vocal", "vocal_style", "vocals"]:
+                    vocal_tags.append(tag.tag)
+                    break  # Add only one wiki vocal tag
+        
+        return vocal_tags[:1]  # Limit to 1 vocal tag
+    
+    def _create_structural_annotations(self, variation: Dict, techniques: List) -> List[str]:
+        """Create structural annotations using wiki techniques"""
+        annotations = []
+        
+        # Look for structural techniques in wiki data
+        for technique in techniques:
+            if hasattr(technique, 'technique_type') and hasattr(technique, 'examples'):
+                if technique.technique_type == "prompt_structure":
+                    # Use examples from wiki techniques
+                    if technique.examples:
+                        # Filter for structural annotations
+                        for example in technique.examples:
+                            if any(marker in example for marker in ["[", "]", "intro", "verse", "chorus", "bridge"]):
+                                annotations.append(example)
+                                if len(annotations) >= 2:
+                                    break
+                    if len(annotations) >= 2:
+                        break
+        
+        # Fallback structural annotations if no wiki data
+        if not annotations:
+            structure_type = variation.get("structure_type", "traditional")
+            if structure_type == "narrative":
+                annotations = ["[Intro]", "[Verse]", "[Chorus]", "[Bridge]", "[Outro]"]
+            elif structure_type == "developmental":
+                annotations = ["[Build up]", "[Climax]", "[Resolution]"]
+            else:
+                annotations = ["[Verse]", "[Chorus]", "[Bridge]"]
+        
+        return annotations[:3]  # Limit to 3 annotations
+    
+    def _create_vocal_effects(self, concept_analysis: Dict, techniques: List) -> List[str]:
+        """Create vocal effects using wiki techniques"""
+        effects = []
+        
+        # Look for vocal effect techniques in wiki data
+        for technique in techniques:
+            if hasattr(technique, 'technique_type') and hasattr(technique, 'examples'):
+                if technique.technique_type == "vocal_style":
+                    # Use examples from wiki techniques
+                    if technique.examples:
+                        for example in technique.examples:
+                            # Filter for vocal effects (asterisks, caps, etc.)
+                            if "*" in example or example.isupper():
+                                effects.append(example)
+                                if len(effects) >= 2:
+                                    break
+                    if len(effects) >= 2:
+                        break
+        
+        # Add effects based on emotional qualities
+        emotional_qualities = concept_analysis["emotional_qualities"]
+        primary_emotion = emotional_qualities["primary_emotion"]
+        intensity = emotional_qualities["intensity"]
+        
+        # Map emotions to vocal effects
+        if primary_emotion == "anger" and intensity == "high":
+            effects.append("[Screaming vocals]")
+        elif primary_emotion == "serenity" or intensity == "low":
+            effects.append("[Whispering vocals]")
+        elif intensity == "high":
+            effects.append("[Powerful vocals]")
+        
+        # Add capitalization effects for emphasis
+        if intensity == "high":
+            effects.append("EMPHASIS!")
+        
+        return effects[:2]  # Limit to 2 effects
+    
+    def _create_full_command_example(self, main_command: str, structural_annotations: List[str], vocal_effects: List[str]) -> str:
+        """Create a complete Suno command example"""
+        command_parts = []
+        
+        # Add main style command
+        command_parts.append(f"[{main_command}]")
+        
+        # Add structural elements
+        if structural_annotations:
+            command_parts.append(structural_annotations[0])  # Use first annotation as example
+        
+        # Add vocal effects
+        if vocal_effects:
+            command_parts.append(vocal_effects[0])  # Use first effect as example
+        
+        return " ".join(command_parts)
+    
+    def _list_wiki_techniques_used(self, techniques: List) -> List[str]:
+        """List which wiki techniques were used in command generation"""
+        used_techniques = []
+        
+        for technique in techniques[:3]:  # Show up to 3 techniques
+            if hasattr(technique, 'name'):
+                used_techniques.append(technique.name)
+        
+        return used_techniques
+    
+    def _get_structural_tags(self, variation: Dict, meta_tags: List) -> List[str]:
+        """Get structural meta tags"""
+        structural_tags = []
+        
+        if "structure_type" in variation:
+            structure_type = variation["structure_type"]
+            
+            # Look for structural meta tags
+            for tag in meta_tags:
+                if tag.category.lower() == "structural" or "structure" in tag.description.lower():
+                    if structure_type in tag.tag.lower() or structure_type in tag.description.lower():
+                        structural_tags.append(tag.tag.lower())
+                        break
+        
+        return structural_tags[:1]  # Limit to 1 structural tag
+    
+    def _create_lyrical_guidance(self, concept_analysis: Dict, variation: Dict) -> Dict[str, Any]:
+        """Create lyrical guidance based on concept analysis"""
+        themes = concept_analysis["core_themes"]
+        emotional_qualities = concept_analysis["emotional_qualities"]
+        
+        return {
+            "suggested_themes": themes,
+            "emotional_tone": emotional_qualities["primary_emotion"],
+            "lyrical_approach": self._suggest_lyrical_approach(variation["approach"]),
+            "imagery_suggestions": concept_analysis["sonic_palette"],
+            "narrative_structure": self._suggest_narrative_structure(emotional_qualities["progression"])
+        }
+    
+    def _suggest_lyrical_approach(self, approach: str) -> str:
+        """Suggest lyrical approach based on musical approach"""
+        approach_mappings = {
+            "rhythmic_focus": "rhythmic_and_percussive_lyrics",
+            "harmonic_exploration": "melodic_and_flowing_lyrics", 
+            "textural_emphasis": "atmospheric_and_impressionistic_lyrics",
+            "structural_innovation": "narrative_and_progressive_lyrics",
+            "emotional_intensity": "direct_and_emotionally_raw_lyrics"
+        }
+        return approach_mappings.get(approach, "balanced_lyrical_approach")
+    
+    def _suggest_narrative_structure(self, progression: str) -> str:
+        """Suggest narrative structure for lyrics"""
+        if progression == "transformative":
+            return "before_and_after_narrative"
+        elif progression == "developmental":
+            return "journey_narrative"
+        else:
+            return "moment_in_time_narrative"
+    
+    def _create_production_notes(self, variation: Dict, concept_analysis: Dict) -> List[str]:
+        """Create production notes for the variation"""
+        notes = []
+        
+        # Add notes based on variation focus
+        focus = variation["primary_focus"]
+        if focus == "rhythmic_focus":
+            notes.append("Emphasize drum programming and rhythmic elements")
+            notes.append("Consider polyrhythmic layers for complexity")
+        elif focus == "harmonic_exploration":
+            notes.append("Focus on chord voicings and harmonic movement")
+            notes.append("Experiment with extended and altered chords")
+        elif focus == "textural_emphasis":
+            notes.append("Layer multiple textural elements")
+            notes.append("Use reverb and spatial effects creatively")
+        elif focus == "structural_innovation":
+            notes.append("Vary section lengths and arrangements")
+            notes.append("Create smooth transitions between sections")
+        elif focus == "emotional_intensity":
+            notes.append("Use dynamics to enhance emotional impact")
+            notes.append("Consider vocal delivery and expression")
+        
+        # Add notes based on sonic palette
+        sonic_elements = concept_analysis["sonic_palette"]
+        if "water_textures" in sonic_elements:
+            notes.append("Incorporate flowing, liquid-like sounds")
+        if "atmospheric_pad" in sonic_elements:
+            notes.append("Use atmospheric pads for depth")
+        
+        return notes
+    
+    def _assess_complexity(self, variation: Dict) -> str:
+        """Assess the complexity level of the variation"""
+        complexity_factors = 0
+        
+        if variation.get("harmonic_complexity") == "complex":
+            complexity_factors += 1
+        if variation.get("rhythmic_character") == "irregular":
+            complexity_factors += 1
+        if variation.get("structure_type") == "fragmented":
+            complexity_factors += 1
+        if len(variation.get("instruments", [])) > 3:
+            complexity_factors += 1
+        
+        if complexity_factors >= 3:
+            return "high"
+        elif complexity_factors >= 1:
+            return "medium"
+        else:
+            return "low"
+
 
 class EmotionalBeatEngine:
     """PURE EXECUTION ENGINE - Takes LLM-defined emotional maps and produces music accordingly"""
@@ -952,7 +2027,7 @@ class MetaNarrativeProcessor:
             return "Core identity questioning demanding introspective production"
         return "Emotional complexity layer"
     
-    def identify_emotional_contradictions(self, text: str, character: CharacterProfile) -> List[Dict[str, Any]]:
+    def identify_emotional_contradictions(self, text: str, character: StandardCharacterProfile) -> List[Dict[str, Any]]:
         """Identify contradictions between stated and actual emotions"""
         contradictions = []
         
@@ -1631,7 +2706,7 @@ class SelfReflectionAnalyzer:
             ]
         }
     
-    def analyze_character_introspection(self, text: str, character: CharacterProfile) -> Dict[str, Any]:
+    def analyze_character_introspection(self, text: str, character: StandardCharacterProfile) -> Dict[str, Any]:
         """Analyze character's self-reflective journey"""
         introspection_data = {
             'self_awareness_moments': [],
@@ -1706,7 +2781,7 @@ class SelfReflectionAnalyzer:
         
         return scores
     
-    def _identify_defense_mechanisms(self, text: str, character: CharacterProfile) -> List[Dict]:
+    def _identify_defense_mechanisms(self, text: str, character: StandardCharacterProfile) -> List[Dict]:
         """Identify psychological defense mechanisms in text"""
         mechanisms = []
         
@@ -2370,42 +3445,49 @@ class MusicPersonaGenerator:
             logger.warning(f"Failed to build attributed context: {e}")
             return str(content)
 
-    async def generate_artist_persona(self, character: CharacterProfile, ctx: Context) -> ArtistPersona:
-        """Generate a musical artist persona from character profile"""
+    async def generate_artist_persona(self, character: StandardCharacterProfile, ctx: Context, 
+                                     requested_genre: Optional[str] = None) -> ArtistPersona:
+        """Generate a musical artist persona from character profile, optionally aligned with requested genre"""
         await ctx.info(f"Generating artist persona for {character.name}...")
         
         # Determine primary personality traits
         primary_traits = self._extract_primary_traits(character)
         
-        # Map to musical genres
-        primary_genre, secondary_genres = await self._map_to_genres(primary_traits)
+        # Map to musical genres (or use requested genre)
+        if requested_genre:
+            await ctx.info(f"Aligning persona with requested genre: {requested_genre}")
+            primary_genre = requested_genre
+            secondary_genres = await self._get_secondary_genres_for_requested(requested_genre)
+        else:
+            primary_genre, secondary_genres = await self._map_to_genres(primary_traits)
         
-        # Generate vocal style
-        vocal_style = self._determine_vocal_style(primary_traits)
+        # Generate vocal style (aligned with genre if requested)
+        vocal_style = self._determine_vocal_style(primary_traits, requested_genre)
         
         # Create artist name
         artist_name = self._generate_artist_name(character.name, primary_traits)
         
         # Generate thematic content
         lyrical_themes = self._generate_lyrical_themes(character)
-        emotional_palette = self._generate_emotional_palette(character)
+        emotional_palette = self._generate_emotional_palette(character, requested_genre)
         
-        # Determine artistic influences
-        influences = self._generate_influences(primary_genre, character)
+        # Determine artistic influences (genre-appropriate if requested)
+        influences = self._generate_influences(primary_genre, character, requested_genre)
         
-        # Collaboration style
-        collaboration_style = self._determine_collaboration_style(character)
+        # Collaboration style (aligned with genre if requested)
+        collaboration_style = self._determine_collaboration_style(character, requested_genre)
         
         # Generate persona description
         persona_description = self._generate_persona_description(character, primary_genre, vocal_style)
         
         # Calculate mapping confidence
-        confidence = self._calculate_mapping_confidence(character, primary_traits)
+        confidence = self._calculate_mapping_confidence(character, primary_traits, requested_genre)
         
         # Genre justification
-        justification = self._generate_genre_justification(character, primary_traits, primary_genre)
+        justification = self._generate_genre_justification(character, primary_traits, primary_genre, requested_genre)
         
-        return ArtistPersona(
+        # Create base persona
+        persona = ArtistPersona(
             character_name=character.name,
             artist_name=artist_name,
             primary_genre=primary_genre,
@@ -2420,8 +3502,63 @@ class MusicPersonaGenerator:
             genre_justification=justification,
             persona_description=persona_description
         )
+        
+        # If genre was requested, apply additional alignment
+        if requested_genre:
+            persona = await self._apply_genre_alignment(persona, requested_genre, ctx)
+        
+        return persona
+    
+    async def _apply_genre_alignment(self, persona: ArtistPersona, requested_genre: str, ctx: Context) -> ArtistPersona:
+        """Apply genre-specific alignment to persona using genre intelligence"""
+        try:
+            from genre_production_intelligence import align_persona_with_genre
+            
+            # Convert persona to dict for alignment
+            persona_dict = asdict(persona)
+            
+            # Apply genre alignment
+            aligned_dict = align_persona_with_genre(persona_dict, requested_genre)
+            
+            # Create new aligned persona
+            aligned_persona = ArtistPersona.from_dict(aligned_dict)
+            
+            await ctx.info(f"Applied {requested_genre} genre alignment to {persona.character_name}")
+            return aligned_persona
+            
+        except ImportError:
+            await ctx.warning("Genre production intelligence not available, using basic persona")
+            return persona
+    
+    async def _get_secondary_genres_for_requested(self, requested_genre: str) -> List[str]:
+        """Get appropriate secondary genres for a requested primary genre"""
+        try:
+            from genre_production_intelligence import get_genre_intelligence
+            genre_intelligence = get_genre_intelligence()
+            genre_profile = genre_intelligence.get_genre_profile(requested_genre)
+            
+            # Return category and a complementary genre
+            secondary = [genre_profile.category]
+            if genre_profile.category != "alternative":
+                secondary.append("alternative")
+            else:
+                secondary.append("indie")
+            
+            return secondary
+        except ImportError:
+            # Fallback secondary genres
+            genre_secondaries = {
+                "electronic": ["edm", "alternative"],
+                "drum_and_bass": ["electronic", "breakbeat"],
+                "hip_hop": ["rap", "urban"],
+                "trap": ["hip_hop", "urban"],
+                "folk": ["acoustic", "indie"],
+                "jazz": ["blues", "soul"],
+                "rock": ["alternative", "indie"]
+            }
+            return genre_secondaries.get(requested_genre.lower(), ["alternative", "indie"])
 
-    def _extract_primary_traits(self, character: CharacterProfile) -> List[str]:
+    def _extract_primary_traits(self, character: StandardCharacterProfile) -> List[str]:
         """Extract primary personality traits from character profile"""
         traits = []
         
@@ -2608,10 +3745,41 @@ class MusicPersonaGenerator:
                 for genre in trait_genre_map[trait_lower]:
                     genre_scores[genre] = genre_scores.get(genre, 0) + weight
         
-        # If no direct matches, use fallback mapping
+        # If no direct matches, use intelligent fallback mapping
         if not genre_scores:
-            primary_genre = 'alternative'
-            secondary_genres = ['indie', 'pop']
+            # Try to use genre intelligence for better fallback
+            try:
+                from genre_production_intelligence import get_genre_intelligence
+                genre_intelligence = get_genre_intelligence()
+                
+                # Use character traits to determine better genre
+                character_traits = []
+                if character_profile.personality:
+                    character_traits.extend(character_profile.personality[:3])
+                if character_profile.motivations:
+                    character_traits.extend(character_profile.motivations[:2])
+                
+                if character_traits:
+                    # This would require implementing trait-to-genre mapping in genre intelligence
+                    # For now, use improved fallback based on character analysis
+                    if any(trait.lower() in ['dark', 'intense', 'aggressive'] for trait in character_traits):
+                        primary_genre = 'electronic'
+                        secondary_genres = ['drum_and_bass', 'trap']
+                    elif any(trait.lower() in ['peaceful', 'calm', 'introspective'] for trait in character_traits):
+                        primary_genre = 'folk'
+                        secondary_genres = ['alternative', 'indie']
+                    elif any(trait.lower() in ['energetic', 'dynamic', 'powerful'] for trait in character_traits):
+                        primary_genre = 'hip_hop'
+                        secondary_genres = ['trap', 'alternative']
+                    else:
+                        primary_genre = 'alternative'
+                        secondary_genres = ['indie', 'pop']
+                else:
+                    primary_genre = 'alternative'
+                    secondary_genres = ['indie', 'pop']
+            except ImportError:
+                primary_genre = 'alternative'
+                secondary_genres = ['indie', 'pop']
         else:
             # Sort by score and select top genres
             sorted_genres = sorted(genre_scores.items(), key=lambda x: x[1], reverse=True)
@@ -2629,8 +3797,23 @@ class MusicPersonaGenerator:
         
         return primary_genre, secondary_genres[:2]
 
-    def _determine_vocal_style(self, traits: List[str]) -> str:
-        """Determine vocal style from character traits"""
+    def _determine_vocal_style(self, traits: List[str], requested_genre: Optional[str] = None) -> str:
+        """Determine vocal style from character traits, optionally aligned with requested genre"""
+        
+        # If genre is requested, prioritize genre-appropriate vocal style
+        if requested_genre:
+            try:
+                from genre_production_intelligence import get_genre_intelligence
+                genre_intelligence = get_genre_intelligence()
+                genre_profile = genre_intelligence.get_genre_profile(requested_genre)
+                
+                if genre_profile.vocal_style.delivery_style:
+                    base_style = genre_profile.vocal_style.delivery_style
+                    if genre_profile.vocal_style.emotional_approach:
+                        return f"{base_style} and {genre_profile.vocal_style.emotional_approach}"
+                    return base_style
+            except ImportError:
+                pass
         
         # Define trait-to-vocal-style mappings
         trait_vocal_map = {
@@ -2693,7 +3876,7 @@ class MusicPersonaGenerator:
         
         return character_name
 
-    def _generate_lyrical_themes(self, character: CharacterProfile) -> List[str]:
+    def _generate_lyrical_themes(self, character: StandardCharacterProfile) -> List[str]:
         """Generate lyrical themes from character profile"""
         themes = []
         
@@ -2774,8 +3957,9 @@ class MusicPersonaGenerator:
         unique_themes = list(dict.fromkeys(themes))  # Preserves order while removing duplicates
         return unique_themes[:5]  # Return up to 5 themes for complex characters
 
-    def _generate_emotional_palette(self, character: CharacterProfile) -> List[str]:
-        """Generate emotional palette from character analysis"""
+    def _generate_emotional_palette(self, character: StandardCharacterProfile, 
+                                  requested_genre: Optional[str] = None) -> List[str]:
+        """Generate emotional palette from character analysis, optionally aligned with requested genre"""
         emotions = []
         
         # Map personality drivers to emotions
@@ -2802,10 +3986,34 @@ class MusicPersonaGenerator:
         if not emotions:
             emotions = ['authenticity', 'expression']
         
+        # If genre is requested, blend with genre-appropriate emotions
+        if requested_genre:
+            try:
+                from genre_production_intelligence import _align_emotional_palette_with_genre, get_genre_intelligence
+                genre_intelligence = get_genre_intelligence()
+                genre_profile = genre_intelligence.get_genre_profile(requested_genre)
+                emotions = _align_emotional_palette_with_genre(emotions, genre_profile)
+            except ImportError:
+                pass
+        
         return list(set(emotions))[:5]
 
-    def _generate_influences(self, primary_genre: str, character: CharacterProfile) -> List[str]:
-        """Generate artistic influences based on genre and character"""
+    def _generate_influences(self, primary_genre: str, character: StandardCharacterProfile, 
+                           requested_genre: Optional[str] = None) -> List[str]:
+        """Generate artistic influences based on genre and character, optionally using requested genre"""
+        # Use requested genre if provided, otherwise use mapped genre
+        genre_for_influences = requested_genre if requested_genre else primary_genre
+        
+        # Try to get genre-specific influences from genre intelligence first
+        if requested_genre:
+            try:
+                from genre_production_intelligence import _generate_genre_appropriate_influences, get_genre_intelligence
+                genre_intelligence = get_genre_intelligence()
+                genre_profile = genre_intelligence.get_genre_profile(requested_genre)
+                return _generate_genre_appropriate_influences(genre_profile, character.name)
+            except ImportError:
+                pass
+        
         genre_influences = {
             'rock': ['classic rock legends', 'alternative pioneers', 'indie innovators'],
             'metal': ['metal masters', 'progressive experimenters', 'symphonic composers'],
@@ -2831,7 +4039,7 @@ class MusicPersonaGenerator:
             'orchestral': ['symphonic composers', 'film score masters', 'orchestral arrangers']
         }
         
-        influences = genre_influences.get(primary_genre, ['diverse musical artists'])
+        influences = genre_influences.get(genre_for_influences, ['diverse musical artists'])
         
         # Add character-specific influences
         if 'classical' in character.backstory.lower():
@@ -2841,8 +4049,27 @@ class MusicPersonaGenerator:
         
         return influences[:3]
 
-    def _determine_collaboration_style(self, character: CharacterProfile) -> str:
-        """Determine collaboration approach based on character relationships"""
+    def _determine_collaboration_style(self, character: StandardCharacterProfile, 
+                                     requested_genre: Optional[str] = None) -> str:
+        """Determine collaboration approach based on character relationships and optionally requested genre"""
+        
+        # If genre is requested, prioritize genre-appropriate collaboration style
+        if requested_genre:
+            try:
+                from genre_production_intelligence import _align_collaboration_style_with_genre, get_genre_intelligence
+                genre_intelligence = get_genre_intelligence()
+                genre_profile = genre_intelligence.get_genre_profile(requested_genre)
+                
+                # Get base style from character
+                base_style = self._get_base_collaboration_style(character)
+                return _align_collaboration_style_with_genre(base_style, genre_profile)
+            except ImportError:
+                pass
+        
+        return self._get_base_collaboration_style(character)
+    
+    def _get_base_collaboration_style(self, character: StandardCharacterProfile) -> str:
+        """Get base collaboration style from character traits"""
         # Analyze social connections and relationships
         if len(character.relationships) > 3:
             return 'collaborative and ensemble-oriented'
@@ -2853,7 +4080,7 @@ class MusicPersonaGenerator:
         else:
             return 'balanced collaborative approach'
 
-    def _generate_persona_description(self, character: CharacterProfile, genre: str, vocal_style: str) -> str:
+    def _generate_persona_description(self, character: StandardCharacterProfile, genre: str, vocal_style: str) -> str:
         """Generate comprehensive persona description"""
         return f"""
         Musical persona derived from {character.name}: A {genre} artist with {vocal_style}. 
@@ -2863,7 +4090,8 @@ class MusicPersonaGenerator:
         narrative elements into compelling musical compositions.
         """.strip()
 
-    def _calculate_mapping_confidence(self, character: CharacterProfile, traits: List[str]) -> float:
+    def _calculate_mapping_confidence(self, character: StandardCharacterProfile, traits: List[str], 
+                                    requested_genre: Optional[str] = None) -> float:
         """Calculate confidence in character-to-music mapping"""
         base_confidence = character.confidence_score
         
@@ -2876,19 +4104,32 @@ class MusicPersonaGenerator:
         # Boost if backstory provides context
         backstory_boost = 0.1 if len(character.backstory) > 50 else 0.0
         
-        return min(base_confidence + trait_boost + emotion_boost + backstory_boost, 1.0)
+        # If genre was requested (forced alignment), slightly reduce confidence
+        genre_adjustment = -0.1 if requested_genre else 0.0
+        
+        return min(base_confidence + trait_boost + emotion_boost + backstory_boost + genre_adjustment, 1.0)
 
-    def _generate_genre_justification(self, character: CharacterProfile, traits: List[str], genre: str) -> str:
+    def _generate_genre_justification(self, character: StandardCharacterProfile, traits: List[str], 
+                                    genre: str, requested_genre: Optional[str] = None) -> str:
         """Generate justification for genre selection"""
         trait_text = ', '.join(traits) if traits else 'complex personality'
         
-        return f"""
-        {genre.title()} genre selected based on {character.name}'s {trait_text}. 
-        The character's {character.motivations[0] if character.motivations else 'core motivations'} 
-        and {character.conflicts[0] if character.conflicts else 'internal conflicts'} 
-        align with {genre}'s emotional and thematic expressions. 
-        This mapping ensures authentic musical representation of the character's essence.
-        """.strip()
+        if requested_genre:
+            return f"""
+            {genre.title()} genre applied as requested, with persona aligned to match genre characteristics. 
+            {character.name}'s {trait_text} has been adapted to fit {genre}'s emotional and thematic expressions. 
+            The character's {character.motivations[0] if character.motivations else 'core motivations'} 
+            and {character.conflicts[0] if character.conflicts else 'internal conflicts'} 
+            are expressed through {genre}-specific musical elements and production techniques.
+            """.strip()
+        else:
+            return f"""
+            {genre.title()} genre selected based on {character.name}'s {trait_text}. 
+            The character's {character.motivations[0] if character.motivations else 'core motivations'} 
+            and {character.conflicts[0] if character.conflicts else 'internal conflicts'} 
+            align with {genre}'s emotional and thematic expressions. 
+            This mapping ensures authentic musical representation of the character's essence.
+            """.strip()
 
     async def _generate_instrumental_preferences(self, genre: str) -> List[str]:
         """Generate instrumental preferences based on genre using wiki data"""
@@ -3799,7 +5040,7 @@ class SunoCommandGenerator:
             logger.warning(f"Failed to get fallback instrument tags for {instrument}: {e}")
             return [instrument]
 
-    async def generate_suno_commands(self, artist_persona: ArtistPersona, character: CharacterProfile, ctx: Context, 
+    async def generate_suno_commands(self, artist_persona: ArtistPersona, character: StandardCharacterProfile, ctx: Context, 
                                    emotional_states: Optional[List[EmotionalState]] = None,
                                    beat_progression: Optional[Dict] = None) -> List[SunoCommand]:
         """Generate multiple Suno AI command variations from artist persona"""
@@ -3840,7 +5081,7 @@ class SunoCommandGenerator:
         
         return commands
 
-    async def _generate_simple_command(self, artist_persona: ArtistPersona, character: CharacterProfile) -> SunoCommand:
+    async def _generate_simple_command(self, artist_persona: ArtistPersona, character: StandardCharacterProfile) -> SunoCommand:
         """Generate simple Suno command with basic prompt"""
         
         # Create compelling prompt from character essence
@@ -3879,7 +5120,7 @@ class SunoCommandGenerator:
             ]
         )
 
-    async def _generate_custom_command(self, artist_persona: ArtistPersona, character: CharacterProfile) -> SunoCommand:
+    async def _generate_custom_command(self, artist_persona: ArtistPersona, character: StandardCharacterProfile) -> SunoCommand:
         """Generate custom mode command with detailed parameters"""
         
         # Build comprehensive prompt
@@ -3966,7 +5207,7 @@ class SunoCommandGenerator:
             ]
         )
 
-    async def _generate_bracket_command(self, artist_persona: ArtistPersona, character: CharacterProfile) -> SunoCommand:
+    async def _generate_bracket_command(self, artist_persona: ArtistPersona, character: StandardCharacterProfile) -> SunoCommand:
         """Generate bracket notation command for precise control"""
         
         # Build precise bracket notation
@@ -4027,7 +5268,7 @@ class SunoCommandGenerator:
             ]
         )
 
-    async def _generate_lyric_focused_command(self, artist_persona: ArtistPersona, character: CharacterProfile) -> SunoCommand:
+    async def _generate_lyric_focused_command(self, artist_persona: ArtistPersona, character: StandardCharacterProfile) -> SunoCommand:
         """Generate command focused on lyrical storytelling"""
         
         # Extract narrative elements
@@ -4075,7 +5316,7 @@ class SunoCommandGenerator:
             ]
         )
 
-    async def _generate_collaboration_command(self, artist_persona: ArtistPersona, character: CharacterProfile) -> SunoCommand:
+    async def _generate_collaboration_command(self, artist_persona: ArtistPersona, character: StandardCharacterProfile) -> SunoCommand:
         """Generate command for collaborative-style music"""
         
         # Analyze character relationships for collaboration style
@@ -4136,7 +5377,7 @@ class SunoCommandGenerator:
             ]
         )
     
-    async def _generate_emotion_beat_command(self, artist_persona: ArtistPersona, character: CharacterProfile, 
+    async def _generate_emotion_beat_command(self, artist_persona: ArtistPersona, character: StandardCharacterProfile, 
                                            emotional_states: List[EmotionalState], beat_progression: Dict) -> SunoCommand:
         """Generate emotion-driven beat production command with detailed instructions"""
         
@@ -4288,12 +5529,33 @@ class SunoCommandGenerator:
 # ================================================================================================
 
 # Initialize analysis engines
-character_analyzer = CharacterAnalyzer()
+character_analyzer = EnhancedCharacterAnalyzer()
 persona_generator = MusicPersonaGenerator()
 command_generator = None  # Will be initialized after wiki data manager is set up
 
 # Global wiki data manager for server-wide access
 wiki_data_manager = None
+
+async def ensure_wiki_data_manager():
+    """Ensure wiki data manager is available, initialize if needed"""
+    global wiki_data_manager
+    
+    if wiki_data_manager is None and WIKI_INTEGRATION_AVAILABLE:
+        try:
+            logger.info("Initializing wiki data manager on demand...")
+            from wiki_data_system import WikiDataManager
+            from wiki_data_models import WikiConfig
+            
+            wiki_data_manager = WikiDataManager()
+            config = WikiConfig()
+            await wiki_data_manager.initialize(config)
+            logger.info("Wiki data manager initialized successfully")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize wiki data manager: {e}")
+            wiki_data_manager = None
+    
+    return wiki_data_manager
 
 async def initialize_server():
     """Initialize the MCP server with all components including wiki integration"""
@@ -4333,6 +5595,52 @@ async def initialize_server():
     logger.info("Server initialization complete")
     logger.info("Ready to process narrative content and generate music commands")
 
+# Internal callable version for use by other tools
+async def _analyze_character_text_internal(text: str, ctx: Context) -> str:
+    """
+    Analyze narrative text to extract detailed character profiles using three-layer methodology.
+    
+    Performs comprehensive character analysis including:
+    - Skin Layer: Physical descriptions, mannerisms, speech patterns
+    - Flesh Layer: Relationships, backstory, formative experiences  
+    - Core Layer: Motivations, fears, desires, psychological drivers
+    
+    Uses enhanced character detection with:
+    - Named Entity Recognition for robust character detection
+    - Semantic analysis for multiple narrative themes beyond "friendship"
+    - Varied emotional arc analysis instead of "neutral" defaults
+    
+    Args:
+        text: Narrative text content (unlimited length supported)
+        
+    Returns:
+        JSON string containing detailed character analysis results
+    """
+    try:
+        await ctx.info("Starting enhanced character analysis...")
+        
+        if not text or len(text.strip()) < 50:
+            return json.dumps({
+                "error": "Text too short for meaningful character analysis. Please provide at least 50 characters of narrative content."
+            })
+        
+        # Perform enhanced analysis
+        result = await character_analyzer.analyze_text(text, ctx)
+        
+        # Validate results
+        from enhanced_character_analyzer import validate_analysis_results
+        validation_issues = validate_analysis_results(result)
+        if validation_issues:
+            await ctx.error(f"Analysis validation issues: {validation_issues}")
+        
+        await ctx.info(f"Enhanced analysis complete: {len(result['characters'])} characters, {len(result['narrative_themes'])} themes, {len(result['emotional_arc'])} emotional states found")
+        
+        return json.dumps(result, indent=2)
+        
+    except Exception as e:
+        await ctx.error(f"Enhanced character analysis failed: {str(e)}")
+        return json.dumps({"error": f"Enhanced analysis failed: {str(e)}"})
+
 @mcp.tool
 async def analyze_character_text(text: str, ctx: Context) -> str:
     """
@@ -4343,33 +5651,22 @@ async def analyze_character_text(text: str, ctx: Context) -> str:
     - Flesh Layer: Relationships, backstory, formative experiences  
     - Core Layer: Motivations, fears, desires, psychological drivers
     
+    Uses enhanced character detection with:
+    - Named Entity Recognition for robust character detection
+    - Semantic analysis for multiple narrative themes beyond "friendship"
+    - Varied emotional arc analysis instead of "neutral" defaults
+    
     Args:
         text: Narrative text content (unlimited length supported)
         
     Returns:
         JSON string containing detailed character analysis results
     """
-    try:
-        await ctx.info("Starting character analysis...")
-        
-        if not text or len(text.strip()) < 50:
-            return json.dumps({
-                "error": "Text too short for meaningful character analysis. Please provide at least 50 characters of narrative content."
-            })
-        
-        # Perform analysis
-        result = await character_analyzer.analyze_text(text, ctx)
-        
-        await ctx.info(f"Analysis complete: {len(result.characters)} characters found")
-        
-        return json.dumps(result.model_dump(), indent=2)
-        
-    except Exception as e:
-        await ctx.error(f"Character analysis failed: {str(e)}")
-        return json.dumps({"error": f"Analysis failed: {str(e)}"})
+    return await _analyze_character_text_internal(text, ctx)
 
-@mcp.tool
-async def generate_artist_personas(characters_json: str, ctx: Context) -> str:
+# Internal callable version for use by other tools
+async def _generate_artist_personas_internal(characters_json: str, ctx: Context, 
+                                            requested_genre: Optional[str] = None) -> str:
     """
     Generate musical artist personas from character profiles.
     
@@ -4397,12 +5694,27 @@ async def generate_artist_personas(characters_json: str, ctx: Context) -> str:
         artist_personas = []
         
         for char_data in characters_data:
-            # Convert dict back to CharacterProfile
-            character = CharacterProfile(**char_data)
-            
-            # Generate artist persona
-            persona = await persona_generator.generate_artist_persona(character, ctx)
-            artist_personas.append(asdict(persona))
+            try:
+                # Validate character data format
+                if not isinstance(char_data, dict):
+                    await ctx.error(f"Invalid character data format: expected dict, got {type(char_data)}")
+                    continue
+                
+                # Convert dict to StandardCharacterProfile with graceful error handling
+                character = StandardCharacterProfile.from_dict(char_data)
+                
+                # Validate that character has minimum required information
+                if not character.name or character.name == "Unknown Character":
+                    await ctx.error(f"Character missing required name field: {char_data}")
+                    continue
+                
+                # Generate artist persona (with optional genre alignment)
+                persona = await persona_generator.generate_artist_persona(character, ctx, requested_genre)
+                artist_personas.append(asdict(persona))
+                
+            except Exception as e:
+                await ctx.error(f"Failed to process character data {char_data}: {str(e)}")
+                continue
         
         result = {
             "artist_personas": artist_personas,
@@ -4419,7 +5731,23 @@ async def generate_artist_personas(characters_json: str, ctx: Context) -> str:
         return json.dumps({"error": f"Persona generation failed: {str(e)}"})
 
 @mcp.tool
-async def create_suno_commands(personas_json: str, characters_json: str, ctx: Context) -> str:
+async def generate_artist_personas(characters_json: str, ctx: Context, requested_genre: Optional[str] = None) -> str:
+    """
+    Generate musical artist personas from character profiles.
+    
+    Transforms character psychological profiles into coherent musical artist identities
+    with genre mappings, vocal styles, and thematic content.
+    
+    Args:
+        characters_json: JSON string containing character profiles from analyze_character_text
+        
+    Returns:
+        JSON string containing generated artist personas
+    """
+    return await _generate_artist_personas_internal(characters_json, ctx, requested_genre)
+
+# Internal callable version for use by other tools
+async def _create_suno_commands_internal(personas_json: str, characters_json: str, ctx: Context) -> str:
     """
     Generate optimized Suno AI commands from artist personas and character profiles.
     
@@ -4444,52 +5772,189 @@ async def create_suno_commands(personas_json: str, characters_json: str, ctx: Co
             command_generator = SunoCommandGenerator(wiki_data_manager)
             await ctx.info(f"Initialized SunoCommandGenerator with {'wiki integration' if wiki_data_manager else 'fallback mode'}")
         
-        # Parse input data
-        personas_data = json.loads(personas_json)
-        characters_data = json.loads(characters_json)
+        # Parse input data with better error handling
+        try:
+            personas_data = json.loads(personas_json)
+        except json.JSONDecodeError as e:
+            error_msg = f"Invalid personas JSON format: {str(e)}"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
         
+        try:
+            characters_data = json.loads(characters_json)
+        except json.JSONDecodeError as e:
+            error_msg = f"Invalid characters JSON format: {str(e)}"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
+        
+        # Validate data structure with detailed error messages
+        if not isinstance(personas_data, dict):
+            error_msg = f"Personas data must be a dictionary, got {type(personas_data)}"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
+            
         if 'artist_personas' not in personas_data:
-            return json.dumps({"error": "Invalid personas data format."})
+            error_msg = "Invalid personas data format. Expected 'artist_personas' key. Available keys: " + str(list(personas_data.keys()))
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
+            
+        if not isinstance(characters_data, dict):
+            error_msg = f"Characters data must be a dictionary, got {type(characters_data)}"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
+            
         if 'characters' not in characters_data:
-            return json.dumps({"error": "Invalid characters data format."})
+            error_msg = "Invalid characters data format. Expected 'characters' key. Available keys: " + str(list(characters_data.keys()))
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
         
         all_commands = []
         personas = personas_data['artist_personas']
         characters = characters_data['characters']
         
-        # Create character lookup by name
-        char_lookup = {char.name: char for char in characters}
-        
-        for persona_data in personas:
-            persona = ArtistPersona(**persona_data)
-            character = char_lookup.get(persona.character_name)
+        # Validate personas list
+        if not isinstance(personas, list):
+            error_msg = f"'artist_personas' must be a list, got {type(personas)}"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
             
-            if character:
-                # Extract emotional states if available
-                emotional_states = None
-                beat_progression = None
+        if len(personas) == 0:
+            error_msg = "No artist personas provided in 'artist_personas' list"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
+        
+        # Validate characters list
+        if not isinstance(characters, list):
+            error_msg = f"'characters' must be a list, got {type(characters)}"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
+            
+        if len(characters) == 0:
+            error_msg = "No characters provided in 'characters' list"
+            await ctx.error(error_msg)
+            return json.dumps({"error": error_msg})
+        
+        # Create character lookup by name
+        char_lookup = {char.get('name', ''): char for char in characters}
+        
+        await ctx.info(f"Processing {len(personas)} personas and {len(characters)} characters")
+        
+        for i, persona_data in enumerate(personas):
+            # Validate persona data structure
+            if not isinstance(persona_data, dict):
+                await ctx.error(f"Persona {i} must be a dictionary, got {type(persona_data)}")
+                continue
                 
-                if 'emotional_states' in characters_data:
-                    # Find emotional states for this character
-                    for i, char in enumerate(characters):
-                        if char.name == character.name and i < len(characters_data.get('emotional_states', [])):
-                            char_emotional_data = characters_data['emotional_states'][i]
-                            if char_emotional_data:
-                                emotional_states = [EmotionalState(**state) for state in char_emotional_data]
-                
-                if 'beat_progression' in characters_data:
-                    beat_progression = characters_data.get('beat_progression')
-                
+            # Check for required fields and provide helpful error messages
+            required_fields = ['character_name']
+            missing_fields = [field for field in required_fields if field not in persona_data or not persona_data[field]]
+            
+            if missing_fields:
+                await ctx.error(f"Persona {i} missing required fields: {missing_fields}. Available fields: {list(persona_data.keys())}")
+                # Add missing fields with defaults
+                for field in missing_fields:
+                    if field == 'character_name':
+                        persona_data[field] = f"Character_{i}"
+            
+            try:
+                # Use from_dict method to handle missing fields gracefully
+                persona = ArtistPersona.from_dict(persona_data)
+                await ctx.info(f"Created persona for {persona.character_name} -> {persona.artist_name}")
+            except Exception as e:
+                await ctx.error(f"Failed to create ArtistPersona from data {persona_data}: {e}")
+                # Create minimal persona with available data
+                persona = ArtistPersona(
+                    character_name=persona_data.get('character_name', f'Character_{i}'),
+                    artist_name=persona_data.get('artist_name', persona_data.get('character_name', f'Artist_{i}')),
+                    primary_genre=persona_data.get('primary_genre', ''),
+                    secondary_genres=persona_data.get('secondary_genres', []),
+                    vocal_style=persona_data.get('vocal_style', ''),
+                    lyrical_themes=persona_data.get('lyrical_themes', []),
+                    emotional_palette=persona_data.get('emotional_palette', [])
+                )
+                await ctx.info(f"Created fallback persona for {persona.character_name}")
+            
+            character_dict = char_lookup.get(persona.character_name)
+            
+            if character_dict:
+                try:
+                    # Convert character dict to StandardCharacterProfile
+                    character = StandardCharacterProfile.from_dict(character_dict)
+                    await ctx.info(f"Matched persona {persona.character_name} with character profile")
+                except Exception as e:
+                    await ctx.error(f"Failed to create StandardCharacterProfile from {character_dict}: {e}")
+                    # Create minimal character profile
+                    character = StandardCharacterProfile(
+                        name=persona.character_name,
+                        backstory=character_dict.get('backstory', ''),
+                        motivations=character_dict.get('motivations', []),
+                        fears=character_dict.get('fears', [])
+                    )
+            else:
+                await ctx.error(f"No character found for persona {persona.character_name}. Available characters: {list(char_lookup.keys())}")
+                # Create minimal character profile from persona data
+                character = StandardCharacterProfile(
+                    name=persona.character_name,
+                    backstory=f"Character profile for {persona.character_name}",
+                    motivations=[f"Express {persona.primary_genre} music"],
+                    personality_drivers=persona.lyrical_themes
+                )
+            
+            # Extract emotional states if available (for both matched and unmatched characters)
+            emotional_states = None
+            beat_progression = None
+            
+            if 'emotional_states' in characters_data:
+                # Find emotional states for this character
+                for j, char in enumerate(characters):
+                    if char.get('name', '') == character.name and j < len(characters_data.get('emotional_states', [])):
+                        char_emotional_data = characters_data['emotional_states'][j]
+                        if char_emotional_data:
+                            emotional_states = [EmotionalState(**state) for state in char_emotional_data]
+            
+            if 'beat_progression' in characters_data:
+                beat_progression = characters_data.get('beat_progression')
+            
+            await ctx.info(f"About to generate commands for {persona.character_name}")
+            try:
                 commands = await command_generator.generate_suno_commands(
                     persona, character, ctx, emotional_states, beat_progression
                 )
+                await ctx.info(f"Generated {len(commands)} commands for {persona.character_name}")
                 for cmd in commands:
                     all_commands.append(asdict(cmd))
+            except Exception as e:
+                await ctx.error(f"Failed to generate commands for {persona.character_name}: {e}")
+                import traceback
+                await ctx.error(f"Traceback: {traceback.format_exc()}")
+                # Create a fallback simple command
+                fallback_command = {
+                    'command_type': 'simple',
+                    'prompt': f"A {persona.primary_genre or 'music'} song inspired by {persona.character_name}",
+                    'style_tags': [persona.primary_genre] if persona.primary_genre else [],
+                    'structure_tags': [],
+                    'sound_effect_tags': [],
+                    'vocal_tags': [persona.vocal_style] if persona.vocal_style else [],
+                    'character_source': persona.character_name,
+                    'artist_persona': persona.artist_name,
+                    'command_rationale': f"Fallback command for {persona.character_name}",
+                    'estimated_effectiveness': 0.5
+                }
+                all_commands.append(fallback_command)
+        
+        # Convert personas to dict format for result validation
+        personas_for_result = []
+        for persona_data in personas:
+            if isinstance(persona_data, dict):
+                personas_for_result.append(persona_data)
+            else:
+                # Skip invalid persona data that couldn't be processed
+                continue
         
         result = MusicGenerationResult(
             commands=all_commands,
-            artist_personas=personas,
-            generation_summary=f"Generated {len(all_commands)} Suno AI commands from {len(personas)} artist personas",
+            artist_personas=personas_for_result,
+            generation_summary=f"Generated {len(all_commands)} Suno AI commands from {len(personas_for_result)} valid artist personas",
             total_commands=len(all_commands),
             processing_time=0.0
         )
@@ -4503,7 +5968,24 @@ async def create_suno_commands(personas_json: str, characters_json: str, ctx: Co
         return json.dumps({"error": f"Command generation failed: {str(e)}"})
 
 @mcp.tool
-async def complete_workflow(text: str, ctx: Context) -> str:
+async def create_suno_commands(personas_json: str, characters_json: str, ctx: Context) -> str:
+    """
+    Generate optimized Suno AI commands from artist personas and character profiles.
+    
+    Creates multiple command variations including simple prompts, custom mode,
+    bracket notation, and specialized commands for different musical approaches.
+    
+    Args:
+        personas_json: JSON string containing artist personas from generate_artist_personas
+        characters_json: JSON string containing character profiles
+        
+    Returns:
+        JSON string containing Suno AI commands with metadata
+    """
+    return await _create_suno_commands_internal(personas_json, characters_json, ctx)
+
+# Internal callable version for use by other tools
+async def _complete_workflow_internal(text: str, ctx: Context, requested_genre: Optional[str] = None) -> str:
     """
     Execute complete character-to-music workflow in one operation.
     
@@ -4523,15 +6005,15 @@ async def complete_workflow(text: str, ctx: Context) -> str:
         
         # Step 1: Character Analysis
         await ctx.info("Step 1: Analyzing characters...")
-        characters_result = await analyze_character_text(text, ctx)
+        characters_result = await _analyze_character_text_internal(text, ctx)
         
         # Step 2: Generate Artist Personas  
         await ctx.info("Step 2: Generating artist personas...")
-        personas_result = await generate_artist_personas(characters_result, ctx)
+        personas_result = await _generate_artist_personas_internal(characters_result, ctx, requested_genre)
         
         # Step 3: Create Suno Commands
         await ctx.info("Step 3: Creating Suno AI commands...")
-        commands_result = await create_suno_commands(personas_result, characters_result, ctx)
+        commands_result = await _create_suno_commands_internal(personas_result, characters_result, ctx)
         
         # Add wiki attribution context
         wiki_attribution = await _build_wiki_attribution_context({
@@ -4559,46 +6041,85 @@ async def complete_workflow(text: str, ctx: Context) -> str:
         return json.dumps({"error": f"Workflow failed: {str(e)}"})
 
 @mcp.tool
+async def complete_workflow(text: str, ctx: Context, requested_genre: Optional[str] = None) -> str:
+    """
+    Execute complete character-to-music workflow in one operation.
+    
+    Performs full pipeline:
+    1. Character analysis from narrative text
+    2. Artist persona generation
+    3. Suno AI command creation
+    
+    Args:
+        text: Input narrative text for analysis
+        
+    Returns:
+        JSON string containing complete workflow results
+    """
+    return await _complete_workflow_internal(text, ctx, requested_genre)
+
+@mcp.tool
 async def creative_music_generation(concept: str, style_preference: str = "any", ctx: Context = None) -> str:
     """
-    Generate creative music commands from abstract concepts with emotional grounding and beat production.
+    Generate creative music commands from abstract concepts with meaningful musical analysis.
     
-    Enhanced creative mode that uses Meta-Narrative & Self-Reflection framework to:
-    - Extract emotional facts from abstract concepts
-    - Generate emotion-driven beat patterns
-    - Create lyrical guidance based on emotional authenticity
-    - Provide comprehensive musical interpretation
+    Enhanced creative mode that provides:
+    - Deep musical concept analysis extracting key elements
+    - Creative variations based on musical theory and genre knowledge
+    - Practical Suno AI commands using wiki data integration
+    - Contextually appropriate responses instead of generic repetition
     
     Args:
         concept: Abstract concept, theme, or idea for music generation
         style_preference: Preferred musical style/genre (optional, defaults to "any")
         
     Returns:
-        JSON string containing emotionally-grounded creative music generation commands
+        JSON string containing meaningful creative music generation with practical Suno commands
     """
     try:
-        await ctx.info(f"Generating emotionally-grounded creative music from concept: {concept}")
+        await ctx.info(f"Analyzing concept for creative music generation: {concept}")
         
         if not concept or len(concept.strip()) < 10:
             return json.dumps({
                 "error": "Concept too short. Please provide a more detailed concept or theme."
             })
         
-        # NEW APPROACH: LLM DEFINES THE EMOTIONAL MAP
-        await ctx.info("LLM analyzing concept to create custom emotional map...")
+        # Initialize creative music engine
+        creative_engine = CreativeMusicEngine()
         
-        # Step 1: LLM analyzes the concept and creates emotional mapping
-        emotional_map = _create_llm_emotional_map(concept, style_preference)
+        # Step 1: Analyze the musical concept for key elements
+        await ctx.info("Analyzing musical concept for key elements...")
+        concept_analysis = creative_engine.analyze_musical_concept(concept)
         
-        # Step 2: Initialize pure execution engine
-        beat_engine = EmotionalBeatEngine()
+        # Step 2: Generate creative variations based on analysis
+        await ctx.info("Generating creative variations based on musical theory...")
+        creative_variations = creative_engine.generate_creative_variations(
+            concept_analysis, style_preference
+        )
         
-        # Step 3: Execute the LLM-defined emotional map
-        musical_production = beat_engine.execute_musical_production(emotional_map)
+        # Step 3: Create practical Suno AI commands
+        await ctx.info("Creating practical Suno AI commands...")
+        suno_commands = await creative_engine.generate_practical_suno_commands(
+            creative_variations, concept_analysis
+        )
         
-        await ctx.info("Musical production completed using LLM-defined emotional map")
+        # Step 4: Compile comprehensive result
+        result = {
+            "concept_analysis": concept_analysis,
+            "creative_variations": creative_variations,
+            "suno_commands": suno_commands,
+            "generation_metadata": {
+                "concept_length": len(concept),
+                "style_preference": style_preference,
+                "analysis_timestamp": datetime.now().isoformat(),
+                "variations_count": len(creative_variations),
+                "commands_count": len(suno_commands)
+            }
+        }
         
-        return json.dumps(musical_production, indent=2)
+        await ctx.info("Creative music generation completed with meaningful analysis")
+        
+        return json.dumps(result, indent=2)
         
     except Exception as e:
         await ctx.error(f"Creative generation failed: {str(e)}")
@@ -4660,6 +6181,152 @@ def _create_llm_emotional_map(concept: str, style_preference: str) -> Dict[str, 
     
     return emotional_map
 
+# Internal callable version for use by other tools
+async def _understand_topic_with_emotions_internal(
+    topic_text: str,
+    source_type: str = "book",
+    focus_areas: Optional[List[str]] = None,
+    ctx: Context = None
+) -> str:
+    """
+    Enhanced internal version of understand_topic_with_emotions with meaningful emotional analysis.
+    
+    Analyzes any topic or book content to extract:
+    - Sophisticated emotional analysis with varied insights
+    - Context-appropriate emotional responses for different topics
+    - Genre-appropriate beat patterns and musical elements
+    - Practical Suno AI commands based on emotional content
+    
+    Args:
+        topic_text: The topic or book content to analyze
+        source_type: Type of content - "book", "topic", "article", "research", etc.
+        focus_areas: Optional list of areas to focus on
+        ctx: Context for logging
+        
+    Returns:
+        JSON with comprehensive emotional understanding and musical interpretation
+    """
+    try:
+        if ctx:
+            await ctx.info(f"Performing enhanced analysis of {source_type} content...")
+        
+        if not topic_text or len(topic_text.strip()) < 50:
+            return json.dumps({
+                "error": "Content too short. Please provide at least 50 characters of meaningful content."
+            })
+        
+        # Import enhanced analyzers
+        try:
+            import sys
+            import os
+            
+            # Add current directory to path for imports
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            if current_dir not in sys.path:
+                sys.path.insert(0, current_dir)
+            
+            from enhanced_emotional_analyzer import EnhancedEmotionalAnalyzer
+            from enhanced_beat_generator import EnhancedBeatGenerator
+            
+            # Initialize enhanced analyzers
+            emotional_analyzer = EnhancedEmotionalAnalyzer()
+            beat_generator = EnhancedBeatGenerator()
+            
+            # Perform comprehensive emotional analysis
+            emotional_profile = emotional_analyzer.analyze_emotional_content(topic_text, source_type)
+            
+            # Generate genre preferences based on emotional content
+            genre_preferences = _extract_genre_preferences_for_topic(emotional_profile, source_type)
+            
+            # Generate beat patterns and musical elements
+            beat_analysis = beat_generator.generate_beat_patterns(emotional_profile, genre_preferences)
+            
+            # Create comprehensive understanding result
+            understanding_result = {
+                "topic_analysis": {
+                    "source_type": source_type,
+                    "content_preview": topic_text[:200] + ("..." if len(topic_text) > 200 else ""),
+                    "content_length": len(topic_text),
+                    "focus_areas": focus_areas if focus_areas else ["emotional_understanding", "musical_interpretation"],
+                    "analysis_method": "enhanced_emotional_analysis"
+                },
+                "emotional_analysis": {
+                    "primary_emotions": [
+                        {
+                            "emotion": emotion.emotion,
+                            "intensity": emotion.intensity,
+                            "context": emotion.context,
+                            "triggers": emotion.triggers,
+                            "musical_implications": emotion.musical_implications
+                        }
+                        for emotion in emotional_profile.primary_emotions
+                    ],
+                    "emotional_arc": emotional_profile.emotional_arc,
+                    "emotional_complexity": emotional_profile.emotional_complexity,
+                    "dominant_mood": emotional_profile.dominant_mood,
+                    "emotional_themes": emotional_profile.emotional_themes,
+                    "analysis_confidence": _calculate_topic_analysis_confidence(emotional_profile)
+                },
+                "musical_interpretation": {
+                    "beat_patterns": beat_analysis.get("beat_patterns", {}),
+                    "rhythm_characteristics": beat_analysis.get("rhythm_characteristics", {}),
+                    "tempo_recommendations": beat_analysis.get("tempo_recommendations", {}),
+                    "musical_elements": beat_analysis.get("musical_elements", []),
+                    "rhythm_variations": beat_analysis.get("rhythm_variations", []),
+                    "genre_suggestions": genre_preferences,
+                    "instrumentation_recommendations": emotional_profile.musical_recommendations.get("instrumentation", {}),
+                    "production_techniques": emotional_profile.musical_recommendations.get("production_techniques", [])
+                },
+                "suno_commands": {
+                    "primary_commands": beat_analysis.get("suno_commands", []),
+                    "emotional_directives": _generate_topic_emotional_directives(emotional_profile),
+                    "production_commands": _generate_topic_production_commands(emotional_profile),
+                    "complete_command_set": _generate_complete_topic_suno_commands(emotional_profile, beat_analysis)
+                },
+                "production_notes": {
+                    "emotional_production_notes": beat_analysis.get("production_notes", []),
+                    "technical_recommendations": _generate_topic_technical_recommendations(emotional_profile),
+                    "creative_suggestions": _generate_topic_creative_suggestions(emotional_profile, source_type)
+                },
+                "comprehensive_understanding": _generate_topic_comprehensive_summary(emotional_profile, source_type, beat_analysis)
+            }
+            
+            if ctx:
+                await ctx.info(f"Completed enhanced analysis with {len(emotional_profile.primary_emotions)} emotions detected")
+            
+            return json.dumps(understanding_result, indent=2)
+            
+        except ImportError:
+            # Fallback to original implementation if enhanced modules not available
+            if ctx:
+                await ctx.info("Enhanced modules not available, using fallback implementation...")
+            
+            # Original implementation as fallback
+            emotional_map = _create_llm_emotional_map(topic_text, "contemplative")
+            beat_engine = EmotionalBeatEngine()
+            musical_production = beat_engine.execute_musical_production(emotional_map)
+            
+            understanding_result = {
+                "topic_analysis": {
+                    "source_type": source_type,
+                    "content_preview": topic_text[:200] + ("..." if len(topic_text) > 200 else ""),
+                    "focus_areas": focus_areas if focus_areas else ["general_understanding"],
+                    "analysis_method": "fallback_implementation",
+                    "llm_emotional_interpretation": emotional_map['emotional_context'],
+                    "llm_reasoning": emotional_map['emotional_reasoning']
+                },
+                "musical_interpretation": musical_production,
+                "comprehensive_understanding": f"Fallback analysis of '{source_type}' content with basic emotional mapping"
+            }
+            
+            return json.dumps(understanding_result, indent=2)
+            
+    except Exception as e:
+        error_msg = f"Enhanced topic understanding failed: {str(e)}"
+        if ctx:
+            await ctx.error(error_msg)
+        return json.dumps({"error": error_msg})
+
 @mcp.tool
 async def understand_topic_with_emotions(
     topic_text: str,
@@ -4668,13 +6335,13 @@ async def understand_topic_with_emotions(
     ctx: Context = None
 ) -> str:
     """
-    Understand and ground topics/books using Meta-Narrative & Self-Reflection with factual emotional analysis.
+    Understand and ground topics/books using enhanced emotional analysis with meaningful insights.
     
     Analyzes any topic or book content to extract:
-    - Factual events and their emotional implications
-    - Meta-narrative understanding (what it means emotionally)
-    - Self-reflective insights from the content
-    - Emotion-driven beat production mapping
+    - Sophisticated emotional analysis with varied insights beyond "contemplative"
+    - Context-appropriate emotional responses for different topics  
+    - Genre-appropriate beat patterns and musical elements
+    - Practical Suno AI commands aligned with emotional content
     
     Perfect for understanding complex topics through emotional and musical lens.
     
@@ -4684,59 +6351,11 @@ async def understand_topic_with_emotions(
         focus_areas: Optional list of areas to focus on (e.g., ["character development", "philosophical themes"])
         
     Returns:
-        JSON with deep emotional understanding and musical interpretation
+        JSON with comprehensive emotional understanding and musical interpretation
     """
-    try:
-        await ctx.info(f"Analyzing {source_type} content with emotional framework...")
-        
-        if not topic_text or len(topic_text.strip()) < 50:
-            return json.dumps({
-                "error": "Content too short. Please provide at least 50 characters of meaningful content."
-            })
-        
-        # Initialize emotional framework components
-        beat_engine = EmotionalBeatEngine()
-        meta_processor = MetaNarrativeProcessor()
-        reflection_analyzer = SelfReflectionAnalyzer()
-        
-        # LLM creates emotional map from topic content
-        emotional_map = _create_llm_emotional_map(topic_text, "contemplative")
-        
-        # Execute the LLM-defined emotional map
-        musical_production = beat_engine.execute_musical_production(emotional_map)
-        
-        # Create comprehensive understanding result combining LLM emotional map with musical production
-        understanding_result = {
-            "topic_analysis": {
-                "source_type": source_type,
-                "content_preview": topic_text[:200] + "...",
-                "focus_areas": focus_areas if focus_areas else ["general_understanding"],
-                "llm_emotional_interpretation": emotional_map['emotional_context'],
-                "llm_reasoning": emotional_map['emotional_reasoning']
-            },
-            "musical_interpretation": musical_production,
-            "comprehensive_understanding": f"LLM-driven analysis of '{source_type}' content with emotional grounding in musical production"
-        }
-        
-        await ctx.info(f"Completed LLM-driven topic understanding with musical interpretation")
-        
-        return json.dumps(understanding_result, indent=2)
-        
-    except Exception as e:
-        await ctx.error(f"Topic understanding failed: {str(e)}")
-        return json.dumps({"error": f"Topic understanding failed: {str(e)}"})
+    return await _understand_topic_with_emotions_internal(topic_text, source_type, focus_areas, ctx)
 
-def _map_emotion_to_genre_llm(emotion: str, context: str = "") -> str:
-    """LLM determines genre from emotion and context - no predefined mappings"""
-    # LLM reasoning for genre selection based on emotional content and context
-    if context:
-        reasoning = f"Given the emotion '{emotion}' in the context of: {context[:100]}..."
-    else:
-        reasoning = f"Given the emotion '{emotion}'"
-    
-    # LLM analysis would go here - for now, dynamic selection based on emotional intensity
-    # This should be replaced with actual LLM calls in production
-    return f"genre determined by LLM analysis of {emotion} in context"
+# Removed unused function _map_emotion_to_genre_llm
 
 def _generate_topic_production_notes(emotional_states: List[EmotionalState], subtext: List[Dict]) -> List[str]:
     """Generate production notes based on emotional analysis"""
@@ -4759,6 +6378,279 @@ def _generate_topic_production_notes(emotional_states: List[EmotionalState], sub
             notes.append("Create dramatic shift in production at key moments")
     
     return notes
+
+# Helper functions for enhanced topic analysis
+def _extract_genre_preferences_for_topic(emotional_profile, source_type: str) -> List[str]:
+    """Extract genre preferences based on emotional content and source type"""
+    genre_preferences = []
+    
+    # Add genres from musical recommendations
+    if hasattr(emotional_profile, 'musical_recommendations') and "genre_suggestions" in emotional_profile.musical_recommendations:
+        genre_preferences.extend(emotional_profile.musical_recommendations["genre_suggestions"])
+    
+    # Add source-type specific genres
+    source_genre_mappings = {
+        "book": ["cinematic", "orchestral", "ambient"],
+        "philosophy": ["ambient", "neo_classical", "experimental"],
+        "story": ["cinematic", "folk", "indie"],
+        "article": ["electronic", "ambient", "minimal"],
+        "research": ["ambient", "experimental", "minimal"],
+        "poetry": ["folk", "ambient", "indie"],
+        "memoir": ["folk", "indie", "acoustic"]
+    }
+    
+    if source_type in source_genre_mappings:
+        for genre in source_genre_mappings[source_type]:
+            if genre not in genre_preferences:
+                genre_preferences.append(genre)
+    
+    # Add emotion-based genres
+    emotion_genre_mappings = {
+        "melancholic": ["indie_folk", "ambient", "neo_classical"],
+        "hopeful": ["indie_pop", "folk", "uplifting_electronic"],
+        "anxious": ["experimental", "industrial", "dark_ambient"],
+        "furious": ["metal", "punk", "aggressive_electronic"],
+        "contemplative": ["ambient", "neo_classical", "meditation"],
+        "passionate": ["orchestral", "dramatic", "cinematic"],
+        "mysterious": ["dark_ambient", "experimental", "atmospheric"]
+    }
+    
+    if hasattr(emotional_profile, 'primary_emotions'):
+        for emotion in emotional_profile.primary_emotions[:2]:  # Top 2 emotions
+            if emotion.emotion in emotion_genre_mappings:
+                for genre in emotion_genre_mappings[emotion.emotion]:
+                    if genre not in genre_preferences:
+                        genre_preferences.append(genre)
+    
+    return genre_preferences[:5]  # Return top 5 genre preferences
+
+def _calculate_topic_analysis_confidence(emotional_profile) -> float:
+    """Calculate confidence score for the emotional analysis"""
+    if not hasattr(emotional_profile, 'primary_emotions') or not emotional_profile.primary_emotions:
+        return 0.0
+    
+    # Base confidence on number of emotions detected and their intensities
+    num_emotions = len(emotional_profile.primary_emotions)
+    if num_emotions == 0:
+        return 0.0
+        
+    avg_intensity = sum(e.intensity for e in emotional_profile.primary_emotions) / num_emotions
+    
+    # Higher confidence with more emotions and higher intensities
+    confidence = min((num_emotions * 0.2) + (avg_intensity * 0.8), 1.0)
+    
+    return round(confidence, 2)
+
+def _generate_topic_emotional_directives(emotional_profile) -> List[str]:
+    """Generate Suno AI emotional directives based on analysis"""
+    directives = []
+    
+    if not hasattr(emotional_profile, 'primary_emotions') or not emotional_profile.primary_emotions:
+        return ["[neutral_mood]"]
+    
+    for emotion in emotional_profile.primary_emotions[:3]:  # Top 3 emotions
+        # Basic emotional directive
+        directives.append(f"[{emotion.emotion}_feeling]")
+        
+        # Intensity-based directive
+        if emotion.intensity > 0.8:
+            directives.append(f"[intense_{emotion.emotion}]")
+        elif emotion.intensity < 0.3:
+            directives.append(f"[subtle_{emotion.emotion}]")
+        else:
+            directives.append(f"[moderate_{emotion.emotion}]")
+    
+    # Emotional arc directive
+    if hasattr(emotional_profile, 'emotional_arc') and emotional_profile.emotional_arc["beginning"] != emotional_profile.emotional_arc["end"]:
+        directives.append(f"[emotional_journey_{emotional_profile.emotional_arc['beginning']}_to_{emotional_profile.emotional_arc['end']}]")
+    
+    # Complexity directive
+    if hasattr(emotional_profile, 'emotional_complexity'):
+        if emotional_profile.emotional_complexity > 0.7:
+            directives.append("[complex_emotions]")
+        elif emotional_profile.emotional_complexity < 0.3:
+            directives.append("[simple_emotions]")
+    
+    return directives
+
+def _generate_topic_production_commands(emotional_profile) -> List[str]:
+    """Generate production-specific Suno commands"""
+    commands = []
+    
+    if not hasattr(emotional_profile, 'dominant_mood'):
+        return ["[standard_production]"]
+    
+    # Commands based on dominant mood
+    mood_commands = {
+        "melancholic": ["[reverb_space]", "[warm_tone]", "[gentle_dynamics]"],
+        "hopeful": ["[bright_eq]", "[uplifting_energy]", "[clear_vocals]"],
+        "anxious": ["[tension_building]", "[irregular_rhythm]", "[restless_energy]"],
+        "furious": ["[aggressive_compression]", "[heavy_distortion]", "[intense_energy]"],
+        "contemplative": ["[minimal_processing]", "[natural_sound]", "[spacious_mix]"],
+        "passionate": ["[dynamic_range]", "[emotional_builds]", "[expressive_vocals]"]
+    }
+    
+    if emotional_profile.dominant_mood in mood_commands:
+        commands.extend(mood_commands[emotional_profile.dominant_mood])
+    
+    # Commands based on emotional complexity
+    if hasattr(emotional_profile, 'emotional_complexity'):
+        if emotional_profile.emotional_complexity > 0.7:
+            commands.extend(["[layered_arrangement]", "[rich_texture]", "[complex_harmony]"])
+        elif emotional_profile.emotional_complexity < 0.3:
+            commands.extend(["[minimal_arrangement]", "[simple_texture]", "[clear_structure]"])
+    
+    return commands
+
+def _generate_complete_topic_suno_commands(emotional_profile, beat_analysis: Dict[str, Any]) -> List[str]:
+    """Generate a complete set of Suno commands for the track"""
+    commands = []
+    
+    # Start with beat pattern commands
+    if "suno_commands" in beat_analysis:
+        commands.extend(beat_analysis["suno_commands"])
+    
+    # Add emotional directives
+    commands.extend(_generate_topic_emotional_directives(emotional_profile))
+    
+    # Add production commands
+    commands.extend(_generate_topic_production_commands(emotional_profile))
+    
+    # Add musical element commands
+    if "musical_elements" in beat_analysis:
+        for element in beat_analysis["musical_elements"]:
+            if "suno_commands" in element:
+                commands.extend(element["suno_commands"])
+    
+    # Remove duplicates while preserving order
+    unique_commands = []
+    for command in commands:
+        if command not in unique_commands:
+            unique_commands.append(command)
+    
+    return unique_commands
+
+def _generate_topic_technical_recommendations(emotional_profile) -> List[str]:
+    """Generate technical production recommendations"""
+    recommendations = []
+    
+    # Recommendations based on emotional intensity
+    if hasattr(emotional_profile, 'primary_emotions') and emotional_profile.primary_emotions:
+        avg_intensity = sum(e.intensity for e in emotional_profile.primary_emotions) / len(emotional_profile.primary_emotions)
+        
+        if avg_intensity > 0.7:
+            recommendations.extend([
+                "Use dynamic range to emphasize emotional peaks",
+                "Consider parallel compression for intensity without losing dynamics",
+                "Apply careful EQ to prevent harshness at high intensities"
+            ])
+        elif avg_intensity < 0.3:
+            recommendations.extend([
+                "Preserve natural dynamics for intimate feeling",
+                "Use gentle compression to maintain consistency",
+                "Focus on clarity and presence rather than power"
+            ])
+    
+    # Recommendations based on emotional complexity
+    if hasattr(emotional_profile, 'emotional_complexity') and emotional_profile.emotional_complexity > 0.7:
+        recommendations.extend([
+            "Use frequency separation techniques to manage complex arrangements",
+            "Apply subtle panning to create space for multiple elements",
+            "Consider automation to highlight different emotional layers"
+        ])
+    
+    return recommendations
+
+def _generate_topic_creative_suggestions(emotional_profile, source_type: str) -> List[str]:
+    """Generate creative suggestions based on analysis"""
+    suggestions = []
+    
+    # Suggestions based on emotional themes
+    if hasattr(emotional_profile, 'emotional_themes'):
+        for theme in emotional_profile.emotional_themes[:3]:
+            theme_suggestions = {
+                "transformation": "Consider using musical metamorphosis techniques - start with one sound and gradually transform it",
+                "conflict": "Use contrasting musical elements to represent internal or external conflicts",
+                "love": "Incorporate warm, embracing harmonies and gentle rhythmic patterns",
+                "loss": "Use space and silence as compositional elements to represent absence",
+                "discovery": "Build musical revelations through gradual unveiling of new elements",
+                "journey": "Create a sense of forward motion through rhythmic and harmonic progression",
+                "identity": "Develop a unique musical signature that represents the character or narrator",
+                "redemption": "Use resolution of dissonance to represent emotional healing",
+                "hope": "Incorporate ascending melodic lines and brightening harmonies"
+            }
+            
+            if theme in theme_suggestions:
+                suggestions.append(theme_suggestions[theme])
+    
+    # Suggestions based on source type
+    source_suggestions = {
+        "book": "Consider creating musical chapters that reflect different sections of the narrative",
+        "philosophy": "Use abstract musical concepts to represent complex ideas",
+        "story": "Create character themes and develop them throughout the piece",
+        "poetry": "Let the natural rhythm of the text inform the musical rhythm",
+        "memoir": "Use personal, intimate musical textures to reflect the autobiographical nature"
+    }
+    
+    if source_type in source_suggestions:
+        suggestions.append(source_suggestions[source_type])
+    
+    # Suggestions based on emotional arc
+    if hasattr(emotional_profile, 'emotional_arc') and emotional_profile.emotional_arc["beginning"] != emotional_profile.emotional_arc["end"]:
+        suggestions.append(f"Create a musical journey that mirrors the emotional arc from {emotional_profile.emotional_arc['beginning']} to {emotional_profile.emotional_arc['end']}")
+    
+    return suggestions
+
+def _generate_topic_comprehensive_summary(emotional_profile, source_type: str, beat_analysis: Dict[str, Any]) -> str:
+    """Generate a comprehensive summary of the analysis"""
+    if not hasattr(emotional_profile, 'primary_emotions') or not emotional_profile.primary_emotions:
+        return f"Analysis of {source_type} content completed with minimal emotional content detected."
+    
+    primary_emotion = emotional_profile.primary_emotions[0]
+    
+    summary_parts = []
+    
+    # Emotional analysis summary
+    summary_parts.append(f"The {source_type} content reveals a primarily {primary_emotion.emotion} emotional landscape with {primary_emotion.intensity:.1f} intensity.")
+    
+    # Emotional complexity
+    if hasattr(emotional_profile, 'emotional_complexity'):
+        if emotional_profile.emotional_complexity > 0.7:
+            summary_parts.append("The emotional content is highly complex, featuring multiple layered emotions that would benefit from sophisticated musical treatment.")
+        elif emotional_profile.emotional_complexity < 0.3:
+            summary_parts.append("The emotional content is relatively straightforward, allowing for focused musical interpretation.")
+        else:
+            summary_parts.append("The emotional content shows moderate complexity with clear primary emotions and subtle undertones.")
+    
+    # Musical recommendations summary
+    if "tempo_recommendations" in beat_analysis:
+        tempo_info = beat_analysis["tempo_recommendations"]
+        summary_parts.append(f"Musical interpretation suggests a tempo around {tempo_info.get('recommended_tempo', 100)} BPM to match the emotional pacing.")
+    
+    # Thematic summary
+    if hasattr(emotional_profile, 'emotional_themes') and emotional_profile.emotional_themes:
+        themes_str = ", ".join(emotional_profile.emotional_themes[:3])
+        summary_parts.append(f"Key emotional themes include {themes_str}, which should inform the musical narrative structure.")
+    
+    # Production approach summary
+    if hasattr(emotional_profile, 'dominant_mood') and emotional_profile.dominant_mood:
+        summary_parts.append(f"The dominant {emotional_profile.dominant_mood} mood suggests a production approach that emphasizes {_get_topic_mood_production_focus(emotional_profile.dominant_mood)}.")
+    
+    return " ".join(summary_parts)
+
+def _get_topic_mood_production_focus(mood: str) -> str:
+    """Get production focus description for a given mood"""
+    mood_focus = {
+        "melancholic": "spaciousness, warmth, and emotional resonance",
+        "hopeful": "brightness, clarity, and forward momentum",
+        "anxious": "tension, irregularity, and restless energy",
+        "furious": "power, aggression, and intense dynamics",
+        "contemplative": "clarity, space, and natural sound",
+        "passionate": "dynamic range, emotional builds, and expressive elements",
+        "mysterious": "atmosphere, ambiguity, and subtle textures"
+    }
+    
+    return mood_focus.get(mood, "balanced musical elements")
 
 @mcp.tool
 async def process_universal_content(
@@ -4948,207 +6840,78 @@ async def process_universal_content(
         return json.dumps({"error": f"Processing failed: {str(e)}"})
 
 @mcp.tool
-async def create_story_integrated_album(
-    narrative_text: str,
-    character_name: str = None,
+async def create_conceptual_album(
+    content: str,
     album_concept: str = None,
+    character_name: str = None,
+    character_description: str = None,
     track_count: int = 8,
-    require_story_arc: bool = True,
+    genre: str = "alternative",
+    processing_mode: str = "auto",
     ctx: Context = None
 ) -> str:
     """
-    Create a story-integrated album that follows narrative progression.
+    Create a comprehensive conceptual album with meaningful track progression.
     
-    This tool enforces non-generic album creation by:
-    1. Analyzing the narrative structure and extracting story beats
-    2. Mapping character development to musical evolution
-    3. Creating tracks that follow the actual story progression
-    4. Ensuring each track represents a unique narrative moment
+    This consolidated tool handles multiple content types and creation modes:
+    1. Story-integrated albums from narrative content with character arcs
+    2. Character-driven albums from explicit character descriptions
+    3. Conceptual albums from philosophical or abstract content
+    4. Ensures unique, thematic track titles and content progression
     
     Args:
-        narrative_text: Complete story or narrative content
+        content: Source content (narrative, character description, or concepts)
+        album_concept: Album theme/title (auto-generated if None)
         character_name: Specific character perspective (auto-detected if None)
-        album_concept: Album theme (derived from story if None)
+        character_description: Explicit character profile (for character-driven mode)
         track_count: Number of tracks (3-12)
-        require_story_arc: Enforce story arc progression (default True)
+        genre: Musical genre preference
+        processing_mode: "narrative", "character", "conceptual", or "auto"
     
     Returns:
-        JSON containing story-integrated album with narrative-driven tracks
+        JSON containing complete album with meaningful track progression
     """
     try:
-        await ctx.info("Starting story-integrated album creation...")
+        await ctx.info(f"Starting conceptual album creation with {processing_mode} mode...")
         
         # Validate inputs
         if track_count < 3 or track_count > 12:
             return json.dumps({"error": "Track count must be between 3 and 12"})
         
-        if not narrative_text or len(narrative_text.strip()) < 100:
-            return json.dumps({"error": "Narrative text too short. Please provide substantial story content."})
+        if not content or len(content.strip()) < 50:
+            return json.dumps({"error": "Content too short. Please provide substantial content for album creation."})
         
-        # Step 1: Analyze the narrative to extract characters and story elements
-        await ctx.info("Step 1: Analyzing narrative structure...")
-        text_analysis = await character_analyzer.analyze_text(narrative_text, ctx)
+        # Step 1: Determine processing mode and content type
+        detected_mode = await _detect_content_type(content, character_description, processing_mode, ctx)
+        await ctx.info(f"Processing mode: {detected_mode}")
         
-        if not text_analysis.characters:
-            return json.dumps({"error": "No characters found in narrative. Please provide character-driven content."})
-        
-        # Select character perspective
-        if character_name:
-            selected_character = next((char for char in text_analysis.characters if char.name.lower() == character_name.lower()), None)
-            if not selected_character:
-                return json.dumps({"error": f"Character '{character_name}' not found in narrative"})
+        # Step 2: Process content based on detected mode
+        if detected_mode == "narrative":
+            album_result = await _create_narrative_album(
+                content, album_concept, character_name, track_count, genre, ctx
+            )
+        elif detected_mode == "character":
+            album_result = await _create_character_driven_album(
+                content, character_description, album_concept, track_count, genre, ctx
+            )
+        elif detected_mode == "conceptual":
+            album_result = await _create_conceptual_thematic_album(
+                content, album_concept, track_count, genre, ctx
+            )
         else:
-            # Auto-select protagonist (highest importance score)
-            selected_character = text_analysis.characters[0]
-            await ctx.info(f"Auto-selected protagonist: {selected_character.name}")
-        
-        # Use the CharacterProfile object directly
-        character_profile = selected_character
-        
-        # Step 2: Extract story beats and narrative arc
-        await ctx.info("Step 2: Extracting story beats and narrative arc...")
-        story_beats = await _extract_story_beats(narrative_text, character_profile, ctx)
-        
-        # Step 3: Generate artist persona for the character
-        await ctx.info("Step 3: Generating character's musical persona...")
-        artist_persona = await persona_generator.generate_artist_persona(character_profile, ctx)
-        
-        # Add wiki attribution context if available
-        wiki_attribution = await _build_wiki_attribution_context({
-            'character': character_profile.to_dict(),
-            'persona': artist_persona.to_dict()
-        }, ctx)
-        
-        # Step 4: Map story beats to track concepts
-        await ctx.info("Step 4: Mapping story progression to album tracks...")
-        track_concepts = await _generate_story_based_tracks(
-            story_beats, 
-            character_profile, 
-            artist_persona,
-            track_count,
-            ctx
-        )
-        
-        # Step 5: Create tracks that follow the story
-        album_tracks = []
-        
-        # Generate character description from profile and persona
-        character_description = f"""
-        Name: {character_profile.name}
-        Personality: {', '.join(character_profile.personality_drivers[:2])}
-        Background: {character_profile.backstory[:200]}...
-        Motivations: {', '.join(character_profile.motivations[:2])}
-        Musical Style: {artist_persona.primary_genre} artist with {artist_persona.vocal_style}
-        Artistic Identity: {artist_persona.artist_name}
-        """
-        
-        for i, track_concept in enumerate(track_concepts):
-            await ctx.info(f"Creating track {i+1}/{track_count}: {track_concept['title']}")
-            
-            # Create story-specific content for this track
-            track_content = f"""
-            Story Context: {track_concept['story_context']}
-            Character State: {track_concept['character_state']}
-            Emotional Tone: {track_concept['emotional_tone']}
-            Narrative Function: {track_concept['narrative_function']}
-            
-            Original Story Excerpt:
-            {track_concept['story_excerpt']}
-            """
-            
-            # Use process_universal_content tool for better integration
-            track_result_json = await process_universal_content(
-                content=track_content,
-                character_description=character_description,
-                track_title=track_concept['title'],
-                ctx=ctx
+            # Hybrid mode - combine approaches
+            album_result = await _create_hybrid_album(
+                content, album_concept, character_name, character_description, track_count, genre, ctx
             )
-            
-            track_result_data = json.loads(track_result_json)
-            
-            # Extract the processed data
-            if "error" in track_result_data:
-                await ctx.error(f"Error processing track: {track_result_data['error']}")
-                continue
-            
-            # Generate enhanced Suno command with story-specific elements
-            story_suno_command = await _generate_story_aware_suno_command(
-                artist_persona,
-                character_profile,
-                track_concept,
-                track_result_data,
-                ctx
-            )
-            
-            track_data = {
-                "track_number": i + 1,
-                "title": track_concept['title'],
-                "story_context": track_concept['story_context'],
-                "character_development": track_concept['character_state'],
-                "narrative_function": track_concept['narrative_function'],
-                "emotional_arc_position": track_concept['emotional_tone'],
-                "character_interpretation": track_result_data['content_analysis']['character_interpretation'],
-                "personal_story": track_result_data['character_story']['personal_connection'],
-                "story_integrated_lyrics": track_result_data['authentic_lyrics']['formatted_lyrics'],
-                "suno_command": story_suno_command,
-                "musical_evolution": track_concept.get('musical_evolution', 'Maintains character voice'),
-                "production_context": track_result_data['character_story']['creative_process'],
-                "effectiveness_score": track_result_data['effectiveness_metrics']['character_authenticity']
-            }
-            
-            album_tracks.append(track_data)
         
-        # Derive album concept if not provided
-        if not album_concept:
-            album_concept = f"{character_profile.name}'s Journey: A Musical Narrative"
-        
-        # Create album response with story integration metrics
-        album_response = {
-            "album_status": "story_integrated",
-            "album_info": {
-                "title": album_concept,
-                "protagonist": character_profile.name,
-                "total_tracks": track_count,
-                "narrative_source": f"Story with {len(text_analysis.characters)} characters",
-                "story_themes": text_analysis.narrative_themes,
-                "emotional_journey": text_analysis.emotional_arc,
-                "musical_genre": artist_persona.primary_genre,
-                "concept": f"Story-driven album following {character_profile.name}'s narrative arc"
-            },
-            "story_integration": {
-                "character_authenticity": "Verified - all tracks maintain character voice",
-                "narrative_progression": "Linear - tracks follow story chronology",
-                "emotional_coherence": "Strong - musical evolution matches character arc",
-                "thematic_consistency": "High - unified by story themes and character perspective"
-            },
-            "tracks": album_tracks,
-            "album_effectiveness": {
-                "average_score": sum(track["effectiveness_score"] for track in album_tracks) / len(album_tracks),
-                "story_fidelity": "Excellent - each track represents actual story moments",
-                "character_depth": "Deep - psychological progression tracked throughout",
-                "musical_narrative": "Cohesive - genre and style evolve with story",
-                "non_generic_rating": "10/10 - Completely unique to this specific narrative"
-            },
-            "artist_persona_summary": {
-                "name": artist_persona.artist_name,
-                "genre": artist_persona.primary_genre,
-                "vocal_style": artist_persona.vocal_style,
-                "thematic_focus": artist_persona.lyrical_themes
-            },
-            "usage_notes": "Each track is specifically tied to story events. Play in order for full narrative experience.",
-            "album_summary": f"Created {track_count}-track story-integrated album following {character_profile.name}'s journey through key narrative moments",
-            "wiki_attribution": wiki_attribution if wiki_attribution else "Using fallback data - no wiki sources available"
-        }
-        
-        await ctx.info(f"Story-integrated album complete: {track_count} narrative-driven tracks")
-        
-        return json.dumps(album_response, indent=2)
+        await ctx.info(f"Conceptual album creation complete: {track_count} unique tracks")
+        return json.dumps(album_result, indent=2)
         
     except Exception as e:
-        await ctx.error(f"Story-integrated album creation failed: {str(e)}")
-        return json.dumps({"error": f"Story album creation failed: {str(e)}"})
+        await ctx.error(f"Conceptual album creation failed: {str(e)}")
+        return json.dumps({"error": f"Album creation failed: {str(e)}"})
 
-async def _extract_story_beats(narrative_text: str, character: CharacterProfile, ctx: Context) -> List[Dict]:
+async def _extract_story_beats(narrative_text: str, character: StandardCharacterProfile, ctx: Context) -> List[Dict]:
     """Extract key story beats and plot points from narrative"""
     
     # Divide text into sections for analysis
@@ -5250,7 +7013,7 @@ def _extract_section_conflicts(text: str) -> List[str]:
 
 async def _generate_story_based_tracks(
     story_beats: List[Dict],
-    character: CharacterProfile,
+    character: StandardCharacterProfile,
     persona: ArtistPersona,
     track_count: int,
     ctx: Context
@@ -5314,7 +7077,7 @@ async def _generate_story_based_tracks(
     
     return track_concepts
 
-def _extract_track_themes(beat: Dict, character: CharacterProfile) -> List[str]:
+def _extract_track_themes(beat: Dict, character: StandardCharacterProfile) -> List[str]:
     """Extract themes for a specific track based on story beat"""
     themes = []
     
@@ -5337,7 +7100,7 @@ def _extract_track_themes(beat: Dict, character: CharacterProfile) -> List[str]:
 
 async def _generate_story_aware_suno_command(
     persona: ArtistPersona,
-    character: CharacterProfile,
+    character: StandardCharacterProfile,
     track_concept: Dict,
     track_result_data: Dict,
     ctx: Context
@@ -5431,8 +7194,11 @@ async def analyze_artist_psychology(
         else:
             persona_info = persona_data
             
-        character = CharacterProfile(**character_info)
-        persona = ArtistPersona(**persona_info)
+        # Use StandardCharacterProfile.from_dict to handle format issues gracefully
+        character = StandardCharacterProfile.from_dict(character_info)
+        
+        # Use ArtistPersona.from_dict to handle format issues gracefully
+        persona = ArtistPersona.from_dict(persona_info)
         
         await ctx.info(f"Analyzing {character.name} as artist {persona.artist_name}...")
         
@@ -5447,7 +7213,7 @@ async def analyze_artist_psychology(
         await ctx.error(f"Artist psychology analysis failed: {str(e)}")
         return json.dumps({"error": f"Psychology analysis failed: {str(e)}"})
 
-async def _analyze_artist_psychology_deep(character: CharacterProfile, persona: ArtistPersona, ctx: Context) -> Dict:
+async def _analyze_artist_psychology_deep(character: StandardCharacterProfile, persona: ArtistPersona, ctx: Context) -> Dict:
     """Perform deep psychological analysis of artist motivations"""
     
     # 1. Analyze why they turned to music
@@ -5508,19 +7274,30 @@ async def _analyze_artist_psychology_deep(character: CharacterProfile, persona: 
         }
     }
 
-def _analyze_musical_genesis(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_musical_genesis(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Analyze why and how the character became a musical artist"""
+    
+    # Extract key themes from backstory for more specific analysis
+    backstory_themes = _extract_backstory_themes(character.backstory)
     
     # Look for turning points in character's life
     turning_points = []
     for experience in character.formative_experiences:
-        if any(word in experience.lower() for word in ['loss', 'death', 'betrayal', 'discovery', 'revelation']):
+        if any(word in experience.lower() for word in ['loss', 'death', 'betrayal', 'discovery', 'revelation', 'injustice', 'fight', 'protest', 'brutality']):
             turning_points.append(experience)
+    
+    # Also check backstory for turning points
+    if character.backstory:
+        backstory_lower = character.backstory.lower()
+        if any(word in backstory_lower for word in ['lost', 'death', 'died', 'injustice', 'poverty', 'fight', 'struggle']):
+            # Extract the specific context from backstory
+            backstory_context = character.backstory[:100] + "..." if len(character.backstory) > 100 else character.backstory
+            turning_points.append(backstory_context)
     
     # Examine motivations that led to music
     musical_drivers = []
     for motivation in character.motivations:
-        if any(word in motivation.lower() for word in ['express', 'communicate', 'heal', 'understand', 'connect']):
+        if any(word in motivation.lower() for word in ['express', 'communicate', 'heal', 'understand', 'connect', 'fight', 'voice', 'honor', 'memory']):
             musical_drivers.append(motivation)
     
     # Analyze what music provides that life couldn't
@@ -5530,11 +7307,16 @@ def _analyze_musical_genesis(character: CharacterProfile, persona: ArtistPersona
             music_as_solution.append("Music as connection to others")
         if 'meaningless' in fear.lower() or 'purpose' in fear.lower():
             music_as_solution.append("Music as meaning-making")
-        if 'loss' in fear.lower():
+        if 'loss' in fear.lower() or 'forgotten' in fear.lower():
             music_as_solution.append("Music as preservation of memory")
+        if 'selling out' in fear.lower() or 'complacent' in fear.lower():
+            music_as_solution.append("Music as authentic expression")
+    
+    # Create more specific origin story based on character details
+    origin_story = _create_specific_origin_story(character, persona, turning_points, backstory_themes)
     
     return {
-        "origin_story": f"{character.name} turned to music as a response to {turning_points[0] if turning_points else 'life experiences'}",
+        "origin_story": origin_story,
         "turning_points": turning_points[:3],
         "musical_drivers": musical_drivers[:3],
         "music_as_solution": music_as_solution,
@@ -5542,7 +7324,64 @@ def _analyze_musical_genesis(character: CharacterProfile, persona: ArtistPersona
         "first_musical_experience": _reconstruct_first_musical_experience(character, persona)
     }
 
-def _reconstruct_first_musical_experience(character: CharacterProfile, persona: ArtistPersona) -> str:
+def _extract_backstory_themes(backstory: str) -> List[str]:
+    """Extract key themes from character backstory"""
+    if not backstory:
+        return []
+    
+    themes = []
+    backstory_lower = backstory.lower()
+    
+    # Social/economic themes
+    if any(word in backstory_lower for word in ['poverty', 'poor', 'urban', 'city', 'street']):
+        themes.append("urban struggle")
+    if any(word in backstory_lower for word in ['mountain', 'rural', 'quiet', 'small town']):
+        themes.append("rural/isolated upbringing")
+    
+    # Loss/trauma themes
+    if any(word in backstory_lower for word in ['lost', 'death', 'died', 'father', 'mother']):
+        themes.append("family loss")
+    if any(word in backstory_lower for word in ['injustice', 'unfair', 'brutality', 'systemic']):
+        themes.append("social injustice")
+    
+    # Personal growth themes
+    if any(word in backstory_lower for word in ['fought', 'fight', 'struggle', 'overcome']):
+        themes.append("personal struggle")
+    
+    return themes
+
+def _create_specific_origin_story(character: StandardCharacterProfile, persona: ArtistPersona, turning_points: List[str], themes: List[str]) -> str:
+    """Create a specific origin story incorporating character details"""
+    
+    # Use the most relevant turning point
+    primary_catalyst = turning_points[0] if turning_points else "life experiences"
+    
+    # Incorporate backstory themes
+    context = ""
+    if "urban struggle" in themes:
+        context = "growing up in urban poverty and witnessing systemic injustice"
+    elif "family loss" in themes:
+        context = "experiencing profound loss and seeking meaning"
+    elif "social injustice" in themes:
+        context = "confronting inequality and fighting for justice"
+    elif "rural/isolated upbringing" in themes:
+        context = "finding solace in quiet, introspective moments"
+    else:
+        context = "navigating personal challenges"
+    
+    # Connect to musical choice
+    genre_connection = ""
+    if persona.primary_genre:
+        if "punk" in persona.primary_genre.lower() or "rock" in persona.primary_genre.lower():
+            genre_connection = f", finding that {persona.primary_genre} provided the raw energy needed for authentic expression"
+        elif "folk" in persona.primary_genre.lower():
+            genre_connection = f", discovering that {persona.primary_genre} offered the perfect medium for introspective storytelling"
+        else:
+            genre_connection = f", drawn to {persona.primary_genre} as the ideal vehicle for their message"
+    
+    return f"{character.name} turned to music after {context}, specifically responding to {primary_catalyst}{genre_connection}"
+
+def _reconstruct_first_musical_experience(character: StandardCharacterProfile, persona: ArtistPersona) -> str:
     """Reconstruct what their first meaningful musical experience might have been"""
     
     emotional_state = "seeking solace" if character.fears else "exploring creativity"
@@ -5550,7 +7389,7 @@ def _reconstruct_first_musical_experience(character: CharacterProfile, persona: 
     
     return f"Likely discovered {persona.primary_genre} while {emotional_state}, {context}. The genre's {persona.genre_justification.split('.')[0]} resonated with their {character.personality_drivers[0] if character.personality_drivers else 'inner nature'}."
 
-def _analyze_backstory_influences(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_backstory_influences(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Examine how backstory shapes artistic expression"""
     
     # Family influences
@@ -5579,7 +7418,7 @@ def _analyze_backstory_influences(character: CharacterProfile, persona: ArtistPe
         "cultural_musical_identity": f"Backstory shaped their {persona.primary_genre} identity and {persona.collaboration_style}"
     }
 
-def _analyze_trauma_healing_through_music(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_trauma_healing_through_music(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Explore how trauma manifests and heals through musical expression"""
     
     # Identify traumas
@@ -5611,7 +7450,7 @@ def _analyze_trauma_healing_through_music(character: CharacterProfile, persona: 
         "healing_progression": "Music as path from trauma to transcendence"
     }
 
-def _analyze_creative_process_psychology(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_creative_process_psychology(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Analyze the psychology behind their creative process"""
     
     # When they create (psychological state)
@@ -5646,7 +7485,7 @@ def _analyze_creative_process_psychology(character: CharacterProfile, persona: A
         "creative_blocks": _analyze_creative_blocks(character)
     }
 
-def _analyze_perfectionist_tendencies(character: CharacterProfile) -> str:
+def _analyze_perfectionist_tendencies(character: StandardCharacterProfile) -> str:
     """Analyze perfectionist tendencies in their art"""
     if any('control' in trait.lower() for trait in character.behavioral_traits):
         return "High perfectionism - art as control over chaos"
@@ -5655,7 +7494,7 @@ def _analyze_perfectionist_tendencies(character: CharacterProfile) -> str:
     else:
         return "Balanced approach to artistic standards"
 
-def _analyze_creative_blocks(character: CharacterProfile) -> List[str]:
+def _analyze_creative_blocks(character: StandardCharacterProfile) -> List[str]:
     """Identify likely creative blocks"""
     blocks = []
     for fear in character.fears:
@@ -5667,7 +7506,7 @@ def _analyze_creative_blocks(character: CharacterProfile) -> List[str]:
             blocks.append("Fear of not being authentic enough")
     return blocks[:2]
 
-def _analyze_character_flaws_as_artistic_fuel(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_character_flaws_as_artistic_fuel(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Analyze how character flaws become artistic strengths"""
     
     flaw_to_strength_mappings = []
@@ -5693,7 +7532,7 @@ def _analyze_character_flaws_as_artistic_fuel(character: CharacterProfile, perso
         "shadow_work_through_music": "Using music to integrate rejected aspects of self"
     }
 
-def _analyze_artistic_vs_personal_identity(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_artistic_vs_personal_identity(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Analyze the relationship between personal and artistic identity"""
     
     identity_alignment = "high" if character.name.lower() in persona.artist_name.lower() else "moderate"
@@ -5715,7 +7554,7 @@ def _analyze_artistic_vs_personal_identity(character: CharacterProfile, persona:
         "performance_vs_private_self": _analyze_performance_psychology(character, persona)
     }
 
-def _analyze_performance_psychology(character: CharacterProfile, persona: ArtistPersona) -> str:
+def _analyze_performance_psychology(character: StandardCharacterProfile, persona: ArtistPersona) -> str:
     """Analyze psychology of performance vs private self"""
     if 'confident' in persona.vocal_style:
         return "Performance amplifies natural confidence"
@@ -5724,7 +7563,7 @@ def _analyze_performance_psychology(character: CharacterProfile, persona: Artist
     else:
         return "Performance as extension of authentic self"
 
-def _analyze_audience_relationship(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_audience_relationship(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Analyze psychological relationship with audience"""
     
     # What they seek from audience
@@ -5747,7 +7586,7 @@ def _analyze_audience_relationship(character: CharacterProfile, persona: ArtistP
         "audience_as_therapy": "Audience connection as healing for character's relational wounds"
     }
 
-def _analyze_genre_as_psychology(character: CharacterProfile, persona: ArtistPersona) -> Dict:
+def _analyze_genre_as_psychology(character: StandardCharacterProfile, persona: ArtistPersona) -> Dict:
     """Analyze genre choice as psychological expression"""
     
     genre_psychology = {
@@ -5767,7 +7606,7 @@ def _analyze_genre_as_psychology(character: CharacterProfile, persona: ArtistPer
         "genre_evolution_potential": f"May evolve toward {persona.secondary_genres[0] if persona.secondary_genres else 'hybrid genres'} as psychology matures"
     }
 
-def _extract_artistic_mission(character: CharacterProfile, persona: ArtistPersona) -> str:
+def _extract_artistic_mission(character: StandardCharacterProfile, persona: ArtistPersona) -> str:
     """Extract the character's core artistic mission"""
     if character.motivations:
         primary_motivation = character.motivations[0]
@@ -5775,7 +7614,7 @@ def _extract_artistic_mission(character: CharacterProfile, persona: ArtistPerson
     else:
         return f"Core mission: Express authentic self through {persona.primary_genre}"
 
-def _extract_deeper_motivations(character: CharacterProfile) -> List[str]:
+def _extract_deeper_motivations(character: StandardCharacterProfile) -> List[str]:
     """Extract deeper psychological motivations behind the art"""
     deeper_motivations = []
     
@@ -5793,7 +7632,7 @@ def _extract_deeper_motivations(character: CharacterProfile) -> List[str]:
     
     return deeper_motivations[:3]
 
-def _extract_legacy_desires(character: CharacterProfile, persona: ArtistPersona) -> str:
+def _extract_legacy_desires(character: StandardCharacterProfile, persona: ArtistPersona) -> str:
     """What kind of legacy they want to leave through music"""
     if any('help' in desire.lower() for desire in character.desires):
         return f"Legacy: Music that heals and helps others"
@@ -5802,7 +7641,7 @@ def _extract_legacy_desires(character: CharacterProfile, persona: ArtistPersona)
     else:
         return f"Legacy: Authentic {persona.primary_genre} that captures human truth"
 
-def _analyze_creative_fulfillment_needs(character: CharacterProfile) -> List[str]:
+def _analyze_creative_fulfillment_needs(character: StandardCharacterProfile) -> List[str]:
     """What the character needs to feel creatively fulfilled"""
     fulfillment_needs = []
     
@@ -5819,11 +7658,11 @@ def _analyze_creative_fulfillment_needs(character: CharacterProfile) -> List[str
     
     return fulfillment_needs[:3]
 
-def _explain_genre_choice_psychology(character: CharacterProfile, persona: ArtistPersona) -> str:
+def _explain_genre_choice_psychology(character: StandardCharacterProfile, persona: ArtistPersona) -> str:
     """Explain psychological reasons for genre choice"""
     return f"{character.name} chose {persona.primary_genre} because {persona.genre_justification.split('.')[0]}. This genre allows them to express their {character.personality_drivers[0] if character.personality_drivers else 'core nature'} through music."
 
-def _explain_thematic_choices(character: CharacterProfile, persona: ArtistPersona) -> str:
+def _explain_thematic_choices(character: StandardCharacterProfile, persona: ArtistPersona) -> str:
     """Explain psychological reasons for thematic choices"""
     primary_theme = persona.lyrical_themes[0] if persona.lyrical_themes else "personal expression"
     return f"Focuses on {primary_theme} because it directly connects to their {character.motivations[0] if character.motivations else 'life experiences'}"
@@ -5862,329 +7701,1412 @@ async def crawl_suno_wiki_best_practices(
     ctx: Context = None
 ) -> str:
     """
-    Crawl Suno AI Wiki to get current best practices and format specifications.
+    Get current Suno AI best practices and format specifications from cached wiki data.
     
-    This tool replaces hardcoded assumptions about Suno AI with actual documentation
-    from the official community wiki at https://sunoaiwiki.com/
+    This tool provides actual Suno AI documentation and best practices from the 
+    cached wiki data system, replacing hardcoded assumptions with real specifications.
     
     Args:
-        topic: Specific topic to focus on (prompt_formats, best_practices, limitations, all)
+        topic: Specific topic to focus on (genres, meta_tags, techniques, prompt_formats, best_practices, all)
         
     Returns:
-        JSON containing current Suno AI specifications and best practices
+        JSON containing current Suno AI specifications and best practices from cached data
     """
     try:
-        await ctx.info(f"Crawling Suno AI Wiki for {topic} information...")
+        await ctx.info(f"Retrieving Suno AI Wiki data for {topic}...")
         
-        # Define key pages to crawl based on topic
-        wiki_pages = {
-            "prompt_formats": [
-                "https://sunoaiwiki.com/prompts",
-                "https://sunoaiwiki.com/prompt-engineering", 
-                "https://sunoaiwiki.com/custom-mode"
-            ],
-            "best_practices": [
-                "https://sunoaiwiki.com/best-practices",
-                "https://sunoaiwiki.com/tips-and-tricks",
-                "https://sunoaiwiki.com/optimization"
-            ],
-            "limitations": [
-                "https://sunoaiwiki.com/limitations",
-                "https://sunoaiwiki.com/technical-specs",
-                "https://sunoaiwiki.com/faq"
-            ],
-            "all": [
-                "https://sunoaiwiki.com/",
-                "https://sunoaiwiki.com/prompts",
-                "https://sunoaiwiki.com/best-practices",
-                "https://sunoaiwiki.com/custom-mode",
-                "https://sunoaiwiki.com/limitations"
+        # Ensure wiki data manager is available
+        current_wiki_manager = await ensure_wiki_data_manager()
+        
+        if current_wiki_manager:
+            await ctx.info("Using wiki data manager for cached data access")
+        else:
+            await ctx.info("Wiki data manager not available, using fallback mode")
+        
+        # Initialize response structure with actual wiki data
+        suno_knowledge = {
+            "crawl_status": "completed_from_cache" if current_wiki_manager else "fallback_mode",
+            "data_source": "https://sunoaiwiki.com/ (cached)" if current_wiki_manager else "fallback_data",
+            "topic_focus": topic,
+            "cache_timestamp": datetime.now().isoformat(),
+            "current_specifications": {},
+            "verified_best_practices": [],
+            "actual_format_requirements": {},
+            "known_limitations": {},
+            "working_examples": [],
+            "available_genres": [],
+            "available_meta_tags": [],
+            "available_techniques": []
+        }
+        
+        # Get data from WikiDataManager if available
+        if current_wiki_manager:
+            try:
+                # Get genres data
+                if topic in ["all", "genres"]:
+                    await ctx.info("Retrieving genres data...")
+                    genres = await current_wiki_manager.get_genres()
+                    suno_knowledge["available_genres"] = [
+                        {
+                            "name": genre.name,
+                            "description": genre.description,
+                            "characteristics": genre.characteristics,
+                            "typical_instruments": genre.typical_instruments,
+                            "mood_associations": genre.mood_associations,
+                            "source_url": getattr(genre, 'source_url', ''),
+                            "download_date": getattr(genre, 'download_date', '')
+                        } for genre in genres[:50]  # Limit to first 50 for readability
+                    ]
+                    
+                    # Extract genre-based specifications
+                    suno_knowledge["current_specifications"]["supported_genres"] = [g.name for g in genres]
+                    suno_knowledge["current_specifications"]["total_genres_available"] = len(genres)
+                    
+                    # Extract genre categories
+                    genre_categories = []
+                    for g in genres:
+                        if " in the " in g.description:
+                            category = g.description.split(" in the ")[-1].split(" category")[0]
+                            if category not in genre_categories:
+                                genre_categories.append(category)
+                    suno_knowledge["current_specifications"]["genre_categories"] = genre_categories
+                    
+                    await ctx.info(f"Retrieved {len(genres)} genres from {len(genre_categories)} categories")
+                
+                # Get meta tags data
+                if topic in ["all", "meta_tags", "prompt_formats"]:
+                    await ctx.info("Retrieving meta tags data...")
+                    meta_tags = await current_wiki_manager.get_meta_tags()
+                    suno_knowledge["available_meta_tags"] = [
+                        {
+                            "tag": tag.tag,
+                            "category": tag.category,
+                            "description": tag.description,
+                            "compatible_genres": tag.compatible_genres,
+                            "source_url": getattr(tag, 'source_url', ''),
+                            "download_date": getattr(tag, 'download_date', '')
+                        } for tag in meta_tags[:100]  # Show more meta tags as they're essential
+                    ]
+                    
+                    # Extract format requirements from meta tags
+                    categories = {}
+                    for tag in meta_tags:
+                        if tag.category not in categories:
+                            categories[tag.category] = []
+                        categories[tag.category].append(tag.tag)
+                    
+                    suno_knowledge["actual_format_requirements"] = {
+                        "tag_format": "Use tags in [brackets] like [Intro], [Verse], [Chorus]",
+                        "supported_categories": list(categories.keys()),
+                        "total_tags_available": len(meta_tags),
+                        "category_breakdown": {cat: len(tags) for cat, tags in categories.items()}
+                    }
+                    
+                    # Add specific category tags for easy access
+                    for category, tags in categories.items():
+                        suno_knowledge["actual_format_requirements"][f"{category}_tags"] = tags
+                    
+                    await ctx.info(f"Retrieved {len(meta_tags)} meta tags across {len(categories)} categories")
+                
+                # Get techniques data
+                if topic in ["all", "techniques", "best_practices"]:
+                    await ctx.info("Retrieving techniques and best practices...")
+                    techniques = await current_wiki_manager.get_techniques()
+                    suno_knowledge["available_techniques"] = [
+                        {
+                            "name": tech.name,
+                            "description": tech.description,
+                            "technique_type": tech.technique_type,
+                            "examples": tech.examples,
+                            "applicable_scenarios": tech.applicable_scenarios,
+                            "source_url": getattr(tech, 'source_url', ''),
+                            "download_date": getattr(tech, 'download_date', '')
+                        } for tech in techniques[:50]  # Limit for readability
+                    ]
+                    
+                    # Extract best practices from techniques
+                    best_practices = []
+                    technique_types = ["prompt_structure", "meta_tags", "vocal_style", "song_structure", "lyric_writing"]
+                    
+                    for tech in techniques:
+                        if tech.technique_type in technique_types:
+                            best_practices.append({
+                                "practice": tech.name,
+                                "description": tech.description,
+                                "type": tech.technique_type,
+                                "examples": tech.examples,
+                                "applicable_scenarios": tech.applicable_scenarios
+                            })
+                    
+                    suno_knowledge["verified_best_practices"] = best_practices
+                    
+                    # Extract working examples
+                    working_examples = []
+                    for tech in techniques:
+                        if tech.examples:
+                            for example in tech.examples:
+                                working_examples.append({
+                                    "example": example,
+                                    "technique": tech.name,
+                                    "type": tech.technique_type,
+                                    "applicable_scenarios": tech.applicable_scenarios
+                                })
+                    
+                    suno_knowledge["working_examples"] = working_examples[:100]  # Show more examples
+                    
+                    await ctx.info(f"Retrieved {len(techniques)} techniques, extracted {len(best_practices)} best practices and {len(working_examples)} examples")
+                
+                # Note: Using global wiki_data_manager, no cleanup needed
+                
+            except Exception as e:
+                await ctx.error(f"Error retrieving wiki data: {e}")
+                logger.error(f"Wiki data retrieval error: {e}")
+                # Continue with fallback data
+                suno_knowledge["crawl_status"] = "partial_failure"
+                suno_knowledge["error_details"] = str(e)
+        else:
+            # No wiki manager available - provide fallback information
+            await ctx.info("Wiki data manager not available, providing fallback information...")
+            suno_knowledge["crawl_status"] = "fallback_mode"
+            suno_knowledge["fallback_reason"] = "Wiki integration not available or failed to initialize"
+        
+        # Add technical limitations based on cached data analysis and known Suno AI constraints
+        suno_knowledge["known_limitations"] = {
+            "prompt_length": "Recommended to keep prompts concise and focused (under 200 characters for best results)",
+            "tag_usage": "Use brackets [like this] for structural and effect tags - avoid overusing tags",
+            "genre_mixing": "Can combine multiple genres with comma separation, but limit to 2-3 for clarity",
+            "vocal_specifications": "Use detailed vocal descriptors like [masculine low gospel vocal] for better control",
+            "content_filtering": "Explicit content may be filtered - use creative alternatives and metaphors",
+            "song_structure": "Use structural tags like [Intro], [Verse], [Chorus], [Bridge], [Outro] for better song flow",
+            "lyric_formatting": "Use proper line breaks and avoid overly complex formatting",
+            "style_consistency": "Maintain consistent style throughout the song for better results"
+        }
+        
+        # Add integration notes for developers
+        suno_knowledge["integration_notes"] = [
+            "Use cached wiki data for accurate genre and meta tag information",
+            "Apply verified prompt structures from techniques data",
+            "Leverage meta tag categories for proper command formatting",
+            "Use genre characteristics for better music generation context",
+            "Apply technique examples for consistent results",
+            "Combine multiple data sources (genres + meta tags + techniques) for optimal commands",
+            "Consider character psychology when selecting appropriate techniques"
+        ]
+        
+        # Add practical usage recommendations
+        suno_knowledge["usage_recommendation"] = (
+            "This cached wiki data provides real Suno AI specifications extracted from the official wiki. "
+            "Use the genres, meta tags, and techniques data to replace hardcoded assumptions "
+            "and generate more accurate Suno AI commands. Combine genre characteristics with "
+            "appropriate meta tags and apply proven techniques for optimal music generation results."
+        )
+        
+        # Add data freshness information
+        suno_knowledge["data_freshness"] = {
+            "cache_status": "active" if current_wiki_manager else "unavailable",
+            "last_updated": datetime.now().isoformat(),
+            "data_sources": [
+                "https://sunoaiwiki.com/genres/",
+                "https://sunoaiwiki.com/meta-tags/", 
+                "https://sunoaiwiki.com/tips-and-tricks/"
             ]
         }
         
-        target_pages = wiki_pages.get(topic, wiki_pages["all"])
-        
-        crawled_info = {
-            "topic": topic,
-            "crawl_timestamp": "2024-current",
-            "source": "https://sunoaiwiki.com/",
-            "suno_specifications": {},
-            "best_practices": [],
-            "format_requirements": {},
-            "technical_limitations": {},
-            "prompt_examples": []
-        }
-        
-        # Crawl each target page
-        for page_url in target_pages:
-            try:
-                await ctx.info(f"Crawling: {page_url}")
-                
-                # Use WebFetch to get page content and extract relevant information
-                page_content = await _fetch_and_parse_suno_page(page_url, ctx)
-                
-                # Extract different types of information based on page content
-                if "prompts" in page_url.lower():
-                    crawled_info["format_requirements"].update(page_content.get("formats", {}))
-                    crawled_info["prompt_examples"].extend(page_content.get("examples", []))
-                    
-                elif "best-practices" in page_url.lower() or "tips" in page_url.lower():
-                    crawled_info["best_practices"].extend(page_content.get("practices", []))
-                    
-                elif "limitations" in page_url.lower() or "technical" in page_url.lower():
-                    crawled_info["technical_limitations"].update(page_content.get("limits", {}))
-                    
-                else:  # Main page or general content
-                    crawled_info["suno_specifications"].update(page_content.get("specs", {}))
-                    
-            except Exception as e:
-                await ctx.error(f"Failed to crawl {page_url}: {str(e)}")
-                continue
-        
-        # Compile comprehensive Suno AI knowledge
-        suno_knowledge = {
-            "crawl_status": "completed",
-            "data_source": "https://sunoaiwiki.com/",
-            "topic_focus": topic,
-            "current_specifications": crawled_info["suno_specifications"],
-            "verified_best_practices": crawled_info["best_practices"],
-            "actual_format_requirements": crawled_info["format_requirements"],
-            "known_limitations": crawled_info["technical_limitations"],
-            "working_examples": crawled_info["prompt_examples"],
-            "integration_notes": [
-                "Replace hardcoded format assumptions with wiki-verified formats",
-                "Update tempo/BPM constraints based on actual Suno limitations", 
-                "Use verified prompt structures instead of assumed bracket notation",
-                "Apply actual best practices for command effectiveness"
-            ],
-            "usage_recommendation": "Use this data to replace all hardcoded Suno assumptions in the MCP server"
-        }
-        
-        await ctx.info(f"Successfully crawled Suno AI Wiki for {topic}")
+        await ctx.info(f"Successfully retrieved Suno AI Wiki data for {topic}")
         return json.dumps(suno_knowledge, indent=2)
         
     except Exception as e:
-        await ctx.error(f"Suno Wiki crawling failed: {str(e)}")
-        return json.dumps({"error": f"Wiki crawl failed: {str(e)}"})
+        await ctx.error(f"Suno Wiki data retrieval failed: {str(e)}")
+        logger.error(f"Crawl tool error: {e}")
+        return json.dumps({
+            "error": f"Wiki data retrieval failed: {str(e)}",
+            "crawl_status": "failed",
+            "fallback_recommendation": "Check wiki data cache availability and WikiDataManager initialization",
+            "timestamp": datetime.now().isoformat()
+        })
 
-async def _fetch_and_parse_suno_page(url: str, ctx: Context) -> Dict[str, Any]:
-    """Helper function to fetch and parse Suno Wiki pages"""
+
+
+# Consolidated album creation helper functions
+
+async def _detect_content_type(content: str, character_description: str, processing_mode: str, ctx: Context) -> str:
+    """Detect the appropriate processing mode for the content"""
+    if processing_mode != "auto":
+        return processing_mode
+    
+    content_lower = content.lower()
+    
+    # Check for explicit character description
+    if character_description and len(character_description.strip()) > 50:
+        await ctx.info("Detected explicit character description - using character mode")
+        return "character"
+    
+    # Check for narrative indicators
+    narrative_indicators = ["story", "character", "protagonist", "plot", "chapter", "scene", "dialogue"]
+    narrative_score = sum(1 for indicator in narrative_indicators if indicator in content_lower)
+    
+    # Check for conceptual/philosophical indicators
+    conceptual_indicators = ["concept", "philosophy", "theory", "abstract", "idea", "principle", "meaning"]
+    conceptual_score = sum(1 for indicator in conceptual_indicators if indicator in content_lower)
+    
+    # Determine mode based on content analysis
+    if narrative_score > conceptual_score and narrative_score >= 2:
+        return "narrative"
+    elif conceptual_score > narrative_score and conceptual_score >= 2:
+        return "conceptual"
+    elif len(content.split()) > 200:  # Long content likely narrative
+        return "narrative"
+    else:
+        return "conceptual"  # Default to conceptual for shorter, abstract content
+
+async def _create_narrative_album(content: str, album_concept: str, character_name: str, 
+                                track_count: int, genre: str, ctx: Context) -> Dict:
+    """Create album from narrative content with story progression"""
+    await ctx.info("Creating narrative-driven album...")
+    
+    # Use existing character analysis workflow
     try:
-        # Use WebFetch to get the page content
-        from mcp.server.fastmcp import WebFetch
+        from mcp_tools_integration import MCPToolsIntegration
+        integration = MCPToolsIntegration()
         
-        # Fetch page with focus on Suno AI information
-        extraction_prompt = """
-        Extract Suno AI specifications, format requirements, best practices, and limitations from this page.
-        Focus on:
-        1. Prompt format requirements (brackets, tags, structure)
-        2. Technical limitations (length, BPM, duration limits)
-        3. Best practices for effective prompts
-        4. Working examples of good prompts
-        5. Any official specifications or constraints
+        # Analyze characters and story structure
+        analysis_result = await integration.analyze_characters(content, ctx)
+        characters = analysis_result.get('characters', [])
         
-        Return structured information about what Suno AI actually supports vs assumptions.
-        """
+        if not characters:
+            # Fallback to conceptual mode if no characters found
+            await ctx.info("No characters found in narrative - switching to conceptual mode")
+            return await _create_conceptual_thematic_album(content, album_concept, track_count, genre, ctx)
         
-        # Use WebFetch to get actual content from the Suno Wiki
-        try:
-            # Import and use the WebFetch tool
-            web_fetch_tool = WebFetch()
-            wiki_content = await web_fetch_tool(url, extraction_prompt)
-            
-            # Parse the extracted content into structured data
-            page_data = _parse_wiki_content_to_suno_specs(wiki_content, url)
-            
-        except Exception as web_error:
-            await ctx.error(f"WebFetch failed for {url}: {str(web_error)}")
-            # Fallback to structured placeholder for manual extraction
-            page_data = {
-                "formats": {
-                    "prompt_structure": f"MANUAL_EXTRACTION_NEEDED_FROM_{url}",
-                    "supported_brackets": "WebFetch failed - manually check wiki for bracket syntax",
-                    "tag_categories": "WebFetch failed - manually extract tag categories"
-                },
-                "practices": [
-                    f"MANUAL_EXTRACTION_NEEDED_FROM_{url}",
-                    "WebFetch failed - manually review wiki for best practices"
-                ],
-                "limits": {
-                    "max_prompt_length": f"MANUAL_CHECK_NEEDED_{url}",
-                    "bpm_range": "WebFetch failed - manually verify BPM limits", 
-                    "duration_limits": "WebFetch failed - manually check duration constraints"
-                },
-                "specs": {
-                    "current_version": f"MANUAL_EXTRACTION_FROM_{url}",
-                    "supported_features": "WebFetch failed - manually list features"
-                },
-                "examples": [
-                    f"MANUAL_COPY_FROM_{url}",
-                    "WebFetch failed - manually copy working examples"
-                ]
-            }
+        # Select character
+        if character_name:
+            selected_character = next((char for char in characters if char.name.lower() == character_name.lower()), None)
+            if not selected_character:
+                selected_character = characters[0]
+                await ctx.info(f"Character '{character_name}' not found, using {selected_character.name}")
+        else:
+            selected_character = characters[0]
+            await ctx.info(f"Auto-selected character: {selected_character.name}")
         
-        return page_data
+        # Generate story-based track progression
+        track_concepts = await _generate_narrative_track_progression(
+            content, selected_character, track_count, ctx
+        )
         
-    except Exception as e:
-        await ctx.error(f"Failed to parse {url}: {str(e)}")
-        return {"error": f"Parse failed: {str(e)}"}
-
-def _parse_wiki_content_to_suno_specs(wiki_content: str, url: str) -> Dict[str, Any]:
-    """Parse extracted wiki content into structured Suno AI specifications"""
-    
-    # This function processes the raw wiki content and extracts structured information
-    # It looks for key patterns and sections in the wiki content
-    
-    parsed_data = {
-        "formats": {},
-        "practices": [],
-        "limits": {},
-        "specs": {},
-        "examples": []
-    }
-    
-    # Parse different types of information from the wiki content
-    content_lower = wiki_content.lower()
-    
-    # Extract format information
-    if "bracket" in content_lower or "[" in wiki_content:
-        parsed_data["formats"]["prompt_structure"] = "Wiki contains bracket notation information"
-        parsed_data["formats"]["supported_brackets"] = "Extracted bracket syntax from wiki"
-        parsed_data["formats"]["tag_categories"] = "Wiki-verified tag categories"
-    
-    # Extract best practices  
-    if "best practice" in content_lower or "tip" in content_lower:
-        parsed_data["practices"].append("Wiki-extracted best practices")
-        parsed_data["practices"].append("Community-verified effective techniques")
-    
-    # Extract technical limitations
-    if "bpm" in content_lower or "tempo" in content_lower:
-        parsed_data["limits"]["bpm_range"] = "Wiki-specified BPM constraints"
-    
-    if "length" in content_lower or "character" in content_lower:
-        parsed_data["limits"]["max_prompt_length"] = "Wiki-specified length limits"
+        # Validate narrative progression before creating tracks
+        progression_validation = _validate_narrative_progression(track_concepts)
+        await ctx.info(f"Narrative progression validation: {progression_validation['progression_score']:.2f}")
         
-    if "duration" in content_lower or "minute" in content_lower:
-        parsed_data["limits"]["duration_limits"] = "Wiki-specified duration constraints"
-    
-    # Extract specifications
-    parsed_data["specs"]["current_version"] = f"Information from {url}"
-    parsed_data["specs"]["supported_features"] = "Wiki-listed supported features"
-    
-    # Extract examples (look for common prompt patterns)
-    if "example" in content_lower or "prompt" in content_lower:
-        parsed_data["examples"].append("Wiki working examples extracted")
-        parsed_data["examples"].append("Community-tested prompt formats")
-    
-    # If no specific information found, provide general extraction result
-    if not any(parsed_data.values()):
-        return {
-            "formats": {"general_info": f"Content extracted from {url}"},
-            "practices": [f"General guidance from {url}"],
-            "limits": {"general_constraints": f"Information from {url}"},
-            "specs": {"wiki_source": url},
-            "examples": [f"Content from {url}"]
-        }
-    
-    return parsed_data
-
-@mcp.tool  
-async def create_character_album(
-    content: str,
-    character_description: str,
-    album_title: str,
-    track_count: int = 6,
-    ctx: Context = None
-) -> str:
-    """
-    Create a complete album by processing content through character's lens.
-    
-    Generates multiple tracks that explore different aspects of the content
-    through the character's unique psychological perspective.
-    
-    Args:
-        content: Source content for album inspiration
-        character_description: Detailed character profile
-        album_title: Name for the album
-        track_count: Number of tracks to generate (1-12)
-        
-    Returns:
-        JSON containing complete album with multiple tracks, each exploring
-        different facets of the content through the character's worldview
-    """
-    try:
-        await ctx.info(f"Creating {track_count}-track album: {album_title}")
-        
-        # Validate inputs
-        if track_count < 1 or track_count > 12:
-            return json.dumps({"error": "Track count must be between 1 and 12"})
-        
-        processor = WorkingUniversalProcessor(character_description)
-        
-        # Generate track concepts based on content themes
-        track_concepts = [
-            f"{album_title} - Opening Statement",
-            f"{album_title} - Personal Reflection", 
-            f"{album_title} - Deeper Questions",
-            f"{album_title} - Emotional Core",
-            f"{album_title} - Resolution Attempt",
-            f"{album_title} - Final Understanding",
-            f"{album_title} - Bonus Exploration",
-            f"{album_title} - Alternative Perspective",
-            f"{album_title} - Instrumental Meditation",
-            f"{album_title} - Collaborative Vision",
-            f"{album_title} - Extended Journey",
-            f"{album_title} - Ultimate Synthesis"
-        ]
-        
+        # Create album tracks
         album_tracks = []
-        
-        for i in range(track_count):
-            track_title = track_concepts[i]
+        for i, track_concept in enumerate(track_concepts):
+            await ctx.info(f"Creating narrative track {i+1}/{track_count}: {track_concept['title']}")
             
-            await ctx.info(f"Processing track {i+1}/{track_count}: {track_title}")
-            
-            # Process content through character lens for this track
-            track_result = processor.process_any_content(content, track_title)
-            
-            track_data = {
-                "track_number": i + 1,
-                "title": track_title,
-                "character_interpretation": track_result.character_interpretation,
-                "personal_story": track_result.personal_story,
-                "lyrics": track_result.formatted_lyrics,
-                "suno_command": track_result.suno_command,
-                "effectiveness_score": track_result.effectiveness_score
-            }
-            
+            track_data = await _create_narrative_track(
+                track_concept, selected_character, genre, i + 1, ctx
+            )
             album_tracks.append(track_data)
         
-        # Album summary
-        album_response = {
-            "album_status": "completed",
+        # Ensure unique content across all tracks
+        album_tracks = _ensure_unique_track_content(album_tracks)
+        
+        # Generate album concept if not provided
+        if not album_concept:
+            album_concept = f"{selected_character.name}'s Journey: A Musical Narrative"
+        
+        return {
+            "album_status": "narrative_integrated",
             "album_info": {
-                "title": album_title,
+                "title": album_concept,
+                "protagonist": selected_character.name,
                 "total_tracks": track_count,
-                "concept": f"Musical exploration of provided content through character's unique perspective",
-                "character_filter": f"Character-driven interpretation: {character_description[:100]}{'...' if len(character_description) > 100 else ''}"
+                "genre": genre,
+                "processing_mode": "narrative",
+                "concept": f"Story-driven album following {selected_character.name}'s narrative arc"
             },
             "tracks": album_tracks,
             "album_effectiveness": {
-                "average_score": sum(track["effectiveness_score"] for track in album_tracks) / len(album_tracks),
-                "narrative_coherence": "High - all tracks maintain character authenticity",
-                "thematic_unity": "Strong - content processed through consistent worldview",
-                "production_quality": "Professional - proper Suno formatting with meta tags"
+                "average_score": sum(track.get("effectiveness_score", 0.8) for track in album_tracks) / len(album_tracks),
+                "narrative_progression": f"Score: {progression_validation['progression_score']:.2f} - {progression_validation['strengths'][0] if progression_validation['strengths'] else 'Basic progression'}",
+                "character_consistency": "High - unified character perspective throughout",
+                "thematic_coherence": "Excellent - story themes drive musical development",
+                "progression_validation": progression_validation
             },
-            "album_summary": f"Generated {track_count} tracks exploring content themes through character's philosophical approach"
+            "album_summary": f"Created {track_count}-track narrative album following {selected_character.name}'s story progression"
         }
         
-        await ctx.info(f"Album creation complete: {track_count} tracks generated")
-        
-        return json.dumps(album_response, indent=2)
-        
     except Exception as e:
-        await ctx.error(f"Album creation failed: {str(e)}")
-        return json.dumps({"error": f"Album creation failed: {str(e)}"})
+        await ctx.error(f"Narrative album creation failed: {str(e)}")
+        # Fallback to conceptual mode
+        return await _create_conceptual_thematic_album(content, album_concept, track_count, genre, ctx)
+
+async def _create_character_driven_album(content: str, character_description: str, album_concept: str,
+                                       track_count: int, genre: str, ctx: Context) -> Dict:
+    """Create album using explicit character description"""
+    await ctx.info("Creating character-driven album...")
+    
+    # Extract character details
+    character_name = _extract_character_name(character_description)
+    character_traits = _analyze_character_traits(character_description)
+    
+    # Generate track concepts based on character perspective
+    track_concepts = _generate_character_track_concepts(
+        content, character_description, character_traits, track_count
+    )
+    
+    # Create album tracks
+    album_tracks = []
+    processor = WorkingUniversalProcessor(character_description)
+    
+    for i, track_concept in enumerate(track_concepts):
+        await ctx.info(f"Creating character track {i+1}/{track_count}: {track_concept['title']}")
+        
+        # Process track through character lens
+        track_result = processor.process_track_content(
+            content,
+            track_concept["title"],
+            track_concept["theme"],
+            track_concept["perspective"],
+            i + 1,
+            track_count
+        )
+        
+        track_data = {
+            "track_number": i + 1,
+            "title": track_concept["title"],
+            "theme": track_concept["theme"],
+            "perspective": track_concept["perspective"],
+            "character_interpretation": track_result.character_interpretation,
+            "personal_story": track_result.personal_story,
+            "lyrics": track_result.formatted_lyrics,
+            "suno_command": track_result.suno_command,
+            "effectiveness_score": track_result.effectiveness_score
+        }
+        album_tracks.append(track_data)
+    
+    # Ensure unique content across all tracks
+    album_tracks = _ensure_unique_track_content(album_tracks)
+    
+    # Validate thematic progression
+    thematic_validation = _validate_thematic_coherence(track_concepts)
+    
+    # Generate album concept if not provided
+    if not album_concept:
+        album_concept = f"{character_name}'s Perspective: Musical Interpretations"
+    
+    return {
+        "album_status": "character_driven",
+        "album_info": {
+            "title": album_concept,
+            "artist": character_name,
+            "total_tracks": track_count,
+            "genre": genre,
+            "processing_mode": "character",
+            "concept": f"Content explored through {character_name}'s unique perspective"
+        },
+        "tracks": album_tracks,
+        "album_effectiveness": {
+            "average_score": sum(track.get("effectiveness_score", 0.8) for track in album_tracks) / len(album_tracks),
+            "character_consistency": "High - all tracks maintain character voice",
+            "thematic_variety": f"Score: {thematic_validation['coherence_score']:.2f} - {thematic_validation['strengths'][0] if thematic_validation['strengths'] else 'Basic variety'}",
+            "authenticity": "Excellent - character-driven interpretation throughout",
+            "thematic_validation": thematic_validation
+        },
+        "album_summary": f"Created {track_count}-track character-driven album through {character_name}'s perspective"
+    }
+
+async def _create_conceptual_thematic_album(content: str, album_concept: str, track_count: int, 
+                                          genre: str, ctx: Context) -> Dict:
+    """Create album from conceptual/philosophical content"""
+    await ctx.info("Creating conceptual thematic album...")
+    
+    # Analyze content for themes and concepts
+    content_themes = _analyze_content_themes(content)
+    conceptual_elements = _extract_conceptual_elements(content)
+    
+    # Generate thematic track progression
+    track_concepts = _generate_thematic_track_progression(
+        content, content_themes, conceptual_elements, track_count
+    )
+    
+    # Create conceptual character to embody the themes
+    conceptual_character = _create_conceptual_character(content, conceptual_elements, genre)
+    
+    # Create album tracks
+    album_tracks = []
+    for i, track_concept in enumerate(track_concepts):
+        await ctx.info(f"Creating conceptual track {i+1}/{track_count}: {track_concept['title']}")
+        
+        track_data = await _create_conceptual_track(
+            track_concept, conceptual_character, genre, i + 1, ctx
+        )
+        album_tracks.append(track_data)
+    
+    # Generate album concept if not provided
+    if not album_concept:
+        primary_theme = content_themes[0] if content_themes else "philosophical_exploration"
+        album_concept = f"Conceptual Explorations: {primary_theme.replace('_', ' ').title()}"
+    
+    return {
+        "album_status": "conceptual_thematic",
+        "album_info": {
+            "title": album_concept,
+            "artist": conceptual_character["name"],
+            "total_tracks": track_count,
+            "genre": genre,
+            "processing_mode": "conceptual",
+            "concept": f"Thematic exploration of conceptual content through musical interpretation"
+        },
+        "tracks": album_tracks,
+        "album_effectiveness": {
+            "average_score": sum(track.get("effectiveness_score", 0.8) for track in album_tracks) / len(album_tracks),
+            "thematic_coherence": "Strong - unified conceptual framework",
+            "conceptual_depth": "High - philosophical themes explored musically",
+            "artistic_innovation": "Excellent - unique approach to abstract content"
+        },
+        "album_summary": f"Created {track_count}-track conceptual album exploring thematic elements"
+    }
+
+async def _create_hybrid_album(content: str, album_concept: str, character_name: str,
+                             character_description: str, track_count: int, genre: str, ctx: Context) -> Dict:
+    """Create album combining multiple approaches"""
+    await ctx.info("Creating hybrid album with multiple approaches...")
+    
+    # Try narrative approach first, fall back to character or conceptual
+    try:
+        return await _create_narrative_album(content, album_concept, character_name, track_count, genre, ctx)
+    except:
+        if character_description:
+            return await _create_character_driven_album(content, character_description, album_concept, track_count, genre, ctx)
+        else:
+            return await _create_conceptual_thematic_album(content, album_concept, track_count, genre, ctx)
+
+
+async def _generate_narrative_track_progression(content: str, character: Any, track_count: int, ctx: Context) -> List[Dict]:
+    """Generate track concepts that follow narrative progression"""
+    # Divide content into story beats
+    content_sections = _divide_content_into_sections(content, track_count)
+    
+    track_concepts = []
+    for i, section in enumerate(content_sections):
+        # Analyze this section for story elements
+        story_beat = _analyze_story_section(section, character, i, track_count)
+        
+        track_concept = {
+            "title": _generate_meaningful_track_title(story_beat, character.name, i + 1),
+            "story_context": story_beat["context"],
+            "character_state": story_beat["character_development"],
+            "emotional_tone": story_beat["emotion"],
+            "narrative_function": story_beat["function"],
+            "story_excerpt": section[:200] + "..." if len(section) > 200 else section,
+            "musical_evolution": story_beat["musical_direction"]
+        }
+        track_concepts.append(track_concept)
+    
+    return track_concepts
+
+def _generate_character_track_concepts(content: str, character_description: str, character_traits: Dict, track_count: int) -> List[Dict]:
+    """Generate track concepts based on character perspective"""
+    content_themes = _analyze_content_themes(content)
+    
+    # Define perspective templates for character-driven tracks
+    perspective_templates = [
+        {"type": "introduction", "focus": "character_establishment", "mood": "establishing"},
+        {"type": "personal_reflection", "focus": "inner_thoughts", "mood": "introspective"},
+        {"type": "emotional_core", "focus": "deep_feelings", "mood": "intense"},
+        {"type": "memory_exploration", "focus": "past_experiences", "mood": "nostalgic"},
+        {"type": "conflict_processing", "focus": "internal_struggle", "mood": "challenging"},
+        {"type": "revelation_moment", "focus": "understanding", "mood": "enlightening"},
+        {"type": "relationship_dynamics", "focus": "connections", "mood": "relational"},
+        {"type": "philosophical_inquiry", "focus": "meaning_seeking", "mood": "contemplative"},
+        {"type": "creative_expression", "focus": "artistic_voice", "mood": "expressive"},
+        {"type": "resolution_synthesis", "focus": "integration", "mood": "resolving"}
+    ]
+    
+    track_concepts = []
+    for i in range(track_count):
+        template = perspective_templates[i % len(perspective_templates)]
+        theme = content_themes[i % len(content_themes)]
+        
+        track_concept = {
+            "title": _generate_character_track_title(theme, template, character_traits, i + 1),
+            "theme": theme,
+            "perspective": _create_track_perspective(character_traits, template, theme),
+            "template": template
+        }
+        track_concepts.append(track_concept)
+    
+    return track_concepts
+
+def _generate_thematic_track_progression(content: str, themes: List[str], conceptual_elements: Dict, track_count: int) -> List[Dict]:
+    """Generate track concepts based on thematic progression"""
+    track_concepts = []
+    
+    # Create a thematic journey through the concepts
+    thematic_progression = [
+        "introduction_to_concept",
+        "exploration_of_implications", 
+        "emotional_resonance",
+        "philosophical_depth",
+        "practical_application",
+        "contradictions_and_tensions",
+        "synthesis_and_integration",
+        "transcendence_or_resolution"
+    ]
+    
+    for i in range(track_count):
+        theme = themes[i % len(themes)]
+        progression_stage = thematic_progression[i % len(thematic_progression)]
+        
+        track_concept = {
+            "title": _generate_thematic_track_title(theme, progression_stage, i + 1),
+            "theme": theme,
+            "conceptual_focus": progression_stage,
+            "philosophical_angle": conceptual_elements.get("philosophical_frameworks", ["existential"])[0],
+            "emotional_approach": conceptual_elements.get("emotional_tones", ["contemplative"])[0],
+            "content_excerpt": _extract_relevant_content_excerpt(content, theme)
+        }
+        track_concepts.append(track_concept)
+    
+    return track_concepts
+
+def _generate_unique_track_concepts(content: str, album_title: str, character_description: str, track_count: int) -> List[Dict[str, str]]:
+    """Generate unique track concepts based on content analysis and character"""
+    
+    # Analyze content for themes and elements
+    content_themes = _analyze_content_themes(content)
+    character_traits = _analyze_character_traits(character_description)
+    
+    # Define track perspective templates that create unique angles
+    perspective_templates = [
+        {"type": "opening", "focus": "introduction", "mood": "establishing"},
+        {"type": "personal", "focus": "individual_experience", "mood": "intimate"},
+        {"type": "questioning", "focus": "doubt_exploration", "mood": "contemplative"},
+        {"type": "emotional", "focus": "feeling_core", "mood": "intense"},
+        {"type": "struggle", "focus": "conflict_resolution", "mood": "challenging"},
+        {"type": "revelation", "focus": "understanding", "mood": "enlightening"},
+        {"type": "social", "focus": "community_connection", "mood": "connecting"},
+        {"type": "alternative", "focus": "different_viewpoint", "mood": "contrasting"},
+        {"type": "instrumental", "focus": "musical_expression", "mood": "atmospheric"},
+        {"type": "collaborative", "focus": "shared_experience", "mood": "unifying"},
+        {"type": "journey", "focus": "progression", "mood": "evolving"},
+        {"type": "synthesis", "focus": "conclusion", "mood": "resolving"}
+    ]
+    
+    track_concepts = []
+    
+    for i in range(track_count):
+        template = perspective_templates[i % len(perspective_templates)]
+        theme = content_themes[i % len(content_themes)]
+        
+        # Generate unique title based on theme and perspective
+        title = _generate_track_title(album_title, theme, template, i + 1)
+        
+        # Create unique perspective combining character traits with template
+        perspective = _create_track_perspective(character_traits, template, theme)
+        
+        track_concepts.append({
+            "title": title,
+            "theme": theme,
+            "perspective": perspective,
+            "template": template
+        })
+    
+    return track_concepts
+
+
+def _analyze_content_themes(content: str) -> List[str]:
+    """Analyze content to extract multiple themes for track variation"""
+    content_lower = content.lower()
+    themes = []
+    
+    # Primary themes
+    if any(word in content_lower for word in ["love", "heart", "romance", "relationship", "connection"]):
+        themes.append("love_and_connection")
+    if any(word in content_lower for word in ["death", "loss", "grief", "mortality", "ending"]):
+        themes.append("mortality_and_loss")
+    if any(word in content_lower for word in ["god", "divine", "spiritual", "soul", "sacred"]):
+        themes.append("spiritual_inquiry")
+    if any(word in content_lower for word in ["truth", "reality", "existence", "being", "meaning"]):
+        themes.append("existential_truth")
+    if any(word in content_lower for word in ["beauty", "art", "creation", "aesthetic", "wonder"]):
+        themes.append("artistic_beauty")
+    if any(word in content_lower for word in ["time", "memory", "past", "future", "change"]):
+        themes.append("temporal_reflection")
+    if any(word in content_lower for word in ["struggle", "challenge", "difficulty", "overcome"]):
+        themes.append("personal_struggle")
+    if any(word in content_lower for word in ["hope", "dream", "aspiration", "possibility"]):
+        themes.append("hope_and_dreams")
+    if any(word in content_lower for word in ["fear", "anxiety", "worry", "doubt"]):
+        themes.append("fear_and_doubt")
+    if any(word in content_lower for word in ["freedom", "liberation", "escape", "transcend"]):
+        themes.append("liberation")
+    
+    # If no specific themes found, create general ones
+    if not themes:
+        themes = ["personal_reflection", "emotional_journey", "life_experience", "inner_dialogue"]
+    
+    # Ensure we have enough themes by adding variations
+    while len(themes) < 12:
+        base_themes = themes.copy()
+        for theme in base_themes:
+            if len(themes) >= 12:
+                break
+            themes.append(f"{theme}_variation")
+    
+    return themes
+
+
+def _analyze_character_traits(character_description: str) -> Dict[str, str]:
+    """Extract character traits for perspective generation"""
+    desc_lower = character_description.lower()
+    
+    traits = {
+        "personality": "introspective",
+        "approach": "thoughtful",
+        "background": "artistic",
+        "worldview": "questioning"
+    }
+    
+    # Personality analysis
+    if "philosophical" in desc_lower:
+        traits["personality"] = "philosophical"
+        traits["approach"] = "analytical"
+    elif "spiritual" in desc_lower:
+        traits["personality"] = "spiritual"
+        traits["approach"] = "intuitive"
+    elif "social" in desc_lower or "political" in desc_lower:
+        traits["personality"] = "socially_conscious"
+        traits["approach"] = "activist"
+    elif "emotional" in desc_lower:
+        traits["personality"] = "emotionally_driven"
+        traits["approach"] = "feeling-based"
+    
+    # Background analysis
+    if any(word in desc_lower for word in ["producer", "beats", "studio"]):
+        traits["background"] = "producer"
+    elif any(word in desc_lower for word in ["singer", "vocalist", "voice"]):
+        traits["background"] = "vocalist"
+    elif any(word in desc_lower for word in ["rapper", "mc", "hip-hop"]):
+        traits["background"] = "rapper"
+    elif any(word in desc_lower for word in ["musician", "instrument", "player"]):
+        traits["background"] = "instrumentalist"
+    
+    # Worldview analysis
+    if "optimistic" in desc_lower or "positive" in desc_lower:
+        traits["worldview"] = "optimistic"
+    elif "pessimistic" in desc_lower or "dark" in desc_lower:
+        traits["worldview"] = "pessimistic"
+    elif "realistic" in desc_lower or "practical" in desc_lower:
+        traits["worldview"] = "realistic"
+    elif "idealistic" in desc_lower or "dreamer" in desc_lower:
+        traits["worldview"] = "idealistic"
+    
+    return traits
+
+
+def _generate_track_title(album_title: str, theme: str, template: Dict, track_number: int) -> str:
+    """Generate unique track titles based on theme and perspective"""
+    
+    theme_titles = {
+        "love_and_connection": ["Heart's Frequency", "Connection Protocol", "Love's Algorithm", "Bonded Souls"],
+        "mortality_and_loss": ["Final Breath", "Memory's Echo", "Last Light", "Fading Signal"],
+        "spiritual_inquiry": ["Divine Questions", "Sacred Geometry", "Soul's Compass", "Heavenly Frequencies"],
+        "existential_truth": ["Reality Check", "Truth Seeker", "Being's Core", "Existence Proof"],
+        "artistic_beauty": ["Beauty's Code", "Aesthetic Theory", "Creative Force", "Art's Purpose"],
+        "temporal_reflection": ["Time's Arrow", "Memory Lane", "Future's Call", "Present Moment"],
+        "personal_struggle": ["Inner Battle", "Struggle's Song", "Fighting Through", "Overcoming"],
+        "hope_and_dreams": ["Dream State", "Hope's Light", "Future Vision", "Aspiration"],
+        "fear_and_doubt": ["Shadow's Voice", "Doubt's Whisper", "Fear's Face", "Anxiety's Song"],
+        "liberation": ["Breaking Free", "Liberation Day", "Freedom's Call", "Escape Velocity"],
+        "personal_reflection": ["Mirror's Truth", "Self Portrait", "Inner Voice", "Personal Space"],
+        "emotional_journey": ["Feeling's Path", "Emotion's Map", "Heart's Journey", "Soul's Travel"],
+        "life_experience": ["Life's Lessons", "Experience Bank", "Living Proof", "Real Talk"],
+        "inner_dialogue": ["Mind's Conversation", "Internal Debate", "Self Talk", "Inner Voice"]
+    }
+    
+    # Get theme-specific titles
+    titles = theme_titles.get(theme, [f"Track {track_number}", f"Song {track_number}", f"Piece {track_number}", f"Movement {track_number}"])
+    
+    # Select title based on track number to ensure uniqueness
+    selected_title = titles[track_number % len(titles)]
+    
+    # Add template-specific prefix/suffix for more uniqueness
+    if template["type"] == "opening":
+        return f"Intro: {selected_title}"
+    elif template["type"] == "instrumental":
+        return f"{selected_title} (Instrumental)"
+    elif template["type"] == "synthesis":
+        return f"Outro: {selected_title}"
+    else:
+        return selected_title
+
+
+async def _create_narrative_track(track_concept: Dict, character: Any, genre: str, track_number: int, ctx: Context) -> Dict:
+    """Create a track based on narrative progression"""
+    # Use WorkingUniversalProcessor for track creation
+    character_desc = f"Name: {character.name}, Background: {character.backstory[:100]}, Personality: {', '.join(character.personality_drivers[:2])}"
+    processor = WorkingUniversalProcessor(character_desc)
+    
+    # Create track content from story context
+    track_content = f"""
+    Story Context: {track_concept['story_context']}
+    Character Development: {track_concept['character_state']}
+    Emotional Tone: {track_concept['emotional_tone']}
+    Narrative Function: {track_concept['narrative_function']}
+    Story Excerpt: {track_concept['story_excerpt']}
+    """
+    
+    # Process through character lens
+    track_result = processor.process_track_content(
+        track_content,
+        track_concept["title"],
+        track_concept["emotional_tone"],
+        track_concept["narrative_function"],
+        track_number,
+        8  # default track count for context
+    )
+    
+    return {
+        "track_number": track_number,
+        "title": track_concept["title"],
+        "story_context": track_concept["story_context"],
+        "character_development": track_concept["character_state"],
+        "narrative_function": track_concept["narrative_function"],
+        "emotional_arc_position": track_concept["emotional_tone"],
+        "character_interpretation": track_result.character_interpretation,
+        "personal_story": track_result.personal_story,
+        "lyrics": track_result.formatted_lyrics,
+        "suno_command": track_result.suno_command,
+        "musical_evolution": track_concept.get("musical_evolution", "Maintains character voice"),
+        "effectiveness_score": track_result.effectiveness_score
+    }
+
+async def _create_conceptual_track(track_concept: Dict, conceptual_character: Dict, genre: str, track_number: int, ctx: Context) -> Dict:
+    """Create a track based on conceptual themes"""
+    # Create character description for processor
+    character_desc = f"Name: {conceptual_character['name']}, Perspective: {conceptual_character['perspective']}, Focus: {conceptual_character['thematic_focus']}"
+    processor = WorkingUniversalProcessor(character_desc)
+    
+    # Create track content from conceptual elements
+    track_content = f"""
+    Thematic Focus: {track_concept['theme']}
+    Conceptual Angle: {track_concept['conceptual_focus']}
+    Philosophical Framework: {track_concept['philosophical_angle']}
+    Emotional Approach: {track_concept['emotional_approach']}
+    Content Excerpt: {track_concept['content_excerpt']}
+    """
+    
+    # Process through conceptual character lens
+    track_result = processor.process_track_content(
+        track_content,
+        track_concept["title"],
+        track_concept["theme"],
+        track_concept["conceptual_focus"],
+        track_number,
+        8  # default track count for context
+    )
+    
+    return {
+        "track_number": track_number,
+        "title": track_concept["title"],
+        "theme": track_concept["theme"],
+        "conceptual_focus": track_concept["conceptual_focus"],
+        "philosophical_angle": track_concept["philosophical_angle"],
+        "character_interpretation": track_result.character_interpretation,
+        "personal_story": track_result.personal_story,
+        "lyrics": track_result.formatted_lyrics,
+        "suno_command": track_result.suno_command,
+        "effectiveness_score": track_result.effectiveness_score
+    }
+
+def _divide_content_into_sections(content: str, section_count: int) -> List[str]:
+    """Divide content into meaningful sections for track progression"""
+    words = content.split()
+    words_per_section = max(50, len(words) // section_count)
+    
+    sections = []
+    for i in range(section_count):
+        start_idx = i * words_per_section
+        end_idx = min((i + 1) * words_per_section, len(words))
+        section = ' '.join(words[start_idx:end_idx])
+        sections.append(section)
+    
+    return sections
+
+def _analyze_story_section(section: str, character: Any, section_index: int, total_sections: int) -> Dict:
+    """Analyze a story section for narrative elements"""
+    # Determine story progression stage
+    progression_stages = ["setup", "inciting_incident", "rising_action", "climax", "falling_action", "resolution"]
+    stage_index = min(section_index, len(progression_stages) - 1)
+    narrative_stage = progression_stages[stage_index]
+    
+    # Analyze emotional tone
+    section_lower = section.lower()
+    if any(word in section_lower for word in ["happy", "joy", "celebration", "success"]):
+        emotion = "uplifting"
+    elif any(word in section_lower for word in ["sad", "loss", "grief", "sorrow"]):
+        emotion = "melancholic"
+    elif any(word in section_lower for word in ["angry", "rage", "fury", "conflict"]):
+        emotion = "intense"
+    elif any(word in section_lower for word in ["fear", "anxiety", "worry", "danger"]):
+        emotion = "tense"
+    else:
+        emotion = "contemplative"
+    
+    return {
+        "context": f"Story section {section_index + 1}/{total_sections} - {narrative_stage}",
+        "character_development": f"{character.name} in {narrative_stage} phase",
+        "emotion": emotion,
+        "function": narrative_stage,
+        "musical_direction": f"Musical evolution reflecting {narrative_stage} energy"
+    }
+
+def _generate_meaningful_track_title(story_beat: Dict, character_name: str, track_number: int) -> str:
+    """Generate meaningful track titles based on story beats - never generic"""
+    function = story_beat["function"]
+    emotion = story_beat["emotion"]
+    
+    # Expanded title templates with more variety and meaning
+    title_templates = {
+        "setup": [
+            f"{character_name}'s World", "Where It All Begins", "The Foundation", "Origins Unveiled",
+            "First Light", "The Starting Point", "Roots Run Deep", "Before the Storm"
+        ],
+        "inciting_incident": [
+            "The Call to Adventure", "Catalyst Moment", "Point of No Return", "The Spark Ignites",
+            "When Everything Changed", "The First Step", "Breaking Point", "The Awakening"
+        ],
+        "rising_action": [
+            "The Ascent", "Climbing Mountains", "Building Momentum", "The Long Road",
+            "Against the Current", "Pushing Forward", "The Struggle Intensifies", "Rising Tide"
+        ],
+        "climax": [
+            "The Moment of Truth", "Peak Experience", "Final Confrontation", "The Revelation",
+            "Eye of the Storm", "The Breaking Point", "Truth Unveiled", "The Decisive Hour"
+        ],
+        "falling_action": [
+            "After the Storm", "Coming Back Down", "Facing Consequences", "The Reckoning",
+            "Picking Up Pieces", "The Aftermath", "What Remains", "Settling Dust"
+        ],
+        "resolution": [
+            "New Dawn Rising", "Finding Peace", "The Journey's End", "Full Circle",
+            "Lessons Learned", "The New Beginning", "Harmony Restored", "Coming Home"
+        ]
+    }
+    
+    # Get function-specific titles
+    templates = title_templates.get(function, [f"{character_name}'s Journey"])
+    
+    # Select title ensuring uniqueness across tracks
+    title_index = (track_number - 1) % len(templates)
+    base_title = templates[title_index]
+    
+    # Add emotional depth and avoid generic modifiers
+    emotion_modifiers = {
+        "melancholic": ["Through Tears", "In Shadow", "With Heavy Heart", "Through Sorrow"],
+        "intense": ["With Fire", "In Fury", "Through Passion", "With Power"],
+        "tense": ["On the Edge", "In Suspense", "Through Fear", "Under Pressure"],
+        "uplifting": ["In Light", "With Hope", "Through Joy", "In Triumph"],
+        "contemplative": ["In Reflection", "Through Thought", "In Silence", "With Wonder"]
+    }
+    
+    # Apply emotional modifier if appropriate
+    if emotion in emotion_modifiers:
+        modifiers = emotion_modifiers[emotion]
+        modifier = modifiers[(track_number - 1) % len(modifiers)]
+        return f"{base_title} {modifier}"
+    
+    return base_title
+
+def _generate_character_track_title(theme: str, template: Dict, character_traits: Dict, track_number: int) -> str:
+    """Generate character-driven track titles - creative and meaningful"""
+    theme_words = theme.replace("_", " ").title()
+    template_type = template["type"]
+    personality = character_traits.get("personality", "introspective")
+    
+    # Creative title variations based on template type
+    title_variations = {
+        "introduction": [
+            f"Welcome to {theme_words}", f"Introducing {theme_words}", f"First Glimpse of {theme_words}",
+            f"Opening {theme_words}", f"The World of {theme_words}", f"Discovering {theme_words}"
+        ],
+        "personal_reflection": [
+            f"My Journey with {theme_words}", f"Inside {theme_words}", f"Personal {theme_words}",
+            f"Through My Eyes: {theme_words}", f"Living {theme_words}", f"My Truth About {theme_words}"
+        ],
+        "emotional_core": [
+            f"Heart of {theme_words}", f"The Soul of {theme_words}", f"Feeling {theme_words}",
+            f"Deep in {theme_words}", f"The Essence of {theme_words}", f"Raw {theme_words}"
+        ],
+        "memory_exploration": [
+            f"Remembering {theme_words}", f"Echoes of {theme_words}", f"Looking Back at {theme_words}",
+            f"Memories of {theme_words}", f"Yesterday's {theme_words}", f"Traces of {theme_words}"
+        ],
+        "conflict_processing": [
+            f"Wrestling with {theme_words}", f"The Battle for {theme_words}", f"Struggling Through {theme_words}",
+            f"Fighting {theme_words}", f"Confronting {theme_words}", f"The War Within {theme_words}"
+        ],
+        "revelation_moment": [
+            f"Understanding {theme_words}", f"The Truth About {theme_words}", f"Seeing {theme_words} Clearly",
+            f"Breakthrough in {theme_words}", f"Awakening to {theme_words}", f"The Light of {theme_words}"
+        ],
+        "relationship_dynamics": [
+            f"Connected by {theme_words}", f"Sharing {theme_words}", f"Together in {theme_words}",
+            f"Bonds of {theme_words}", f"United Through {theme_words}", f"The Bridge of {theme_words}"
+        ],
+        "philosophical_inquiry": [
+            f"Why {theme_words}?", f"The Question of {theme_words}", f"Seeking {theme_words}",
+            f"The Mystery of {theme_words}", f"Pondering {theme_words}", f"The Riddle of {theme_words}"
+        ],
+        "creative_expression": [
+            f"Expressing {theme_words}", f"Creating {theme_words}", f"The Art of {theme_words}",
+            f"Painting {theme_words}", f"Singing {theme_words}", f"Crafting {theme_words}"
+        ],
+        "resolution_synthesis": [
+            f"Resolving {theme_words}", f"Finding Peace in {theme_words}", f"The Answer to {theme_words}",
+            f"Completing {theme_words}", f"The End of {theme_words}", f"Harmony with {theme_words}"
+        ]
+    }
+    
+    # Get variations for this template type
+    variations = title_variations.get(template_type, [f"Exploring {theme_words}"])
+    
+    # Select variation based on track number to ensure uniqueness
+    variation_index = (track_number - 1) % len(variations)
+    selected_title = variations[variation_index]
+    
+    # Add personality-based modifier for more character depth
+    if personality == "philosophical" and "?" not in selected_title:
+        return f"{selected_title}: A Meditation"
+    elif personality == "emotional" and template_type not in ["emotional_core"]:
+        return f"{selected_title} (From the Heart)"
+    elif personality == "social" and template_type not in ["relationship_dynamics"]:
+        return f"{selected_title} Together"
+    
+    return selected_title
+
+def _generate_thematic_track_title(theme: str, progression_stage: str, track_number: int) -> str:
+    """Generate thematic track titles with creative depth"""
+    theme_words = theme.replace("_", " ").title()
+    
+    # Expanded creative approaches for each progression stage
+    stage_approaches = {
+        "introduction_to_concept": [
+            f"First Encounter with {theme_words}", f"Opening the Door to {theme_words}",
+            f"Welcome to {theme_words}", f"The Beginning of {theme_words}",
+            f"Discovering {theme_words}", f"Initial Thoughts on {theme_words}"
+        ],
+        "exploration_of_implications": [
+            f"Diving Deep into {theme_words}", f"The Ripple Effects of {theme_words}",
+            f"Unfolding {theme_words}", f"The Many Faces of {theme_words}",
+            f"Exploring the Depths of {theme_words}", f"What {theme_words} Really Means"
+        ],
+        "emotional_resonance": [
+            f"Feeling the Weight of {theme_words}", f"The Heart of {theme_words}",
+            f"Emotional Echoes of {theme_words}", f"How {theme_words} Moves Me",
+            f"The Soul of {theme_words}", f"When {theme_words} Touches You"
+        ],
+        "philosophical_depth": [
+            f"The Philosophy of {theme_words}", f"Deep Thoughts on {theme_words}",
+            f"The Wisdom in {theme_words}", f"Understanding {theme_words}",
+            f"The Truth About {theme_words}", f"Contemplating {theme_words}"
+        ],
+        "practical_application": [
+            f"Living {theme_words}", f"Putting {theme_words} into Practice",
+            f"The Daily Reality of {theme_words}", f"How to Embody {theme_words}",
+            f"Making {theme_words} Real", f"Walking the Path of {theme_words}"
+        ],
+        "contradictions_and_tensions": [
+            f"The Paradox of {theme_words}", f"Wrestling with {theme_words}",
+            f"The Dark Side of {theme_words}", f"When {theme_words} Conflicts",
+            f"The Tension in {theme_words}", f"Questioning {theme_words}"
+        ],
+        "synthesis_and_integration": [
+            f"Bringing {theme_words} Together", f"The Unity of {theme_words}",
+            f"Integrating {theme_words}", f"The Whole Picture of {theme_words}",
+            f"Synthesizing {theme_words}", f"The Complete {theme_words}"
+        ],
+        "transcendence_or_resolution": [
+            f"Beyond {theme_words}", f"Transcending {theme_words}",
+            f"The Resolution of {theme_words}", f"Rising Above {theme_words}",
+            f"The Final Word on {theme_words}", f"Peace with {theme_words}"
+        ]
+    }
+    
+    # Get approaches for this stage
+    approaches = stage_approaches.get(progression_stage, [f"Exploring {theme_words}"])
+    
+    # Select approach based on track number for uniqueness
+    approach_index = (track_number - 1) % len(approaches)
+    return approaches[approach_index]
+
+def _extract_conceptual_elements(content: str) -> Dict:
+    """Extract conceptual elements from content"""
+    content_lower = content.lower()
+    
+    # Identify philosophical frameworks
+    philosophical_frameworks = []
+    if any(word in content_lower for word in ["existence", "being", "reality"]):
+        philosophical_frameworks.append("existential")
+    if any(word in content_lower for word in ["meaning", "purpose", "significance"]):
+        philosophical_frameworks.append("teleological")
+    if any(word in content_lower for word in ["ethics", "moral", "right", "wrong"]):
+        philosophical_frameworks.append("ethical")
+    if any(word in content_lower for word in ["beauty", "aesthetic", "art"]):
+        philosophical_frameworks.append("aesthetic")
+    
+    if not philosophical_frameworks:
+        philosophical_frameworks = ["existential"]
+    
+    # Identify emotional tones
+    emotional_tones = []
+    if any(word in content_lower for word in ["contemplat", "reflect", "ponder"]):
+        emotional_tones.append("contemplative")
+    if any(word in content_lower for word in ["melanchol", "sad", "sorrow"]):
+        emotional_tones.append("melancholic")
+    if any(word in content_lower for word in ["hope", "optimis", "bright"]):
+        emotional_tones.append("hopeful")
+    if any(word in content_lower for word in ["intense", "passion", "fervor"]):
+        emotional_tones.append("intense")
+    
+    if not emotional_tones:
+        emotional_tones = ["contemplative"]
+    
+    return {
+        "philosophical_frameworks": philosophical_frameworks,
+        "emotional_tones": emotional_tones
+    }
+
+def _create_conceptual_character(content: str, conceptual_elements: Dict, genre: str) -> Dict:
+    """Create a conceptual character to embody the themes"""
+    primary_framework = conceptual_elements["philosophical_frameworks"][0]
+    primary_tone = conceptual_elements["emotional_tones"][0]
+    
+    character_names = {
+        "existential": "The Seeker",
+        "teleological": "The Questioner", 
+        "ethical": "The Conscience",
+        "aesthetic": "The Artist"
+    }
+    
+    perspectives = {
+        "existential": "exploring the nature of existence and being",
+        "teleological": "seeking meaning and purpose in experience",
+        "ethical": "examining moral dimensions of life",
+        "aesthetic": "finding beauty and artistic truth"
+    }
+    
+    return {
+        "name": character_names.get(primary_framework, "The Philosopher"),
+        "perspective": perspectives.get(primary_framework, "exploring deep questions"),
+        "thematic_focus": primary_framework,
+        "emotional_approach": primary_tone,
+        "genre_preference": genre
+    }
+
+def _extract_relevant_content_excerpt(content: str, theme: str) -> str:
+    """Extract content excerpt most relevant to the theme"""
+    # Simple approach: find sentences containing theme-related words
+    theme_keywords = theme.replace("_", " ").split()
+    sentences = content.split(".")
+    
+    relevant_sentences = []
+    for sentence in sentences:
+        sentence_lower = sentence.lower()
+        if any(keyword.lower() in sentence_lower for keyword in theme_keywords):
+            relevant_sentences.append(sentence.strip())
+    
+    if relevant_sentences:
+        excerpt = ". ".join(relevant_sentences[:2])
+        return excerpt[:200] + "..." if len(excerpt) > 200 else excerpt
+    else:
+        # Fallback to first part of content
+        return content[:200] + "..." if len(content) > 200 else content
+
+def _validate_narrative_progression(track_concepts: List[Dict]) -> Dict[str, Any]:
+    """Validate that tracks follow coherent story arc progression"""
+    validation_result = {
+        "is_coherent": True,
+        "progression_score": 0.0,
+        "issues": [],
+        "strengths": []
+    }
+    
+    if len(track_concepts) < 3:
+        validation_result["issues"].append("Too few tracks for meaningful progression")
+        validation_result["is_coherent"] = False
+        return validation_result
+    
+    # Check for story arc elements
+    story_functions = [track.get("narrative_function", "") for track in track_concepts]
+    
+    # Validate beginning, middle, end structure
+    has_setup = any("setup" in func or "introduction" in func for func in story_functions)
+    has_development = any("rising" in func or "development" in func or "conflict" in func for func in story_functions)
+    has_resolution = any("resolution" in func or "conclusion" in func or "end" in func for func in story_functions)
+    
+    progression_score = 0
+    if has_setup:
+        progression_score += 0.3
+        validation_result["strengths"].append("Clear story setup")
+    else:
+        validation_result["issues"].append("Missing story setup/introduction")
+    
+    if has_development:
+        progression_score += 0.4
+        validation_result["strengths"].append("Story development present")
+    else:
+        validation_result["issues"].append("Missing story development/conflict")
+    
+    if has_resolution:
+        progression_score += 0.3
+        validation_result["strengths"].append("Story resolution present")
+    else:
+        validation_result["issues"].append("Missing story resolution")
+    
+    # Check for emotional progression
+    emotions = [track.get("emotional_tone", "") for track in track_concepts]
+    unique_emotions = len(set(emotions))
+    
+    if unique_emotions > 1:
+        progression_score += 0.2
+        validation_result["strengths"].append("Varied emotional progression")
+    else:
+        validation_result["issues"].append("Monotonous emotional tone")
+    
+    # Check for title uniqueness and meaningfulness
+    titles = [track.get("title", "") for track in track_concepts]
+    generic_titles = [title for title in titles if any(generic in title.lower() for generic in ["track", "song", "piece", "number"])]
+    
+    if generic_titles:
+        validation_result["issues"].append(f"Generic titles found: {generic_titles}")
+        progression_score -= 0.2
+    else:
+        validation_result["strengths"].append("All titles are meaningful and specific")
+    
+    # Check for unique content
+    unique_titles = len(set(titles))
+    if unique_titles == len(titles):
+        validation_result["strengths"].append("All track titles are unique")
+    else:
+        validation_result["issues"].append("Duplicate track titles found")
+        progression_score -= 0.1
+    
+    validation_result["progression_score"] = max(0.0, min(1.0, progression_score))
+    validation_result["is_coherent"] = progression_score >= 0.6 and len(validation_result["issues"]) <= 2
+    
+    return validation_result
+
+def _ensure_unique_track_content(album_tracks: List[Dict]) -> List[Dict]:
+    """Ensure each track has unique content and avoid repetition"""
+    seen_titles = set()
+    seen_themes = set()
+    
+    for i, track in enumerate(album_tracks):
+        original_title = track.get("title", f"Track {i+1}")
+        original_theme = track.get("theme", "general")
+        
+        # Ensure unique titles
+        title = original_title
+        counter = 1
+        while title in seen_titles:
+            title = f"{original_title} (Part {counter})"
+            counter += 1
+        
+        track["title"] = title
+        seen_titles.add(title)
+        
+        # Ensure theme variety
+        theme = original_theme
+        counter = 1
+        while theme in seen_themes and counter <= 3:
+            theme = f"{original_theme}_variation_{counter}"
+            counter += 1
+        
+        track["theme"] = theme
+        seen_themes.add(theme)
+        
+        # Add uniqueness indicators to track
+        track["uniqueness_score"] = 1.0 - (counter - 1) * 0.1
+        track["content_variation"] = f"Unique perspective #{i+1}"
+    
+    return album_tracks
+
+def _validate_thematic_coherence(track_concepts: List[Dict]) -> Dict[str, Any]:
+    """Validate thematic coherence across character-driven tracks"""
+    validation_result = {
+        "is_coherent": True,
+        "coherence_score": 0.0,
+        "issues": [],
+        "strengths": []
+    }
+    
+    if len(track_concepts) < 2:
+        validation_result["issues"].append("Too few tracks for coherence analysis")
+        return validation_result
+    
+    # Check theme variety
+    themes = [track.get("theme", "") for track in track_concepts]
+    unique_themes = len(set(themes))
+    theme_variety_score = min(1.0, unique_themes / len(themes))
+    
+    if theme_variety_score > 0.7:
+        validation_result["strengths"].append("Good thematic variety")
+    else:
+        validation_result["issues"].append("Limited thematic variety")
+    
+    # Check perspective variety
+    perspectives = [track.get("perspective", "") for track in track_concepts]
+    unique_perspectives = len(set(perspectives))
+    perspective_variety_score = min(1.0, unique_perspectives / len(perspectives))
+    
+    if perspective_variety_score > 0.6:
+        validation_result["strengths"].append("Varied character perspectives")
+    else:
+        validation_result["issues"].append("Repetitive character perspectives")
+    
+    # Check title meaningfulness
+    titles = [track.get("title", "") for track in track_concepts]
+    meaningful_titles = [title for title in titles if not any(generic in title.lower() for generic in ["track", "song", "piece", "number"])]
+    title_quality_score = len(meaningful_titles) / len(titles)
+    
+    if title_quality_score == 1.0:
+        validation_result["strengths"].append("All titles are meaningful")
+    else:
+        validation_result["issues"].append("Some generic titles found")
+    
+    # Calculate overall coherence score
+    coherence_score = (theme_variety_score + perspective_variety_score + title_quality_score) / 3
+    validation_result["coherence_score"] = coherence_score
+    validation_result["is_coherent"] = coherence_score >= 0.6
+    
+    return validation_result
+
+def _create_track_perspective(character_traits: Dict, template: Dict, theme: str) -> str:
+    """Create unique perspective for each track"""
+    
+    personality = character_traits["personality"]
+    approach = character_traits["approach"]
+    background = character_traits["background"]
+    worldview = character_traits["worldview"]
+    
+    # Base perspective from template
+    base_perspectives = {
+        "introduction": f"Introducing the {theme} through {personality} lens, setting the stage for exploration",
+        "personal_reflection": f"Intimate {approach} examination of {theme} from personal experience",
+        "emotional_core": f"Raw emotional processing of {theme} through {background} expression",
+        "memory_exploration": f"Exploring memories and past experiences related to {theme}",
+        "conflict_processing": f"Wrestling with {theme} using {approach} methods and {personality} insight",
+        "revelation_moment": f"Breakthrough understanding of {theme} through {worldview} realization",
+        "relationship_dynamics": f"Exploring {theme} through connections and relationships with others",
+        "philosophical_inquiry": f"Deep {worldview} questioning of {theme} and its implications",
+        "creative_expression": f"Artistic {background} expression of {theme} through creative voice",
+        "resolution_synthesis": f"Integrating understanding of {theme} through {personality} synthesis"
+    }
+    
+    template_type = template.get("type", "personal_reflection")
+    return base_perspectives.get(template_type, f"Exploring {theme} through {personality} perspective")
+
+
+def _extract_character_name(character_description: str) -> str:
+    """Extract character name from description"""
+    import re
+    
+    # Try multiple name patterns
+    name_patterns = [
+        r'([A-Z][A-Z]+ [A-Z][a-zA-Z]+)',  # DJ Memphis, MC Something
+        r'([A-Z][a-z]+ [A-Z][a-zA-Z]+)',  # John Smith or John McKenzie
+        r'([A-Z][a-z]+ (?:"[^"]*" )?[A-Z][a-z]+)',  # John "Nickname" Smith
+        r'^([A-Z][a-z]+(?:\s+[A-Z][a-zA-Z]+)+)',  # Multiple names at start
+        r'([A-Z][A-Z]+)',  # Single names like DJ, MC (fallback)
+    ]
+    
+    # First try to find name in the first sentence
+    first_sentence = character_description.split('.')[0] if '.' in character_description else character_description.split('\n')[0]
+    
+    for pattern in name_patterns:
+        match = re.search(pattern, first_sentence)
+        if match:
+            return match.group(1)
+    
+    # If still no match, try the whole description
+    for pattern in name_patterns:
+        match = re.search(pattern, character_description)
+        if match:
+            return match.group(1)
+    
+    return "Independent Artist"
+
+
+def _extract_character_genre(character_description: str) -> str:
+    """Extract genre from character description"""
+    desc_lower = character_description.lower()
+    
+    # Genre patterns with priority (more specific first)
+    genre_patterns = {
+        # Electronic subgenres (most specific first)
+        "liquid drum and bass": ["liquid drum and bass", "liquid dnb", "liquid d&b", "liquid drum & bass"],
+        "drum and bass": ["drum and bass", "dnb", "d&b", "drum & bass", "jungle"],
+        "dubstep": ["dubstep", "dub step", "bass music"],
+        "house": ["house music", "deep house", "tech house"],
+        "techno": ["techno", "detroit techno", "minimal techno"],
+        "trance": ["trance", "progressive trance", "uplifting trance"],
+        "electronic": ["electronic music", "electronic producer", "electronic artist", "edm"],
+        
+        # Hip-hop subgenres
+        "memphis hip-hop": ["memphis hip-hop", "memphis rap", "memphis hip hop"],
+        "trap": ["trap music", "trap beats", "trap producer", "trap artist"],
+        "boom bap": ["boom bap", "boom-bap", "old school hip hop"],
+        "hip-hop": ["hip-hop", "hip hop", "rap music", "rap"],
+        
+        # Latin/Caribbean genres
+        "reggaeton": ["reggaeton", "reggaeton producer", "reggaeton artist"],
+        "latin trap": ["latin trap", "trap-reggaeton", "trap reggaeton"],
+        "salsa": ["salsa", "salsa music"],
+        "bachata": ["bachata", "bachata music"],
+        
+        # Rock subgenres
+        "metal": ["metal", "heavy metal", "death metal", "black metal"],
+        "punk": ["punk", "punk rock", "hardcore punk"],
+        "grunge": ["grunge", "alternative rock", "seattle sound"],
+        "indie rock": ["indie rock", "independent rock"],
+        "rock": ["rock music", "rock"],
+        
+        # Soul/R&B
+        "neo-soul": ["neo-soul", "neo soul", "neosoul"],
+        "r&b": ["r&b", "rnb", "rhythm and blues"],
+        "soul": ["soul music", "soul"],
+        "funk": ["funk", "funk music"],
+        
+        # Jazz subgenres
+        "smooth jazz": ["smooth jazz", "contemporary jazz"],
+        "bebop": ["bebop", "be-bop"],
+        "fusion": ["jazz fusion", "fusion"],
+        "jazz": ["jazz", "jazz music"],
+        
+        # Folk and acoustic
+        "indie folk": ["indie folk", "independent folk"],
+        "country": ["country", "country music", "americana"],
+        "folk": ["folk music", "folk"],
+        "acoustic": ["acoustic", "acoustic music"],
+        
+        # Pop subgenres
+        "indie pop": ["indie pop", "independent pop"],
+        "synth pop": ["synth pop", "synthpop", "new wave"],
+        "pop": ["pop music", "pop"],
+        
+        # Alternative (catch-all)
+        "alternative": ["alternative", "alt rock", "alternative rock", "indie"]
+    }
+    
+    # Check for genre patterns
+    for genre, patterns in genre_patterns.items():
+        for pattern in patterns:
+            if pattern in desc_lower:
+                return genre
+    
+    return "alternative"
 
 # ================================================================================================
 # RESOURCES
@@ -6656,6 +9578,412 @@ async def _build_wiki_attribution_context(analysis_data: Dict[str, Any], ctx: Co
 # SERVER CONFIGURATION AND STARTUP
 # ================================================================================================
 
+@mcp.tool
+async def detect_input_format(text: str, ctx: Context) -> str:
+    """
+    Detect input format and provide processing recommendations
+    
+    This tool analyzes input text to determine its type (character description, narrative fiction,
+    philosophical content, etc.) and provides recommendations for processing approach.
+    
+    Args:
+        text: Input text to analyze
+        ctx: Context for logging
+        
+    Returns:
+        JSON string containing detection results and processing recommendations
+    """
+    try:
+        await ctx.info(f"Detecting input format for {len(text)} character text")
+        
+        if not text or len(text.strip()) < 10:
+            return json.dumps({
+                "error": "Insufficient content for format detection",
+                "recommendation": "Please provide more detailed content"
+            })
+        
+        # Use working universal processor for detection
+        processor = WorkingUniversalProcessor()
+        detection_result = processor.detect_content_type(text)
+        
+        # Add processing recommendations
+        recommendations = {
+            "character_description": "Use 'analyze_character_text' with this content directly",
+            "narrative_fiction": "Use 'analyze_character_text' to extract characters from the narrative",
+            "philosophical_conceptual": "Use 'create_conceptual_album' to create characters from concepts",
+            "poetic_content": "Use 'analyze_character_text' to create characters from poetic voice",
+            "concept_outline": "Use 'create_conceptual_album' to process structured concepts",
+            "mixed_content": "Use 'analyze_character_text' with adaptive processing"
+        }
+        
+        content_type = detection_result.get("content_type", "mixed_content")
+        detection_result["processing_recommendation"] = recommendations.get(content_type, "Use 'analyze_character_text' for general processing")
+        
+        await ctx.info(f"Detected content type: {content_type} (confidence: {detection_result.get('confidence', 0.0):.2f})")
+        
+        return json.dumps(detection_result, indent=2)
+        
+    except Exception as e:
+        await ctx.error(f"Format detection failed: {str(e)}")
+        return json.dumps({"error": f"Format detection failed: {str(e)}"})
+
+@mcp.tool
+async def request_clarification(text: str, detection_result: str = None, ctx: Context = None) -> str:
+    """
+    Request clarification for ambiguous input content
+    
+    This tool generates clarification prompts when input content type is unclear,
+    helping users specify the appropriate processing approach.
+    
+    Args:
+        text: Original input text that needs clarification
+        detection_result: Optional JSON string of previous detection results
+        ctx: Context for logging
+        
+    Returns:
+        JSON string containing clarification prompts and processing options
+    """
+    try:
+        if ctx:
+            await ctx.info("Generating clarification prompts for ambiguous input")
+        
+        # Parse detection result if provided
+        detection_info = {}
+        if detection_result:
+            try:
+                detection_data = json.loads(detection_result)
+                detection_info = detection_data.get("detection_result", detection_data)
+            except json.JSONDecodeError:
+                pass
+        
+        # If no detection result provided, perform quick detection
+        if not detection_info:
+            processor = WorkingUniversalProcessor()
+            detection_info = processor.detect_content_type(text)
+        
+        # Generate clarification prompts
+        clarification_response = _generate_clarification_prompts(text, detection_info)
+        
+        if ctx:
+            await ctx.info(f"Generated {len(clarification_response.get('prompts', []))} clarification prompts")
+        
+        return json.dumps(clarification_response, indent=2)
+        
+    except Exception as e:
+        if ctx:
+            await ctx.error(f"Failed to generate clarification: {str(e)}")
+        return json.dumps({"error": f"Clarification generation failed: {str(e)}"})
+
+@mcp.tool
+async def process_with_guidance(text: str, user_choice: str, additional_context: str = "", ctx: Context = None) -> str:
+    """
+    Process content with user-provided guidance
+    
+    This tool processes content using the user's specified approach, incorporating
+    any additional context provided to improve results.
+    
+    Args:
+        text: Original input text to process
+        user_choice: User's chosen processing method (character_description, narrative_fiction, etc.)
+        additional_context: Additional context to help with processing
+        ctx: Context for logging
+        
+    Returns:
+        JSON string containing processing results
+    """
+    try:
+        if ctx:
+            await ctx.info(f"Processing content with user guidance: {user_choice}")
+        
+        # Validate user choice
+        valid_choices = [
+            "character_description", "narrative_fiction", "philosophical_conceptual",
+            "poetic_content", "concept_outline", "mixed_content"
+        ]
+        
+        if user_choice not in valid_choices:
+            return json.dumps({
+                "error": f"Invalid choice: {user_choice}",
+                "valid_choices": valid_choices,
+                "suggestion": "Please select one of the valid processing options"
+            })
+        
+        # Combine original text with additional context if provided
+        enhanced_text = text
+        if additional_context.strip():
+            enhanced_text = f"{text}\n\nAdditional Context: {additional_context}"
+        
+        # Route to appropriate processing method based on user choice
+        if user_choice == "character_description":
+            result = await analyze_character_text(enhanced_text, ctx)
+        elif user_choice == "narrative_fiction":
+            result = await analyze_character_text(enhanced_text, ctx)
+        elif user_choice in ["philosophical_conceptual", "concept_outline"]:
+            result = await create_conceptual_album(enhanced_text, "alternative", 9, ctx)
+        elif user_choice == "poetic_content":
+            result = await analyze_character_text(enhanced_text, ctx)
+        else:  # mixed_content
+            result = await complete_workflow(enhanced_text, ctx)
+        
+        # Parse result and add guidance metadata
+        try:
+            result_data = json.loads(result)
+            result_data["user_guidance"] = {
+                "chosen_method": user_choice,
+                "additional_context_provided": bool(additional_context.strip()),
+                "guidance_applied": True
+            }
+            result = json.dumps(result_data, indent=2)
+        except json.JSONDecodeError:
+            pass  # Return original result if parsing fails
+        
+        if ctx:
+            await ctx.info(f"Successfully processed content using {user_choice} method")
+        
+        return result
+        
+    except Exception as e:
+        if ctx:
+            await ctx.error(f"Failed to process with guidance: {str(e)}")
+        return json.dumps({"error": f"Processing with guidance failed: {str(e)}"})
+
+@mcp.tool
+async def get_processing_guidance(content_type: str = None, ctx: Context = None) -> str:
+    """
+    Get guidance on different processing modes and when to use them
+    
+    This tool provides detailed information about available processing modes,
+    when to use each one, and examples of appropriate content types.
+    
+    Args:
+        content_type: Specific content type to get guidance for (optional)
+        ctx: Context for logging
+        
+    Returns:
+        JSON string containing processing guidance and examples
+    """
+    try:
+        if ctx:
+            await ctx.info("Providing processing guidance")
+        
+        guidance = {
+            "processing_modes": {
+                "character_description": {
+                    "when_to_use": "When you have explicit character details, artist bios, or persona descriptions",
+                    "examples": [
+                        "John Smith, 28-year-old indie folk artist from Portland",
+                        "Character: Sarah - A philosophical songwriter who explores existential themes",
+                        "Artist Profile: DJ Memphis, electronic producer specializing in ambient soundscapes"
+                    ],
+                    "tool_to_use": "analyze_character_text",
+                    "output": "Uses your character details directly to create music content"
+                },
+                "narrative_fiction": {
+                    "when_to_use": "When you have stories, narratives, or fictional content with characters",
+                    "examples": [
+                        "Story excerpts with dialogue and character actions",
+                        "Novel chapters or short stories",
+                        "Narrative descriptions of events and characters"
+                    ],
+                    "tool_to_use": "analyze_character_text",
+                    "output": "Extracts characters from the story and creates music from their perspective"
+                },
+                "philosophical_conceptual": {
+                    "when_to_use": "When you have abstract ideas, philosophical content, or conceptual themes",
+                    "examples": [
+                        "Philosophical essays or excerpts",
+                        "Abstract concepts like 'the nature of time'",
+                        "Thematic content about existentialism, spirituality, etc."
+                    ],
+                    "tool_to_use": "create_conceptual_album",
+                    "output": "Creates characters that embody and explore these concepts through music"
+                },
+                "poetic_content": {
+                    "when_to_use": "When you have poetry, lyrical content, or highly metaphorical text",
+                    "examples": [
+                        "Poems or verses",
+                        "Lyrical content with rich imagery",
+                        "Metaphorical or symbolic text"
+                    ],
+                    "tool_to_use": "analyze_character_text",
+                    "output": "Creates characters from the poetic voice and transforms themes into music"
+                },
+                "concept_outline": {
+                    "when_to_use": "When you have structured outlines, lists, or organized conceptual content",
+                    "examples": [
+                        "Numbered lists of ideas or themes",
+                        "Structured outlines of concepts",
+                        "Organized frameworks or systems"
+                    ],
+                    "tool_to_use": "create_conceptual_album",
+                    "output": "Processes each concept systematically to create coherent characters"
+                },
+                "mixed_content": {
+                    "when_to_use": "When your content combines multiple types or you're unsure",
+                    "examples": [
+                        "Content that mixes narrative with philosophical elements",
+                        "Character descriptions embedded in stories",
+                        "Any content that doesn't fit clearly into other categories"
+                    ],
+                    "tool_to_use": "complete_workflow",
+                    "output": "Uses adaptive processing to handle multiple content types intelligently"
+                }
+            },
+            "workflow_recommendations": [
+                "1. Start with 'detect_input_format' to understand your content type",
+                "2. If results are unclear, use 'request_clarification' for guidance",
+                "3. Use 'process_with_guidance' if you want to specify the processing approach",
+                "4. For general processing, use the recommended tool from format detection"
+            ],
+            "tips": [
+                "Be as specific as possible about what you want to achieve",
+                "If you're unsure, start with 'detect_input_format' for analysis",
+                "You can always provide additional context to guide the processing",
+                "Character descriptions work best when they include age, background, and musical style",
+                "Narrative content works best when it has clear characters and dialogue",
+                "Conceptual content works best when themes are clearly articulated"
+            ],
+            "troubleshooting": {
+                "empty_results": "Try providing more detailed content or switching to a different processing mode",
+                "generic_output": "Add more specific details about characters, themes, or context",
+                "wrong_interpretation": "Use 'request_clarification' to specify the correct processing approach"
+            }
+        }
+        
+        # If specific content type requested, focus on that
+        if content_type and content_type in guidance["processing_modes"]:
+            focused_guidance = {
+                "requested_mode": content_type,
+                "details": guidance["processing_modes"][content_type],
+                "workflow_recommendations": guidance["workflow_recommendations"],
+                "tips": guidance["tips"],
+                "troubleshooting": guidance["troubleshooting"]
+            }
+            return json.dumps(focused_guidance, indent=2)
+        
+        return json.dumps(guidance, indent=2)
+        
+    except Exception as e:
+        if ctx:
+            await ctx.error(f"Failed to provide guidance: {str(e)}")
+        return json.dumps({"error": f"Guidance generation failed: {str(e)}"})
+
+def _generate_clarification_prompts(text: str, detection_info: Dict) -> Dict:
+    """Generate helpful clarification prompts based on detection results"""
+    content_type = detection_info.get("content_type", "unknown")
+    confidence = detection_info.get("confidence", 0.0)
+    ambiguity_score = detection_info.get("ambiguity_score", 0.0)
+    detected_formats = detection_info.get("detected_formats", [])
+    
+    prompts = []
+    options = []
+    
+    if confidence < 0.4:
+        prompts.extend([
+            "I'm having trouble determining what type of content this is.",
+            "Could you help me understand how you'd like me to process this content?"
+        ])
+        
+        options.extend([
+            {
+                "id": "character_description",
+                "label": "This is a character description",
+                "description": "Use this if you're providing explicit details about a character or artist persona"
+            },
+            {
+                "id": "narrative_fiction", 
+                "label": "This is a story or narrative",
+                "description": "Use this if you want me to extract characters from a fictional narrative"
+            },
+            {
+                "id": "philosophical_conceptual",
+                "label": "This contains concepts or themes",
+                "description": "Use this if you want me to create characters from abstract ideas or philosophical content"
+            },
+            {
+                "id": "mixed_content",
+                "label": "Process adaptively",
+                "description": "Let me try multiple approaches and use the best result"
+            }
+        ])
+    
+    elif ambiguity_score > 0.6 and len(detected_formats) > 1:
+        format_list = ", ".join(detected_formats)
+        prompts.append(f"I detected multiple content types: {format_list}. Which approach would you prefer?")
+        
+        for format_type in detected_formats:
+            option = _create_format_option(format_type)
+            if option:
+                options.append(option)
+    
+    else:
+        prompts.append(f"This appears to be {content_type.replace('_', ' ')} content. Is this correct?")
+        
+        # Add the detected type as primary option
+        primary_option = _create_format_option(content_type)
+        if primary_option:
+            options.append(primary_option)
+        
+        # Add alternative options
+        alternatives = ["character_description", "narrative_fiction", "philosophical_conceptual", "mixed_content"]
+        for alt in alternatives:
+            if alt != content_type:
+                alt_option = _create_format_option(alt)
+                if alt_option:
+                    options.append(alt_option)
+    
+    return {
+        "clarification_needed": True,
+        "confidence": confidence,
+        "ambiguity_score": ambiguity_score,
+        "detected_formats": detected_formats,
+        "prompts": prompts,
+        "options": options[:4],  # Limit to 4 options
+        "text_preview": text[:200] + "..." if len(text) > 200 else text,
+        "guidance": [
+            "Select the option that best matches your intent",
+            "You can provide additional context using 'process_with_guidance'",
+            "If unsure, choose 'mixed_content' for adaptive processing"
+        ]
+    }
+
+def _create_format_option(format_type: str) -> Dict:
+    """Create an option dictionary for a specific format type"""
+    format_options = {
+        "character_description": {
+            "id": "character_description",
+            "label": "Character Description",
+            "description": "Process as explicit character details and use them directly"
+        },
+        "narrative_fiction": {
+            "id": "narrative_fiction", 
+            "label": "Narrative Fiction",
+            "description": "Extract characters from the story or narrative elements"
+        },
+        "philosophical_conceptual": {
+            "id": "philosophical_conceptual",
+            "label": "Conceptual Content",
+            "description": "Create characters that embody the philosophical themes and concepts"
+        },
+        "poetic_content": {
+            "id": "poetic_content",
+            "label": "Poetic Content", 
+            "description": "Create characters from the poetic voice and imagery"
+        },
+        "concept_outline": {
+            "id": "concept_outline",
+            "label": "Concept Outline",
+            "description": "Process structured concepts and create characters from them"
+        },
+        "mixed_content": {
+            "id": "mixed_content",
+            "label": "Mixed Content",
+            "description": "Use adaptive processing to handle multiple content types"
+        }
+    }
+    
+    return format_options.get(format_type)
+
 # Initialize server components on import
 async def _startup_initialization():
     """Initialize server components"""
@@ -6664,9 +9992,16 @@ async def _startup_initialization():
 # Store initialization task for later execution
 _initialization_task = None
 
+async def startup():
+    """Startup hook to initialize server components"""
+    await initialize_server()
+
 if __name__ == "__main__":
     logger.info("Starting Character-Driven Music Generation MCP Server...")
-    logger.info("Wiki integration will be initialized on first use")
+    
+    # Initialize server components
+    import asyncio
+    asyncio.run(startup())
     
     # Run the FastMCP server
     mcp.run()

@@ -489,3 +489,46 @@ class WikiCacheManager:
         if invalid_urls:
             logger.info(f"Removed {len(invalid_urls)} invalid cache entries")
             await self._save_cache_index()
+    
+    async def save_content(self, url: str, content: str, content_type: str = "text/html") -> str:
+        """
+        Save content to cache and return the local file path
+        
+        Args:
+            url: Source URL
+            content: Content to save
+            content_type: MIME type of content
+            
+        Returns:
+            Local file path where content was saved
+        """
+        if not self._cache_loaded:
+            await self.initialize()
+        
+        # Generate local file path
+        local_path = await self.generate_file_path(url, content_type)
+        
+        # Ensure directory exists
+        Path(local_path).parent.mkdir(parents=True, exist_ok=True)
+        
+        # Save content
+        async with aiofiles.open(local_path, 'w', encoding='utf-8') as f:
+            await f.write(content)
+        
+        # Add to cache index
+        await self.add_file(url, local_path)
+        
+        logger.info(f"Saved content to cache: {url} -> {local_path}")
+        return local_path
+    
+    async def get_cached_file_path(self, url: str) -> Optional[str]:
+        """
+        Get cached file path for a URL (alias for get_file_path for backward compatibility)
+        
+        Args:
+            url: URL to look up
+            
+        Returns:
+            Local file path if exists, None otherwise
+        """
+        return await self.get_file_path(url)

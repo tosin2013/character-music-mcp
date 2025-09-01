@@ -89,14 +89,14 @@ except ImportError:
 class TestEnhancedGenreMapper:
     """Unit tests for EnhancedGenreMapper class"""
     
-    @pytest.fixture
+    @pytest_asyncio.fixture
     def mock_wiki_data_manager(self):
         """Create a mock WikiDataManager for testing"""
         manager = Mock(spec=WikiDataManager)
         manager.get_genres = AsyncMock()
         return manager
     
-    @pytest.fixture
+    @pytest_asyncio.fixture
     def sample_genres(self):
         """Create sample genres for testing"""
         return [
@@ -157,7 +157,7 @@ class TestEnhancedGenreMapper:
             )
         ]
     
-    @pytest.fixture
+    @pytest_asyncio.fixture
     def genre_mapper(self, mock_wiki_data_manager, sample_genres):
         """Create an EnhancedGenreMapper instance for testing"""
         mock_wiki_data_manager.get_genres.return_value = sample_genres

@@ -5,6 +5,7 @@ Test Data Manager for Character-Driven Music Generation
 Provides centralized management of test data and fixtures for all test suites.
 """
 
+import pytest
 import json
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Any, Union
