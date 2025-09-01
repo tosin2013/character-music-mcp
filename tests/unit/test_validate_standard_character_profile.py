@@ -4,6 +4,7 @@ Auto-generated test file to improve coverage
 """
 
 import pytest
+import pytest_asyncio
 import asyncio
 from unittest.mock import Mock, patch, AsyncMock
 import sys
@@ -21,7 +22,7 @@ except ImportError as e:
 class TestValidateStandardCharacterProfile:
     """Test class for validate_standard_character_profile module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {
