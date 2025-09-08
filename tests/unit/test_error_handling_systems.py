@@ -8,6 +8,7 @@ graceful degradation system, retry system, and error monitoring system.
 
 import asyncio
 import pytest
+import pytest_asyncio
 from datetime import datetime, timedelta
 from unittest.mock import Mock, AsyncMock, patch
 from typing import List, Dict, Any

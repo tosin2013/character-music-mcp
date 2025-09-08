@@ -7,6 +7,7 @@ with the EnhancedGenreMapper while maintaining backward compatibility.
 """
 
 import pytest
+import pytest_asyncio
 import asyncio
 import tempfile
 from unittest.mock import AsyncMock, Mock, patch

@@ -187,7 +187,7 @@ perfect alignment before starting her day, a ritual that calmed her anxiety.
         assert short_score < 0.5
     
     @pytest.mark.asyncio
-async def test_test_template_without_mcp_tools(self):
+    async def test_test_template_without_mcp_tools(self):
         """Test template testing without MCP tools (heuristic mode)"""
         template = PromptTemplate(
             name="Test Template",
@@ -211,7 +211,7 @@ async def test_test_template_without_mcp_tools(self):
         assert result.filled_template == template.template_text
     
     @pytest.mark.asyncio
-async def test_test_template_with_mock_mcp_tools(self):
+    async def test_test_template_with_mock_mcp_tools(self):
         """Test template testing with mocked MCP tools"""
         template = PromptTemplate(
             name="Mock Test Template",
@@ -248,7 +248,7 @@ async def test_test_template_with_mock_mcp_tools(self):
         assert result.effectiveness_score > 0.8
     
     @pytest.mark.asyncio
-async def test_test_all_templates(self):
+    async def test_test_all_templates(self):
         """Test comprehensive template testing"""
         # Create test templates
         template1_content = """# Template 1

@@ -7,6 +7,7 @@ with wiki data integration, focusing on compatibility and fallback behavior.
 """
 
 import pytest
+import pytest_asyncio
 import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 from pathlib import Path

@@ -1,4 +1,3 @@
-import pytest
 #!/usr/bin/env python3
 """
 Basic Functionality Tests
@@ -7,12 +6,13 @@ Simple tests to verify core server functionality and increase test coverage.
 These tests focus on actually exercising the server code rather than complex scenarios.
 """
 
+import pytest
+import pytest_asyncio
 import asyncio
 import sys
 import os
 
 try:
-    import pytest
     PYTEST_AVAILABLE = True
     def asyncio_test(func):
         return pytest.mark.asyncio(func) if PYTEST_AVAILABLE else func
@@ -142,9 +142,8 @@ class TestBasicServerFunctionality:
         assert command.estimated_effectiveness == 0.8
         assert "Test Song" in command.prompt
     
-    @asyncio_test  # Marker added conditionally
     @pytest.mark.asyncio
-async def test_character_analyzer_initialization(self, mock_ctx):
+    async def test_character_analyzer_initialization(self, mock_ctx):
         """Test that CharacterAnalyzer can be initialized"""
         analyzer = CharacterAnalyzer()
         assert analyzer is not None
@@ -153,9 +152,8 @@ async def test_character_analyzer_initialization(self, mock_ctx):
         assert hasattr(analyzer, 'analyze_text')
         assert callable(getattr(analyzer, 'analyze_text'))
     
-    @asyncio_test  # Marker added conditionally
     @pytest.mark.asyncio
-async def test_music_persona_generator_initialization(self, mock_ctx):
+    async def test_music_persona_generator_initialization(self, mock_ctx):
         """Test that MusicPersonaGenerator can be initialized"""
         generator = MusicPersonaGenerator()
         assert generator is not None
@@ -164,9 +162,8 @@ async def test_music_persona_generator_initialization(self, mock_ctx):
         assert hasattr(generator, 'generate_artist_persona')
         assert callable(getattr(generator, 'generate_artist_persona'))
     
-    @asyncio_test  # Marker added conditionally
     @pytest.mark.asyncio
-async def test_suno_command_generator_initialization(self, mock_ctx):
+    async def test_suno_command_generator_initialization(self, mock_ctx):
         """Test that SunoCommandGenerator can be initialized"""
         generator = SunoCommandGenerator()
         assert generator is not None
@@ -175,9 +172,8 @@ async def test_suno_command_generator_initialization(self, mock_ctx):
         assert hasattr(generator, 'generate_suno_commands')
         assert callable(getattr(generator, 'generate_suno_commands'))
     
-    @asyncio_test  # Marker added conditionally
     @pytest.mark.asyncio
-async def test_mock_context_functionality(self, mock_ctx):
+    async def test_mock_context_functionality(self, mock_ctx):
         """Test that mock context works as expected"""
         await mock_ctx.info("Test info message")
         await mock_ctx.error("Test error message")
@@ -191,9 +187,8 @@ async def test_mock_context_functionality(self, mock_ctx):
         assert mock_ctx.errors[0].message == "Test error message"
         assert mock_ctx.warnings[0].message == "Test warning message"
     
-    @asyncio_test  # Marker added conditionally
     @pytest.mark.asyncio
-async def test_persona_generation_basic(self, mock_ctx, sample_character):
+    async def test_persona_generation_basic(self, mock_ctx, sample_character):
         """Test basic persona generation functionality"""
         generator = MusicPersonaGenerator()
         
@@ -216,9 +211,8 @@ async def test_persona_generation_basic(self, mock_ctx, sample_character):
             await mock_ctx.info(f"Persona generation failed as expected: {e}")
             assert True  # Test passes - we're just checking basic functionality
     
-    @asyncio_test  # Marker added conditionally
     @pytest.mark.asyncio
-async def test_character_analysis_basic(self, mock_ctx):
+    async def test_character_analysis_basic(self, mock_ctx):
         """Test basic character analysis functionality"""
         analyzer = CharacterAnalyzer()
         
@@ -241,9 +235,8 @@ async def test_character_analysis_basic(self, mock_ctx):
             await mock_ctx.info(f"Character analysis failed as expected: {e}")
             assert True  # Test passes - we're just checking basic functionality
     
-    @asyncio_test  # Marker added conditionally
     @pytest.mark.asyncio
-async def test_suno_command_generation_basic(self, mock_ctx, sample_character):
+    async def test_suno_command_generation_basic(self, mock_ctx, sample_character):
         """Test basic Suno command generation functionality"""
         # Create a basic persona
         persona = ArtistPersona(

@@ -1,0 +1,66 @@
+[project]
+name = "dagger-test-repair-agent"
+version = "0.1.0"
+description = "Automated test repair agent using Dagger.io"
+requires-python = ">=3.10"
+dependencies = [
+    "dagger-io",
+    "httpx>=0.25.0",
+    "pydantic>=2.0.0",
+    "asyncio-mqtt>=0.13.0",
+    "python-dotenv>=1.0.0",
+    "structlog>=23.0.0",
+    "tenacity>=8.0.0",
+    "aiofiles>=23.0.0",
+    "PyGithub>=1.59.0",
+    "cryptography>=41.0.0",
+    "click>=8.0.0",
+]
+
+[project.scripts]
+dagger-test-repair-agent = "character_music_mcp.cli:cli"
+
+[project.entry-points."dagger.mod"]
+main_object = "character_music_mcp.main:DaggerTestRepairAgent"
+
+[build-system]
+requires = ["hatchling==1.25.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/character_music_mcp"]
+
+[tool.uv.sources]
+dagger-io = { path = "sdk", editable = true }
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.10.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "coverage>=7.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

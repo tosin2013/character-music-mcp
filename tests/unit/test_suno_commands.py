@@ -305,9 +305,8 @@ from tests.fixtures.mock_contexts import MockContext, create_mock_context
 class TestBasicCommandGeneration:
     """Test basic Suno command generation functionality"""
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_simple_command_generation(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_simple_command_generation(self, ctx: MockContext, data_manager: TestDataManager):
         """Test generation of simple Suno commands"""
         expected_char = data_manager.get_expected_character("Sarah Chen")
         expected_persona = data_manager.get_expected_persona("Sarah Chen")
@@ -336,9 +335,8 @@ async def test_simple_command_generation(self, ctx: MockContext, data_manager: T
         
         await ctx.info(f"Simple command generated: {len(command.prompt)} characters")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_custom_command_generation(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_custom_command_generation(self, ctx: MockContext, data_manager: TestDataManager):
         """Test generation of custom Suno commands with detailed parameters"""
         expected_char = data_manager.get_expected_character("The Philosopher")
         expected_persona = data_manager.get_expected_persona("The Philosopher")
@@ -371,9 +369,8 @@ async def test_custom_command_generation(self, ctx: MockContext, data_manager: T
         
         await ctx.info(f"Custom command generated with {len(command.prompt)} characters")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_bracket_notation_command(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_bracket_notation_command(self, ctx: MockContext, data_manager: TestDataManager):
         """Test generation of commands with proper bracket notation"""
         expected_char = data_manager.get_expected_character("Marcus")
         expected_persona = data_manager.get_expected_persona("Marcus")
@@ -406,9 +403,8 @@ async def test_bracket_notation_command(self, ctx: MockContext, data_manager: Te
 class TestCommandFormats:
     """Test different Suno command formats"""
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_narrative_command_format(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_narrative_command_format(self, ctx: MockContext, data_manager: TestDataManager):
         """Test narrative-style command format with story integration"""
         enhanced_generator = EnhancedSunoCommandGenerator()
         
@@ -438,9 +434,8 @@ async def test_narrative_command_format(self, ctx: MockContext, data_manager: Te
         
         await ctx.info("Narrative command format validated")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_production_focused_format(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_production_focused_format(self, ctx: MockContext, data_manager: TestDataManager):
         """Test production-focused command format with technical details"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")
         expected_persona = data_manager.get_expected_persona("Captain Zara Okafor")
@@ -473,9 +468,8 @@ async def test_production_focused_format(self, ctx: MockContext, data_manager: T
         
         await ctx.info("Production-focused format validated")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_lyrical_focused_format(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_lyrical_focused_format(self, ctx: MockContext, data_manager: TestDataManager):
         """Test lyrical-focused command format emphasizing vocal content"""
         expected_char = data_manager.get_expected_character("Elena Rodriguez")
         expected_persona = data_manager.get_expected_persona("Elena Rodriguez")
@@ -510,9 +504,8 @@ async def test_lyrical_focused_format(self, ctx: MockContext, data_manager: Test
 class TestMetaTagStrategy:
     """Test meta tag strategy and implementation"""
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_structural_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_structural_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test proper use of structural meta tags"""
         expected_char = data_manager.get_expected_character("Sarah Chen")
         expected_persona = data_manager.get_expected_persona("Sarah Chen")
@@ -544,9 +537,8 @@ async def test_structural_meta_tags(self, ctx: MockContext, data_manager: TestDa
         
         await ctx.info(f"Structural meta tags validated: {found_tags}")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_emotional_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_emotional_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test use of emotional meta tags based on character"""
         expected_char = data_manager.get_expected_character("Marcus")  # Grief-focused character
         expected_persona = data_manager.get_expected_persona("Marcus")
@@ -577,9 +569,8 @@ async def test_emotional_meta_tags(self, ctx: MockContext, data_manager: TestDat
         
         await ctx.info(f"Emotional meta tags validated: {found_emotional_tags}")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_instrumental_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_instrumental_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test instrumental meta tags based on persona preferences"""
         expected_char = data_manager.get_expected_character("The Philosopher")
         expected_persona = data_manager.get_expected_persona("The Philosopher")
@@ -611,9 +602,8 @@ async def test_instrumental_meta_tags(self, ctx: MockContext, data_manager: Test
         
         await ctx.info("Instrumental meta tags validated")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_genre_specific_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_genre_specific_meta_tags(self, ctx: MockContext, data_manager: TestDataManager):
         """Test genre-specific meta tag usage"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")  # Electronic genre
         expected_persona = data_manager.get_expected_persona("Captain Zara Okafor")
@@ -650,9 +640,8 @@ async def test_genre_specific_meta_tags(self, ctx: MockContext, data_manager: Te
 class TestEffectivenessScoring:
     """Test Suno command effectiveness scoring system"""
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_narrative_coherence_scoring(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_narrative_coherence_scoring(self, ctx: MockContext, data_manager: TestDataManager):
         """Test narrative coherence scoring component"""
         enhanced_generator = EnhancedSunoCommandGenerator()
         
@@ -690,9 +679,8 @@ async def test_narrative_coherence_scoring(self, ctx: MockContext, data_manager:
         
         await ctx.info("Narrative coherence scoring validated")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_production_authenticity_scoring(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_production_authenticity_scoring(self, ctx: MockContext, data_manager: TestDataManager):
         """Test production authenticity scoring component"""
         enhanced_generator = EnhancedSunoCommandGenerator()
         
@@ -730,9 +718,8 @@ async def test_production_authenticity_scoring(self, ctx: MockContext, data_mana
         
         await ctx.info("Production authenticity scoring validated")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_suno_optimization_scoring(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_suno_optimization_scoring(self, ctx: MockContext, data_manager: TestDataManager):
         """Test Suno AI optimization scoring component"""
         enhanced_generator = EnhancedSunoCommandGenerator()
         
@@ -767,9 +754,8 @@ async def test_suno_optimization_scoring(self, ctx: MockContext, data_manager: T
         
         await ctx.info("Suno optimization scoring validated")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_overall_effectiveness_calculation(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_overall_effectiveness_calculation(self, ctx: MockContext, data_manager: TestDataManager):
         """Test overall effectiveness score calculation"""
         enhanced_generator = EnhancedSunoCommandGenerator()
         
@@ -807,9 +793,8 @@ async def test_overall_effectiveness_calculation(self, ctx: MockContext, data_ma
 class TestCommandOptimization:
     """Test command optimization features"""
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_length_optimization(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_length_optimization(self, ctx: MockContext, data_manager: TestDataManager):
         """Test command length optimization for Suno AI limits"""
         expected_char = data_manager.get_expected_character("The Philosopher")
         expected_persona = data_manager.get_expected_persona("The Philosopher")
@@ -848,9 +833,8 @@ async def test_length_optimization(self, ctx: MockContext, data_manager: TestDat
         
         await ctx.info(f"Length optimization validated: {len(command.prompt)} characters")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_clarity_optimization(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_clarity_optimization(self, ctx: MockContext, data_manager: TestDataManager):
         """Test command clarity optimization for better Suno AI understanding"""
         expected_char = data_manager.get_expected_character("Maya Patel")
         expected_persona = data_manager.get_expected_persona("Maya Patel")
@@ -887,9 +871,8 @@ async def test_clarity_optimization(self, ctx: MockContext, data_manager: TestDa
         
         await ctx.info("Command clarity optimization validated")
     
-    @asyncio_test
     @pytest.mark.asyncio
-async def test_genre_optimization(self, ctx: MockContext, data_manager: TestDataManager):
+    async def test_genre_optimization(self, ctx: MockContext, data_manager: TestDataManager):
         """Test genre-specific command optimization"""
         expected_char = data_manager.get_expected_character("Captain Zara Okafor")
         expected_persona = data_manager.get_expected_persona("Captain Zara Okafor")

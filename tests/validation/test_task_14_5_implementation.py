@@ -5,6 +5,7 @@ Test implementation of Task 14.5: Replace hardcoded style and emotional tags wit
 
 import asyncio
 import pytest
+import pytest_asyncio
 from server import SunoCommandGenerator
 from wiki_data_system import WikiDataManager
 from wiki_data_models import WikiConfig, MetaTag

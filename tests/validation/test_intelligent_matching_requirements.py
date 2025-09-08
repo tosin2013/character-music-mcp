@@ -5,6 +5,7 @@ Test script to verify intelligent genre matching algorithms meet requirements 5.
 
 import asyncio
 import pytest
+import pytest_asyncio
 from unittest.mock import AsyncMock
 from datetime import datetime
 from wiki_data_system import Genre, WikiDataManager

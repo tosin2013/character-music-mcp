@@ -4,6 +4,7 @@ Auto-generated test file to improve coverage
 """
 
 import pytest
+import pytest_asyncio
 import asyncio
 from unittest.mock import Mock, patch, AsyncMock
 import sys

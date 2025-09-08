@@ -1,0 +1,8 @@
+{
+  "name": "character-music-mcp",
+  "engineVersion": "v0.18.14",
+  "sdk": {
+    "source": "python"
+  },
+  "source": "dagger-agent"
+}
