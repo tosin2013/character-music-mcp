@@ -30,6 +30,7 @@ from tests.fixtures.mock_contexts import MockContext, create_mock_context
 @dataclass
 class TestResult:
     """Individual test result"""
+    __test__ = False  # Prevent pytest from collecting this class
     test_name: str
     test_suite: str
     status: str  # "passed", "failed", "skipped", "error"
@@ -54,6 +55,7 @@ class TestResult:
 @dataclass
 class TestSuiteResult:
     """Test suite result summary"""
+    __test__ = False  # Prevent pytest from collecting this class
     suite_name: str
     total_tests: int
     passed: int
@@ -84,6 +86,7 @@ class TestSuiteResult:
 @dataclass
 class TestRunSummary:
     """Complete test run summary"""
+    __test__ = False  # Prevent pytest from collecting this class
     start_time: datetime
     end_time: datetime
     total_suites: int
@@ -117,6 +120,7 @@ class TestRunSummary:
 
 class TestRunner:
     """Unified test runner for all test suites"""
+    __test__ = False  # Prevent pytest from collecting this class
     
     def __init__(self, test_data_manager: TestDataManager):
         self.test_data_manager = test_data_manager

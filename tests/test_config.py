@@ -13,6 +13,7 @@ from pathlib import Path
 
 class TestConfig:
     """Test configuration management"""
+    __test__ = False  # Prevent pytest from collecting this class
     
     def __init__(self):
         # Test execution settings
@@ -203,6 +204,7 @@ def get_test_scenarios_for_complexity(complexity: str) -> List[str]:
 # Environment-specific configurations
 class DevelopmentTestConfig(TestConfig):
     """Configuration for development environment"""
+    __test__ = False  # Prevent pytest from collecting this class
     
     def __init__(self):
         super().__init__()
@@ -214,6 +216,7 @@ class DevelopmentTestConfig(TestConfig):
 
 class CITestConfig(TestConfig):
     """Configuration for CI/CD environment"""
+    __test__ = False  # Prevent pytest from collecting this class
     
     def __init__(self):
         super().__init__()
@@ -226,6 +229,7 @@ class CITestConfig(TestConfig):
 
 class ProductionTestConfig(TestConfig):
     """Configuration for production-like testing"""
+    __test__ = False  # Prevent pytest from collecting this class
     
     def __init__(self):
         super().__init__()

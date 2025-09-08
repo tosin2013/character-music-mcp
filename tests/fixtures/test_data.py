@@ -22,6 +22,7 @@ from server import CharacterProfile, ArtistPersona, SunoCommand
 @dataclass
 class TestScenario:
     """Test scenario with expected inputs and outputs"""
+    __test__ = False  # Prevent pytest from collecting this class
     name: str
     description: str
     narrative_text: str
