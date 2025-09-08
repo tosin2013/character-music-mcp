@@ -143,6 +143,65 @@ class WikiCacheManager:
         
         self._cache_misses += 1
         return None
+
+    async def get_cached_file_path(self, url: str) -> Optional[str]:
+        """
+        Get local file path for a cached URL (alias for get_file_path)
+        
+        Args:
+            url: Source URL
+            
+        Returns:
+            Local file path if cached, None otherwise
+        """
+        return await self.get_file_path(url)
+
+    async def save_content(self, url: str, content: str, content_type: str = "text/html") -> CacheEntry:
+        """
+        Save content to cache and add to cache index
+        
+        Args:
+            url: Source URL
+            content: Content to save
+            content_type: MIME type of content
+            
+        Returns:
+            CacheEntry for the saved file
+        """
+        if not self._cache_loaded:
+            await self.initialize()
+        
+        # Generate local path
+        local_path = self.get_organized_path(url, self._determine_content_type_from_mime(content_type))
+        
+        # Ensure directory exists
+        Path(local_path).parent.mkdir(parents=True, exist_ok=True)
+        
+        # Write content to file
+        async with aiofiles.open(local_path, 'w', encoding='utf-8') as f:
+            await f.write(content)
+        
+        # Add to cache
+        return await self.add_file(url, local_path)
+
+    def _determine_content_type_from_mime(self, mime_type: str) -> str:
+        """
+        Determine content type from MIME type
+        
+        Args:
+            mime_type: MIME type string
+            
+        Returns:
+            Content type category
+        """
+        if 'html' in mime_type:
+            return 'general'
+        elif 'json' in mime_type:
+            return 'data'
+        elif 'text' in mime_type:
+            return 'general'
+        else:
+            return 'general'
     
     async def add_file(self, url: str, local_path: str, download_date: Optional[datetime] = None) -> CacheEntry:
         """

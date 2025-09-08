@@ -97,6 +97,23 @@ class WikiDataManager:
             await self.downloader.cleanup()
             self.downloader = None
         self.cache_manager = None
+
+    async def clear_cache(self) -> None:
+        """Clear all cached data"""
+        self._genres = []
+        self._meta_tags = []
+        self._techniques = []
+        self._cache_valid = False
+        logger.info("Cache cleared")
+
+    async def get_cache_stats(self) -> Dict[str, int]:
+        """Get cache statistics"""
+        return {
+            'genres_cached': len(self._genres),
+            'meta_tags_cached': len(self._meta_tags),
+            'techniques_cached': len(self._techniques),
+            'cache_valid': self._cache_valid
+        }
     
     async def get_genres(self) -> List[Genre]:
         """Get list of genres from wiki data"""
@@ -619,6 +636,119 @@ class ConfigurationManager:
             logger.error(f"Error saving config to {path}: {e}")
             raise
     
+    def _get_fallback_genres(self) -> List[Genre]:
+        """Get fallback genres when wiki data is unavailable"""
+        fallback_genres = [
+            Genre(
+                name="Rock",
+                description="A broad genre of popular music characterized by amplified instruments and strong rhythms",
+                subgenres=["Alternative Rock", "Classic Rock", "Hard Rock", "Punk Rock"],
+                characteristics=["electric guitars", "drums", "bass", "strong vocals"],
+                typical_instruments=["electric guitar", "drums", "bass guitar"],
+                mood_associations=["energetic", "rebellious", "powerful"],
+                source_url="hardcoded_fallback",
+                confidence_score=0.8
+            ),
+            Genre(
+                name="Pop",
+                description="Popular music characterized by catchy melodies and broad appeal",
+                subgenres=["Dance Pop", "Synth Pop", "Teen Pop"],
+                characteristics=["catchy hooks", "verse-chorus structure", "electronic production"],
+                typical_instruments=["synthesizers", "drums", "vocals"],
+                mood_associations=["upbeat", "fun", "romantic"],
+                source_url="hardcoded_fallback",
+                confidence_score=0.9
+            ),
+            Genre(
+                name="Hip Hop",
+                description="Music genre consisting of stylized rhythmic music accompanied by rapping",
+                subgenres=["Trap", "Drill", "Conscious Hip Hop"],
+                characteristics=["beats", "rapping", "sampling"],
+                typical_instruments=["drum machine", "sampler", "turntables"],
+                mood_associations=["confident", "streetwise", "expressive"],
+                source_url="hardcoded_fallback",
+                confidence_score=0.85
+            )
+        ]
+        return fallback_genres
+
+    def _get_fallback_meta_tags(self) -> List[MetaTag]:
+        """Get fallback meta tags when wiki data is unavailable"""
+        fallback_tags = [
+            MetaTag(
+                tag="verse",
+                description="Section of a song typically featuring lyrics and melody",
+                category="structure",
+                source_url="hardcoded_fallback"
+            ),
+            MetaTag(
+                tag="chorus",
+                description="Repeated section of a song with the main hook",
+                category="structure",
+                source_url="hardcoded_fallback"
+            ),
+            MetaTag(
+                tag="bridge",
+                description="Contrasting section that prepares for the return of original material",
+                category="structure",
+                source_url="hardcoded_fallback"
+            ),
+            MetaTag(
+                tag="intro",
+                description="Opening section of a song",
+                category="structure",
+                source_url="hardcoded_fallback"
+            ),
+            MetaTag(
+                tag="outro",
+                description="Closing section of a song",
+                category="structure",
+                source_url="hardcoded_fallback"
+            )
+        ]
+        return fallback_tags
+
+    def _get_fallback_techniques(self) -> List[Technique]:
+        """Get fallback techniques when wiki data is unavailable"""
+        fallback_techniques = [
+            Technique(
+                name="Layering",
+                description="Adding multiple instrumental or vocal tracks to create depth",
+                technique_type="production",
+                difficulty="intermediate",
+                source_url="hardcoded_fallback"
+            ),
+            Technique(
+                name="Compression",
+                description="Reducing dynamic range to make audio more consistent",
+                technique_type="mixing",
+                difficulty="advanced",
+                source_url="hardcoded_fallback"
+            ),
+            Technique(
+                name="Sampling",
+                description="Using portions of existing recordings in new compositions",
+                technique_type="production",
+                difficulty="beginner",
+                source_url="hardcoded_fallback"
+            ),
+            Technique(
+                name="EQ",
+                description="Adjusting frequency balance of audio signals",
+                technique_type="mixing",
+                difficulty="intermediate",
+                source_url="hardcoded_fallback"
+            ),
+            Technique(
+                name="Reverb",
+                description="Adding artificial space and depth to sounds",
+                technique_type="effects",
+                difficulty="beginner",
+                source_url="hardcoded_fallback"
+            )
+        ]
+        return fallback_techniques
+
     @classmethod
     def validate_config(cls, config: WikiConfig) -> List[str]:
         """Validate configuration and return errors"""
