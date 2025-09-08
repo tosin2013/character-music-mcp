@@ -244,6 +244,7 @@ class ErrorMonitoringSystem:
         self.error_events.append(error_event)
         
         # Update operation metrics
+        self.operation_metrics[operation]['total_operations'] += 1
         self.operation_metrics[operation]['failed_operations'] += 1
         self.operation_metrics[operation]['last_failure'] = datetime.now()
         

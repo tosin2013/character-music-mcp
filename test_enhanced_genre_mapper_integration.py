@@ -6,6 +6,7 @@ Tests the enhanced genre mapping functionality with actual WikiDataManager integ
 """
 
 import pytest
+import pytest_asyncio
 import asyncio
 from pathlib import Path
 import tempfile
@@ -18,7 +19,7 @@ from wiki_data_system import WikiDataManager, WikiConfig
 class TestEnhancedGenreMapperIntegration:
     """Integration tests for EnhancedGenreMapper with WikiDataManager"""
     
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def wiki_data_manager(self):
         """Create a WikiDataManager instance for testing"""
         # Create temporary directory for test data
@@ -99,7 +100,7 @@ class TestEnhancedGenreMapperIntegration:
         genre_mapper = EnhancedGenreMapper(wiki_data_manager)
         
         # Test with a genre that should have hierarchy
-        hierarchy = genre_mapper.get_genre_hierarchy("Progressive Rock")
+        hierarchy = await genre_mapper.get_genre_hierarchy("Progressive Rock")
         
         # May return None if no data available, which is acceptable
         if hierarchy:

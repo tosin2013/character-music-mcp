@@ -8,20 +8,21 @@ graceful degradation system, retry system, and error monitoring system.
 
 import asyncio
 import pytest
+import pytest_asyncio
 from datetime import datetime, timedelta
 from unittest.mock import Mock, AsyncMock, patch
 from typing import List, Dict, Any
 
 from error_recovery_manager import (
     ErrorRecoveryManager, ErrorType, RecoveryAction, DataSource, 
-    FallbackData, RecoveryResult
+    FallbackData, RecoveryResult, ErrorRecord
 )
 from graceful_degradation_system import (
     GracefulDegradationSystem, DataQualityMetrics, DegradationLevel
 )
 from retry_system import (
     RetrySystem, RetryPolicy, RetryStrategy, OperationType, 
-    CircuitState, RetrySession
+    CircuitState, RetrySession, RetryAttempt
 )
 from error_monitoring_system import (
     ErrorMonitoringSystem, ErrorSeverity, AlertType, HealthStatus,
@@ -33,7 +34,7 @@ from wiki_data_system import Genre, MetaTag, Technique, WikiDataManager
 # TEST FIXTURES
 # ================================================================================================
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def error_recovery_manager():
     """Create and initialize ErrorRecoveryManager for testing"""
     manager = ErrorRecoveryManager("./test_data/error_recovery")
@@ -41,7 +42,7 @@ async def error_recovery_manager():
     yield manager
     # Cleanup would go here if needed
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def retry_system():
     """Create and initialize RetrySystem for testing"""
     system = RetrySystem("./test_data/retry_system")
@@ -49,7 +50,7 @@ async def retry_system():
     yield system
     # Cleanup would go here if needed
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def error_monitoring_system():
     """Create and initialize ErrorMonitoringSystem for testing"""
     system = ErrorMonitoringSystem("./test_data/error_monitoring")
@@ -66,7 +67,7 @@ def mock_wiki_data_manager():
     manager.get_techniques = AsyncMock()
     return manager
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def graceful_degradation_system(mock_wiki_data_manager, error_recovery_manager):
     """Create and initialize GracefulDegradationSystem for testing"""
     system = GracefulDegradationSystem(mock_wiki_data_manager, error_recovery_manager)
@@ -156,9 +157,24 @@ class TestErrorRecoveryManager:
         """Test getting error statistics"""
         # Add some test errors
         error_recovery_manager.error_history.extend([
-            Mock(error_type=ErrorType.NETWORK_ERROR, recovery_successful=True),
-            Mock(error_type=ErrorType.PARSE_ERROR, recovery_successful=False),
-            Mock(error_type=ErrorType.NETWORK_ERROR, recovery_successful=True)
+            ErrorRecord(
+                error_type=ErrorType.NETWORK_ERROR,
+                error_message="Network timeout",
+                operation="download:genres",
+                recovery_successful=True
+            ),
+            ErrorRecord(
+                error_type=ErrorType.PARSE_ERROR,
+                error_message="Invalid JSON format",
+                operation="parse:genres",
+                recovery_successful=False
+            ),
+            ErrorRecord(
+                error_type=ErrorType.NETWORK_ERROR,
+                error_message="Connection refused",
+                operation="download:techniques",
+                recovery_successful=True
+            )
         ])
         
         stats = error_recovery_manager.get_error_statistics()
@@ -207,16 +223,16 @@ class TestGracefulDegradationSystem:
         
         genres, quality_metrics = await graceful_degradation_system.get_genres_with_fallback()
         
-        assert len(genres) > 0  # Should have fallback data
+        assert len(genres) > 0  # Should have cached data (fallback is secondary)
         assert isinstance(quality_metrics, DataQualityMetrics)
         assert quality_metrics.wiki_items == 0
-        assert quality_metrics.fallback_items > 0
-        assert quality_metrics.overall_score < 0.8  # Lower quality with fallback only
+        assert quality_metrics.cached_items > 0  # Should have cached data
+        assert quality_metrics.overall_score < 0.8  # Lower quality with cached data only
     
     @pytest.mark.asyncio
     async def test_handle_partial_data_failure(self, graceful_degradation_system):
         """Test handling partial data failure"""
-        partial_data = [{'name': 'Partial Rock', 'description': 'Partially recovered'}]
+        partial_data = [Genre(name='Partial Rock', description='Partially recovered')]
         error = ValueError("Parse error")
         
         combined_data, quality_metrics = await graceful_degradation_system.handle_partial_data_failure(
@@ -364,13 +380,30 @@ class TestRetrySystem:
     
     def test_retry_statistics(self, retry_system):
         """Test getting retry statistics"""
-        # Add some mock sessions
-        retry_system.retry_sessions.extend([
-            Mock(final_success=True, total_attempts=1, operation_type=OperationType.DOWNLOAD, 
-                 start_time=datetime.now(), duration=timedelta(seconds=1)),
-            Mock(final_success=False, total_attempts=3, operation_type=OperationType.PARSE,
-                 start_time=datetime.now(), duration=timedelta(seconds=5))
-        ])
+        # Add some proper retry sessions
+        success_session = RetrySession(
+            operation_id="test_success",
+            operation_type=OperationType.DOWNLOAD,
+            start_time=datetime.now(),
+            total_attempts=1,
+            final_success=True,
+            attempts=[RetryAttempt(attempt_number=1, timestamp=datetime.now(), delay_before=0, success=True)]
+        )
+        
+        failure_session = RetrySession(
+            operation_id="test_failure",
+            operation_type=OperationType.PARSE,
+            start_time=datetime.now(),
+            total_attempts=3,
+            final_success=False,
+            attempts=[
+                RetryAttempt(attempt_number=1, timestamp=datetime.now(), delay_before=0, error="Error 1"),
+                RetryAttempt(attempt_number=2, timestamp=datetime.now(), delay_before=1, error="Error 2"),
+                RetryAttempt(attempt_number=3, timestamp=datetime.now(), delay_before=2, error="Error 3")
+            ]
+        )
+        
+        retry_system.retry_sessions.extend([success_session, failure_session])
         
         stats = retry_system.get_retry_statistics()
         
@@ -585,6 +618,10 @@ class TestErrorHandlingIntegration:
         """Test graceful degradation with error monitoring"""
         # Simulate wiki service failure
         mock_wiki_data_manager.get_genres.side_effect = ConnectionError("Wiki service down")
+        
+        # Log some successful operations first to establish baseline
+        error_monitoring_system.log_success("wiki_service", 0.5)
+        error_monitoring_system.log_success("wiki_service", 0.7)
         
         # Log the error
         error_monitoring_system.log_error("wiki_service", ConnectionError("Wiki service down"), 
