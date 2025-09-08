@@ -64,7 +64,7 @@ class ErrorEvent:
     def error_hash(self) -> str:
         """Generate hash for error deduplication"""
         content = f"{self.operation}:{self.error_type}:{self.error_message[:200]}"
-        return hashlib.md5(content.encode()).hexdigest()[:16]
+        return hashlib.sha256(content.encode()).hexdigest()[:16]
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization"""
