@@ -1,4 +1,4 @@
-# Artist Description Feature
+# Artist Description Feature -test
 
 ## Overview
 The enhanced Music Bible now includes a compelling **Artist Description** - a single, narrative sentence that captures the artist's origin, identity, and style in a storytelling format.
