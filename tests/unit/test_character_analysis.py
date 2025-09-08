@@ -1,4 +1,3 @@
-import pytest
 #!/usr/bin/env python3
 """
 Unit Tests for Character Analysis Components
@@ -11,8 +10,10 @@ import asyncio
 import sys
 import os
 from typing import Dict, List, Any, Optional
+
 try:
     import pytest
+    import pytest_asyncio
     PYTEST_AVAILABLE = True
     def asyncio_test(func):
         return pytest.mark.asyncio(func) if PYTEST_AVAILABLE else func
