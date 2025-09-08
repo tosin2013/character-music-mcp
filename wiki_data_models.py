@@ -172,8 +172,8 @@ class WikiConfig:
 class RefreshResult:
     """Result of data refresh operation"""
     success: bool
-    pages_downloaded: int
-    pages_failed: int
+    downloaded_pages: int
+    failed_pages: int
     errors: List[str] = field(default_factory=list)
     refresh_time: datetime = field(default_factory=datetime.now)
     

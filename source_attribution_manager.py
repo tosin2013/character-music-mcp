@@ -389,4 +389,4 @@ class SourceAttributionManager:
         sources_str = "|".join(sorted(sources))
         combined = f"{content_str}|{sources_str}"
         
-        return hashlib.md5(combined.encode()).hexdigest()[:16]
+        return hashlib.sha256(combined.encode()).hexdigest()[:16]

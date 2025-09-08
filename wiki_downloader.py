@@ -126,6 +126,11 @@ class WikiDownloader:
         
         self._session: Optional[aiohttp.ClientSession] = None
         self._download_history: List[DownloadResult] = []
+
+    @property
+    def session(self) -> Optional[aiohttp.ClientSession]:
+        """Get the HTTP session (read-only)"""
+        return self._session
     
     async def __aenter__(self):
         """Async context manager entry"""
@@ -177,6 +182,7 @@ class WikiDownloader:
             result = DownloadResult(
                 url=url,
                 success=False,
+                status_code=0,  # 0 indicates network error
                 error_message=error_msg
             )
             
@@ -208,7 +214,7 @@ class WikiDownloader:
         
         # Attempt download with retries
         last_error = None
-        for attempt in range(self.max_retries):
+        for attempt in range(self.max_retries + 1):
             try:
                 result = await self._attempt_download(url, sanitized_path, attempt)
                 if result.success:
@@ -251,6 +257,7 @@ class WikiDownloader:
             url=url,
             success=False,
             local_path=sanitized_path,
+            status_code=0,  # 0 indicates network error
             error_message=error_msg,
             retry_count=self.max_retries
         )
@@ -331,6 +338,7 @@ class WikiDownloader:
                 url=url,
                 success=False,
                 local_path=local_path,
+                status_code=0,  # 0 indicates network error
                 download_time=start_time,
                 error_message=error_msg,
                 retry_count=attempt
@@ -341,6 +349,7 @@ class WikiDownloader:
                 url=url,
                 success=False,
                 local_path=local_path,
+                status_code=0,  # 0 indicates network error
                 download_time=start_time,
                 error_message=error_msg,
                 retry_count=attempt
@@ -417,8 +426,8 @@ class WikiDownloader:
             # Skip dangerous parts
             if part in ['.', '..'] or part.startswith('.'):
                 continue
-            # Sanitize filename
-            sanitized_part = "".join(c for c in part if c.isalnum() or c in '-_.')
+            # Sanitize filename (preserve spaces but remove other special characters)
+            sanitized_part = "".join(c for c in part if c.isalnum() or c in ' -_.')
             if sanitized_part:
                 parts.append(sanitized_part)
         
@@ -508,7 +517,7 @@ class WikiDownloader:
         
         # Extract filename from URL
         path_parts = parsed.path.strip('/').split('/')
-        filename = path_parts[-1] if path_parts else 'index'
+        filename = path_parts[-1] if path_parts and path_parts[-1] else 'index'
         
         # Ensure .html extension
         if not filename.endswith('.html'):
@@ -574,6 +583,7 @@ class WikiDownloader:
                 error_result = DownloadResult(
                     url=urls[i],
                     success=False,
+                    status_code=0,  # 0 indicates network error
                     error_message=str(result)
                 )
                 processed_results.append(error_result)
@@ -671,6 +681,7 @@ class WikiDownloader:
                 return DownloadResult(
                     url=url,
                     success=False,
+                    status_code=0,  # 0 indicates network error
                     error_message=str(e)
                 )
     
