@@ -704,7 +704,7 @@ def calculate_data_quality_score(data: Dict[str, Any], required_fields: List[str
     content_quality = 0.0
     content_count = 0
 
-    for key, value in data.items():
+    for _key, value in data.items():
         content_count += 1
         if isinstance(value, str) and len(value.strip()) > 0:
             content_quality += 1.0

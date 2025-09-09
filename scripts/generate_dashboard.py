@@ -32,32 +32,32 @@ class QualityDashboardGenerator:
     <title>Character Music MCP - Quality Dashboard</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                background: #f5f7fa; color: #333; line-height: 1.6; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                   color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
         .header h1 { font-size: 2.5em; margin-bottom: 10px; }
         .header p { font-size: 1.1em; opacity: 0.9; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                       gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 25px; border-radius: 10px; 
+        .stat-card { background: white; padding: 25px; border-radius: 10px;
                      box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .stat-card h3 { color: #666; font-size: 0.9em; text-transform: uppercase; 
+        .stat-card h3 { color: #666; font-size: 0.9em; text-transform: uppercase;
                         letter-spacing: 1px; margin-bottom: 10px; }
         .stat-value { font-size: 2.5em; font-weight: bold; margin-bottom: 5px; }
         .stat-value.success { color: #27ae60; }
         .stat-value.warning { color: #f39c12; }
         .stat-value.error { color: #e74c3c; }
         .stat-subtitle { color: #888; font-size: 0.9em; }
-        .section { background: white; padding: 30px; border-radius: 10px; 
+        .section { background: white; padding: 30px; border-radius: 10px;
                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .section h2 { color: #333; margin-bottom: 20px; padding-bottom: 10px; 
+        .section h2 { color: #333; margin-bottom: 20px; padding-bottom: 10px;
                       border-bottom: 2px solid #eee; }
         .test-results { display: grid; gap: 15px; }
         .test-suite { border: 1px solid #eee; border-radius: 8px; padding: 20px; }
         .test-suite h4 { color: #555; margin-bottom: 15px; }
-        .test-progress { background: #f8f9fa; height: 8px; border-radius: 4px; 
+        .test-progress { background: #f8f9fa; height: 8px; border-radius: 4px;
                          overflow: hidden; margin-bottom: 10px; }
         .test-progress-bar { height: 100%; transition: width 0.3s ease; }
         .test-progress-bar.success { background: #27ae60; }
@@ -68,7 +68,7 @@ class QualityDashboardGenerator:
         .benchmark-metric { display: flex; justify-content: space-between; margin-bottom: 8px; }
         .benchmark-metric span:first-child { color: #666; }
         .benchmark-metric span:last-child { font-weight: bold; }
-        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8em; 
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8em;
                         font-weight: bold; text-transform: uppercase; }
         .status-badge.passed { background: #d4edda; color: #155724; }
         .status-badge.failed { background: #f8d7da; color: #721c24; }
@@ -98,7 +98,7 @@ class QualityDashboardGenerator:
                 </div>
                 <div class="stat-subtitle">{{ total_tests }} total tests</div>
             </div>
-            
+
             <div class="stat-card">
                 <h3>Code Coverage</h3>
                 <div class="stat-value {{ 'success' if coverage_percentage >= 80 else 'warning' if coverage_percentage >= 60 else 'error' }}">
@@ -106,7 +106,7 @@ class QualityDashboardGenerator:
                 </div>
                 <div class="stat-subtitle">Line coverage</div>
             </div>
-            
+
             <div class="stat-card">
                 <h3>Performance Score</h3>
                 <div class="stat-value {{ 'success' if performance_score >= 0.8 else 'warning' if performance_score >= 0.6 else 'error' }}">
@@ -114,7 +114,7 @@ class QualityDashboardGenerator:
                 </div>
                 <div class="stat-subtitle">Benchmarks passed</div>
             </div>
-            
+
             <div class="stat-card">
                 <h3>Documentation Quality</h3>
                 <div class="stat-value {{ 'success' if documentation_score >= 0.9 else 'warning' if documentation_score >= 0.7 else 'error' }}">
@@ -131,7 +131,7 @@ class QualityDashboardGenerator:
                 <div class="test-suite">
                     <h4>{{ suite.name }}</h4>
                     <div class="test-progress">
-                        <div class="test-progress-bar {{ 'success' if suite.success_rate >= 0.9 else 'partial' }}" 
+                        <div class="test-progress-bar {{ 'success' if suite.success_rate >= 0.9 else 'partial' }}"
                              style="width: {{ suite.success_rate * 100 }}%"></div>
                     </div>
                     <div class="benchmark-metric">

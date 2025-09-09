@@ -27,6 +27,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 # Use the actual MusicPersonaGenerator from server
 from server import MusicPersonaGenerator as PersonaGenerator
+
 from tests.fixtures.mock_contexts import MockContext, create_mock_context
 from tests.fixtures.test_data import TestDataManager, test_data_manager
 

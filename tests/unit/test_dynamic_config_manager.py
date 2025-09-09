@@ -9,7 +9,6 @@ from unittest.mock import MagicMock, patch
 
 import aiofiles
 import pytest
-
 from dynamic_config_manager import (
     ConfigChangeHandler,
     DynamicConfigManager,
@@ -75,7 +74,7 @@ class TestDynamicConfigManager:
         assert manager.config_file.name == "wiki_config.json"
         assert manager.current_config is None
         assert manager.observer is None
-        assert manager.watching == False
+        assert not manager.watching
         assert manager.change_callbacks == []
 
     def test_initialization_with_custom_path(self):
@@ -132,13 +131,13 @@ class TestDynamicConfigManager:
 
             # Start watching
             manager.start_watching()
-            assert manager.watching == True
+            assert manager.watching
             assert manager.observer is not None
             assert manager.file_handler is not None
 
             # Stop watching
             manager.stop_watching()
-            assert manager.watching == False
+            assert not manager.watching
             assert manager.observer is None
             assert manager.file_handler is None
 
@@ -149,11 +148,11 @@ class TestDynamicConfigManager:
             manager = DynamicConfigManager(str(config_file))
 
             manager.start_watching()
-            assert manager.watching == True
+            assert manager.watching
 
             # Try to start again - should log warning but not fail
             manager.start_watching()
-            assert manager.watching == True
+            assert manager.watching
 
             manager.stop_watching()
 
@@ -255,7 +254,7 @@ class TestDynamicConfigManager:
 
         await manager._notify_change_callbacks(old_config, new_config)
 
-        assert callback_called == True
+        assert callback_called
         assert old_config_received == old_config
         assert new_config_received == new_config
 
@@ -277,7 +276,7 @@ class TestDynamicConfigManager:
 
         await manager._notify_change_callbacks(old_config, new_config)
 
-        assert callback_called == True
+        assert callback_called
 
     @pytest.mark.asyncio
     async def test_update_config_success(self):
@@ -295,7 +294,7 @@ class TestDynamicConfigManager:
 
             result = await manager.update_config(new_config, validate_urls=False)
 
-            assert result.is_valid == True
+            assert result.is_valid
             assert manager.current_config.refresh_interval_hours == 48
 
     @pytest.mark.asyncio
@@ -314,7 +313,7 @@ class TestDynamicConfigManager:
 
             result = await manager.update_config(invalid_config, validate_urls=False)
 
-            assert result.is_valid == False
+            assert not result.is_valid
             assert len(result.errors) > 0
 
     @pytest.mark.asyncio
@@ -333,7 +332,7 @@ class TestDynamicConfigManager:
 
                 result = await manager.add_urls("genre_pages", new_urls, validate_urls=True)
 
-                assert result.is_valid == True
+                assert result.is_valid
                 assert "https://example.com/new-page" in manager.current_config.genre_pages
 
     @pytest.mark.asyncio
@@ -347,7 +346,7 @@ class TestDynamicConfigManager:
 
             result = await manager.add_urls("invalid_type", ["https://example.com"])
 
-            assert result.is_valid == False
+            assert not result.is_valid
             assert any("Invalid URL type" in error for error in result.errors)
 
     @pytest.mark.asyncio
@@ -366,7 +365,7 @@ class TestDynamicConfigManager:
 
                 result = await manager.add_urls("genre_pages", invalid_urls, validate_urls=True)
 
-                assert result.is_valid == False
+                assert not result.is_valid
                 assert any("Invalid or inaccessible URL" in error for error in result.errors)
 
     @pytest.mark.asyncio
@@ -389,7 +388,7 @@ class TestDynamicConfigManager:
             urls_to_remove = ["https://example.com/page1"]
             result = await manager.remove_urls("genre_pages", urls_to_remove)
 
-            assert result.is_valid == True
+            assert result.is_valid
             assert "https://example.com/page1" not in manager.current_config.genre_pages
             assert "https://example.com/page2" in manager.current_config.genre_pages
 
@@ -407,7 +406,7 @@ class TestDynamicConfigManager:
                 request_timeout=60
             )
 
-            assert result.is_valid == True
+            assert result.is_valid
             assert manager.current_config.refresh_interval_hours == 48
             assert manager.current_config.request_timeout == 60
 
@@ -422,7 +421,7 @@ class TestDynamicConfigManager:
 
             result = await manager.update_settings(unknown_setting="value")
 
-            assert result.is_valid == False
+            assert not result.is_valid
             assert any("Unknown configuration setting" in error for error in result.errors)
 
     def test_get_current_config(self):
@@ -451,10 +450,10 @@ class TestDynamicConfigManager:
         """Test watching status check"""
         manager = DynamicConfigManager()
 
-        assert manager.is_watching() == False
+        assert not manager.is_watching()
 
         manager.watching = True
-        assert manager.is_watching() == True
+        assert manager.is_watching()
 
     @pytest.mark.asyncio
     async def test_reload_config(self):
@@ -484,10 +483,10 @@ class TestDynamicConfigManager:
 
             async with DynamicConfigManager(str(config_file)) as manager:
                 assert manager.current_config is not None
-                assert manager.is_watching() == True
+                assert manager.is_watching()
 
             # Should have stopped watching after exit
-            assert manager.is_watching() == False
+            assert not manager.is_watching()
 
 
 class TestConvenienceFunctions:
@@ -526,7 +525,7 @@ class TestConvenienceFunctions:
             )
 
             assert isinstance(result, ValidationResult)
-            assert result.is_valid == True
+            assert result.is_valid
 
     @pytest.mark.asyncio
     async def test_add_wiki_urls_runtime(self):
@@ -550,7 +549,7 @@ class TestConvenienceFunctions:
                 )
 
                 assert isinstance(result, ValidationResult)
-                assert result.is_valid == True
+                assert result.is_valid
 
 
 if __name__ == "__main__":

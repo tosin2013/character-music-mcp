@@ -285,7 +285,7 @@ class PerformanceMonitor:
     async def measure_character_analysis(self, iterations: int = 5) -> float:
         """Measure character analysis performance"""
         scenario = test_data_manager.get_test_scenario("single_character_simple")
-        ctx = create_mock_context("performance", session_id="perf_char_analysis")
+        create_mock_context("performance", session_id="perf_char_analysis")
 
         times = []
 
@@ -328,11 +328,11 @@ class PerformanceMonitor:
 
     async def measure_persona_generation(self, iterations: int = 5) -> float:
         """Measure persona generation performance"""
-        ctx = create_mock_context("performance", session_id="perf_persona_gen")
+        create_mock_context("performance", session_id="perf_persona_gen")
 
         times = []
 
-        for i in range(iterations):
+        for _i in range(iterations):
             start_time = time.time()
 
             try:
@@ -357,11 +357,11 @@ class PerformanceMonitor:
 
     async def measure_command_generation(self, iterations: int = 5) -> float:
         """Measure command generation performance"""
-        ctx = create_mock_context("performance", session_id="perf_cmd_gen")
+        create_mock_context("performance", session_id="perf_cmd_gen")
 
         times = []
 
-        for i in range(iterations):
+        for _i in range(iterations):
             start_time = time.time()
 
             try:
@@ -387,7 +387,7 @@ class PerformanceMonitor:
     async def measure_complete_workflow(self, iterations: int = 3) -> float:
         """Measure complete workflow performance"""
         scenario = test_data_manager.get_test_scenario("single_character_simple")
-        ctx = create_mock_context("performance", session_id="perf_workflow")
+        create_mock_context("performance", session_id="perf_workflow")
 
         times = []
 
@@ -644,7 +644,7 @@ class PerformanceMonitor:
         print("⚡ Starting performance monitoring cycle...")
 
         # Run measurements
-        results = await self.run_performance_measurements()
+        await self.run_performance_measurements()
 
         # Save metrics
         self.save_metrics()

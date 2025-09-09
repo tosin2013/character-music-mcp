@@ -7,7 +7,7 @@ This module implements comprehensive validation tests for task 9.2:
 
 Specifically tests:
 - Complete download → parse → generate → attribute flow
-- Fallback scenarios with unavailable wiki data  
+- Fallback scenarios with unavailable wiki data
 - Configuration changes and system reconfiguration
 - Concurrent access and performance under load
 - All requirements validation
@@ -34,12 +34,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from enhanced_genre_mapper import EnhancedGenreMapper
 from server import CharacterAnalyzer, MusicPersonaGenerator, SunoCommandGenerator
 from source_attribution_manager import SourceAttributionManager
-from tests.fixtures.mock_contexts import MockContext, MockPerformanceContext
-from tests.fixtures.test_data import TestDataManager
 from wiki_data_models import WikiConfig
 
 # Import wiki integration components
 from wiki_data_system import WikiDataManager
+
+from tests.fixtures.mock_contexts import MockContext, MockPerformanceContext
+from tests.fixtures.test_data import TestDataManager
 
 
 async def complete_workflow_test_helper(text: str, ctx) -> str:
@@ -139,21 +140,21 @@ class TestComprehensiveIntegrationValidation:
                 <li>IDM (Intelligent Dance Music, complex rhythms, experimental)</li>
                 <li>Downtempo (Relaxed, chilled, atmospheric)</li>
             </ul>
-            
+
             <h3>Rock</h3>
             <ul>
                 <li>Progressive Rock (Complex compositions, instrumental virtuosity)</li>
                 <li>Post-Rock (Instrumental, atmospheric, dynamic)</li>
                 <li>Alternative Rock (Non-mainstream, diverse influences)</li>
             </ul>
-            
+
             <h3>Jazz</h3>
             <ul>
                 <li>Jazz Fusion (Genre blending, improvisation, complex harmonies)</li>
                 <li>Smooth Jazz (Accessible, mellow, contemporary)</li>
                 <li>Free Jazz (Experimental, avant-garde, improvised)</li>
             </ul>
-            
+
             <h3>Folk</h3>
             <ul>
                 <li>Indie Folk (Independent, acoustic, introspective)</li>
@@ -229,7 +230,7 @@ class TestComprehensiveIntegrationValidation:
                 <li><strong>Meta Tag Sequencing:</strong> Order tags for optimal results</li>
                 <li><strong>Contextual Prompting:</strong> Use narrative context for coherence</li>
             </ol>
-            
+
             <h2>Production Techniques</h2>
             <ul>
                 <li>Layer complementary genres for depth</li>
@@ -238,7 +239,7 @@ class TestComprehensiveIntegrationValidation:
                 <li>Apply production tags for sonic character</li>
                 <li>Structure sections for dynamic flow</li>
             </ul>
-            
+
             <h2>Best Practices</h2>
             <p>Always consider the narrative context when selecting genres and meta tags.</p>
             <p>Test different combinations to find optimal results.</p>
@@ -404,7 +405,7 @@ class TestComprehensiveIntegrationValidation:
             # Verify file age checking (Requirement 3.2)
             # Get initial file modification time
             genre_file = genre_files[0]
-            initial_mtime = genre_file.stat().st_mtime
+            genre_file.stat().st_mtime
 
             # Wait a moment and refresh
             await asyncio.sleep(0.1)
@@ -421,7 +422,7 @@ class TestComprehensiveIntegrationValidation:
             await wiki_manager.reconfigure(short_config)
 
             # File should be refreshed
-            new_mtime = genre_file.stat().st_mtime
+            genre_file.stat().st_mtime
             # Note: File might not always be updated due to caching, which is acceptable
 
             # Verify download metadata tracking (Requirement 3.3)
@@ -461,7 +462,7 @@ class TestComprehensiveIntegrationValidation:
             await wiki_manager.initialize(self.test_config)
 
             # Verify configuration is loaded correctly
-            assert wiki_manager.config.enabled == True
+            assert wiki_manager.config.enabled
             assert wiki_manager.config.local_storage_path == self.wiki_storage_path
 
             # Test disabled configuration (Requirement 4.2)
@@ -546,7 +547,7 @@ class TestComprehensiveIntegrationValidation:
             electronic_matches = await enhanced_mapper.map_traits_to_genres(electronic_traits)
 
             # Should find multiple electronic subgenres
-            electronic_genres = [match.genre.name for match in electronic_matches
+            [match.genre.name for match in electronic_matches
                                 if 'electronic' in match.genre.name.lower() or
                                    'electronic' in match.genre.description.lower()]
 
@@ -698,7 +699,7 @@ class TestComprehensiveIntegrationValidation:
             wiki_manager = WikiDataManager()
             await wiki_manager.initialize(self.test_config)
 
-            enhanced_mapper = EnhancedGenreMapper(wiki_manager)
+            EnhancedGenreMapper(wiki_manager)
             attribution_manager = SourceAttributionManager(self.attribution_storage_path)
             await attribution_manager.initialize()
 

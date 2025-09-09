@@ -66,7 +66,7 @@ class TestMCPToolsWorkflowIntegration:
     async def test_complete_workflow_execution_no_callable_errors(self):
         """
         Test complete workflow execution without callable errors
-        
+
         Requirements: 4.1, 4.2 - Workflow execution without FunctionTool errors
         """
         # Test with simple character scenario
@@ -108,7 +108,7 @@ class TestMCPToolsWorkflowIntegration:
     async def test_data_flow_between_tools_consistent_formats(self):
         """
         Test data flow between tools with consistent formats
-        
+
         Requirements: 13.1, 13.2, 13.3 - Consistent data models and interfaces
         """
         scenario = self.test_scenarios["multi_character_medium"]
@@ -172,7 +172,7 @@ class TestMCPToolsWorkflowIntegration:
     async def test_various_character_descriptions_and_genres(self):
         """
         Test various character descriptions and genre specifications
-        
+
         Requirements: 5.1, 5.2, 6.2, 6.3 - Dynamic content processing and genre respect
         """
         test_cases = [
@@ -250,22 +250,22 @@ class TestMCPToolsWorkflowIntegration:
     async def test_end_to_end_functionality_realistic_use_cases(self):
         """
         Test end-to-end functionality with realistic use cases
-        
+
         Requirements: All requirements validation - comprehensive end-to-end testing
         """
         realistic_scenarios = [
             {
                 "name": "indie_musician_story",
                 "text": """
-                Jamie Martinez sat in their cramped apartment, guitar in hand, staring at the 
-                rejection email from yet another record label. At 26, they had been writing 
-                songs since high school, pouring their heart into indie folk melodies that 
+                Jamie Martinez sat in their cramped apartment, guitar in hand, staring at the
+                rejection email from yet another record label. At 26, they had been writing
+                songs since high school, pouring their heart into indie folk melodies that
                 spoke of small-town dreams and big-city disappointments.
-                
-                Their latest EP, recorded in their bedroom with borrowed equipment, captured 
-                the raw emotion of their journey from rural Texas to Austin's competitive 
-                music scene. Each song told a piece of their story - the loneliness of 
-                leaving home, the struggle to pay rent while chasing dreams, the bittersweet 
+
+                Their latest EP, recorded in their bedroom with borrowed equipment, captured
+                the raw emotion of their journey from rural Texas to Austin's competitive
+                music scene. Each song told a piece of their story - the loneliness of
+                leaving home, the struggle to pay rent while chasing dreams, the bittersweet
                 hope that kept them going despite constant rejection.
                 """,
                 "expected_character": "Jamie Martinez",
@@ -275,14 +275,14 @@ class TestMCPToolsWorkflowIntegration:
             {
                 "name": "electronic_producer_narrative",
                 "text": """
-                Alex Chen worked through the night in their home studio, surrounded by 
-                synthesizers and drum machines that hummed with electronic potential. 
-                As a 24-year-old producer, they had found their voice in the intersection 
+                Alex Chen worked through the night in their home studio, surrounded by
+                synthesizers and drum machines that hummed with electronic potential.
+                As a 24-year-old producer, they had found their voice in the intersection
                 of ambient soundscapes and driving techno beats.
-                
-                Their music reflected their dual heritage - the meditative qualities of 
-                their grandmother's traditional Chinese music blended with the pulsing 
-                energy of underground Berlin clubs they'd discovered online. Each track 
+
+                Their music reflected their dual heritage - the meditative qualities of
+                their grandmother's traditional Chinese music blended with the pulsing
+                energy of underground Berlin clubs they'd discovered online. Each track
                 was a journey through digital landscapes that somehow felt deeply human.
                 """,
                 "expected_character": "Alex Chen",
@@ -341,7 +341,7 @@ class TestMCPToolsWorkflowIntegration:
     async def test_error_recovery_and_graceful_degradation(self):
         """
         Test error recovery and graceful degradation
-        
+
         Requirements: 12.3, 12.4 - Error recovery mechanisms
         """
         # Test with problematic input that might cause errors
@@ -401,7 +401,7 @@ class TestMCPToolsWorkflowIntegration:
     async def test_performance_and_scalability(self):
         """
         Test performance and scalability of workflow
-        
+
         Requirements: Performance validation for production use
         """
         # Test with multiple scenarios to measure performance
@@ -459,7 +459,7 @@ class TestMCPToolsWorkflowIntegration:
     async def test_concurrent_workflow_execution(self):
         """
         Test concurrent workflow execution
-        
+
         Requirements: Concurrent processing capability
         """
         # Test concurrent execution of multiple workflows
@@ -516,7 +516,7 @@ class TestMCPToolsWorkflowIntegration:
     async def test_requirements_validation_comprehensive(self):
         """
         Comprehensive validation of all requirements
-        
+
         Requirements: All requirements from 1.1 to 13.4
         """
         validation_results = {

@@ -48,12 +48,13 @@ from server import (
     MusicPersonaGenerator,
     SunoCommandGenerator,
 )
-from tests.fixtures.mock_contexts import MockContext, MockPerformanceContext
-from tests.fixtures.test_data import TestDataManager
 from wiki_data_models import WikiConfig
 
 # Import wiki integration components
 from wiki_data_system import WikiDataManager
+
+from tests.fixtures.mock_contexts import MockContext, MockPerformanceContext
+from tests.fixtures.test_data import TestDataManager
 
 
 async def complete_workflow_test_helper(text: str, ctx) -> str:
@@ -436,7 +437,7 @@ class TestWikiPerformanceAndEdgeCases:
 
         # Request after cache invalidation
         start_time = time.time()
-        third_result = await enhanced_mapper.map_traits_to_genres(test_traits)
+        await enhanced_mapper.map_traits_to_genres(test_traits)
         third_time = time.time() - start_time
 
         await self.performance_context.record_performance_metric("cache_invalidation_time", third_time)
@@ -548,7 +549,7 @@ class TestWikiPerformanceAndEdgeCases:
         tags = []
 
         for i in range(count):
-            category = random.choice(categories)
+            random.choice(categories)
             tag_name = f"test_tag_{i}"
             description = f"Description for test tag {i}"
 
@@ -591,7 +592,7 @@ class TestWikiPerformanceAndEdgeCases:
     def _get_directory_size(self, path: str) -> int:
         """Get total size of directory in bytes"""
         total_size = 0
-        for dirpath, dirnames, filenames in os.walk(path):
+        for dirpath, _dirnames, filenames in os.walk(path):
             for filename in filenames:
                 filepath = os.path.join(dirpath, filename)
                 if os.path.exists(filepath):

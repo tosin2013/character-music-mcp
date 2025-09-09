@@ -54,7 +54,7 @@ async def test_crawl_tool_integration():
         # Note: We can't directly call the @mcp.tool decorated function,
         # but we can test the logic by simulating it
 
-        ctx = MockContext()
+        MockContext()
         topics = ["all", "genres", "meta_tags", "techniques", "best_practices"]
 
         for topic in topics:
@@ -170,11 +170,11 @@ async def test_crawl_tool_integration():
             manager = await ensure_wiki_data_manager()
             if manager:
                 # Test genre mapper integration
-                genre_mapper = EnhancedGenreMapper(manager)
+                EnhancedGenreMapper(manager)
                 print("✓ EnhancedGenreMapper can use wiki data manager")
 
                 # Test source attribution integration
-                attribution_manager = SourceAttributionManager(manager)
+                SourceAttributionManager(manager)
                 print("✓ SourceAttributionManager can use wiki data manager")
 
         except ImportError as e:

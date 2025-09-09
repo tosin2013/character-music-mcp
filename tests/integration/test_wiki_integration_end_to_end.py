@@ -30,12 +30,13 @@ from server import (
     SunoCommandGenerator,
 )
 from source_attribution_manager import SourceAttributionManager
-from tests.fixtures.mock_contexts import MockContext, MockPerformanceContext
-from tests.fixtures.test_data import TestDataManager
 from wiki_data_models import WikiConfig
 
 # Import wiki integration components
 from wiki_data_system import WikiDataManager
+
+from tests.fixtures.mock_contexts import MockContext, MockPerformanceContext
+from tests.fixtures.test_data import TestDataManager
 
 
 async def complete_workflow_test_helper(text: str, ctx) -> str:
@@ -134,13 +135,13 @@ class TestWikiIntegrationEndToEnd:
                 <li>Indie Folk (Acoustic instruments, introspective lyrics, organic sound)</li>
                 <li>Traditional Folk (Historical folk traditions and storytelling)</li>
             </ul>
-            
+
             <h3>Electronic</h3>
             <ul>
                 <li>Electronic Ambient (Atmospheric textures, minimal beats, ethereal soundscapes)</li>
                 <li>Synthwave (Retro-futuristic electronic music with 80s influences)</li>
             </ul>
-            
+
             <h3>Jazz</h3>
             <ul>
                 <li>Jazz Fusion (Complex harmonies, improvisation, genre blending)</li>
@@ -191,7 +192,7 @@ class TestWikiIntegrationEndToEnd:
         <h1>How to Structure Prompts for Suno AI</h1>
         <div class="tip-content">
             <p>This guide explains how to structure effective prompts for Suno AI music generation.</p>
-            
+
             <h2>Key Techniques</h2>
             <ol>
                 <li><strong>Genre Specification:</strong> Start with genre specification for consistent style</li>
@@ -199,7 +200,7 @@ class TestWikiIntegrationEndToEnd:
                 <li><strong>Instrumental Preferences:</strong> Include instrumental preferences for texture</li>
                 <li><strong>Section Structure:</strong> Structure sections clearly with tags</li>
             </ol>
-            
+
             <h2>Best Practices</h2>
             <ul>
                 <li>Keep prompts concise but descriptive</li>
@@ -207,7 +208,7 @@ class TestWikiIntegrationEndToEnd:
                 <li>Combine complementary meta tags</li>
                 <li>Test variations for optimal results</li>
             </ul>
-            
+
             <h2>Examples</h2>
             <p>Example 1: [Verse] Indie folk with acoustic guitar, melancholic mood</p>
             <p>Example 2: [Chorus] Electronic ambient, dreamy atmosphere, synthesizers</p>
@@ -272,7 +273,7 @@ class TestWikiIntegrationEndToEnd:
             # Step 2: Parse downloaded content
             genres = await wiki_manager.get_genres()
             meta_tags = await wiki_manager.get_meta_tags()
-            techniques = await wiki_manager.get_techniques()
+            await wiki_manager.get_techniques()
 
             # Verify parsing worked
             assert len(genres) >= 3  # Should have parsed our sample genres
@@ -409,7 +410,7 @@ class TestWikiIntegrationEndToEnd:
             await wiki_manager.initialize(self.test_config)
 
             initial_genres = await wiki_manager.get_genres()
-            initial_count = len(initial_genres)
+            len(initial_genres)
 
             # Change configuration - add more URLs
             new_config = WikiConfig(
@@ -476,7 +477,7 @@ class TestWikiIntegrationEndToEnd:
             await wiki_manager.initialize(self.test_config)
 
             enhanced_mapper = EnhancedGenreMapper(wiki_manager)
-            attribution_manager = SourceAttributionManager(self.attribution_storage_path)
+            SourceAttributionManager(self.attribution_storage_path)
 
             # Test concurrent genre mapping
             test_traits = [
@@ -579,8 +580,8 @@ class TestWikiIntegrationEndToEnd:
 
             # Get data from wiki manager
             wiki_genres = await wiki_manager.get_genres()
-            wiki_meta_tags = await wiki_manager.get_meta_tags()
-            wiki_techniques = await wiki_manager.get_techniques()
+            await wiki_manager.get_meta_tags()
+            await wiki_manager.get_techniques()
 
             # Test genre mapper consistency
             test_traits = ["introspective", "acoustic", "melancholic"]

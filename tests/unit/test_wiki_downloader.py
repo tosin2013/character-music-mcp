@@ -38,9 +38,9 @@ async def test_basic_functionality():
 
         async with downloader:
             # Test URL validation
-            assert downloader.validate_url("https://example.com") == True
-            assert downloader.validate_url("invalid-url") == False
-            assert downloader.validate_url("") == False
+            assert downloader.validate_url("https://example.com")
+            assert not downloader.validate_url("invalid-url")
+            assert not downloader.validate_url("")
 
             logger.info("✓ URL validation tests passed")
 
@@ -61,7 +61,7 @@ async def test_basic_functionality():
 
             # Test file age checking (should return True for non-existent files)
             needs_refresh = await downloader.is_refresh_needed(test_url, 24)
-            assert needs_refresh == True
+            assert needs_refresh
 
             logger.info("✓ File age checking tests passed")
 

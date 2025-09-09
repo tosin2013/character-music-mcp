@@ -17,7 +17,6 @@ from urllib.parse import urlparse
 
 import aiofiles
 import aiohttp
-
 from wiki_data_system import WikiConfig
 
 logger = logging.getLogger(__name__)
@@ -62,11 +61,11 @@ class WikiConfigValidator:
     async def validate_config(self, config: WikiConfig, check_urls: bool = True) -> ValidationResult:
         """
         Perform comprehensive configuration validation
-        
+
         Args:
             config: WikiConfig to validate
             check_urls: Whether to perform network checks on URLs
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -241,7 +240,7 @@ class WikiConfigValidator:
     async def _check_url_accessibility(self, url: str) -> Tuple[bool, Optional[int], Optional[str]]:
         """
         Check if URL is accessible
-        
+
         Returns:
             Tuple of (accessible, status_code, error_message)
         """
@@ -262,10 +261,10 @@ class WikiConfigValidator:
     async def validate_new_urls(self, urls: List[str]) -> Dict[str, bool]:
         """
         Validate a list of new URLs for accessibility
-        
+
         Args:
             urls: List of URLs to validate
-            
+
         Returns:
             Dictionary mapping URLs to accessibility status
         """

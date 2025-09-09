@@ -27,7 +27,7 @@ class WorkflowStep:
 class FixedWorkflowManager:
     """
     Workflow manager with proper function tool handling
-    
+
     This class ensures that all tool functions are properly callable
     and provides comprehensive error handling for workflow execution.
     """
@@ -94,12 +94,12 @@ class FixedWorkflowManager:
     async def execute_workflow_step(self, step_name: str, *args, **kwargs) -> Dict[str, Any]:
         """
         Execute a single workflow step with proper error handling
-        
+
         Args:
             step_name: Name of the workflow step to execute
             *args: Positional arguments for the step function
             **kwargs: Keyword arguments for the step function
-            
+
         Returns:
             Dictionary containing step results or error information
         """
@@ -137,11 +137,11 @@ class FixedWorkflowManager:
     async def execute_complete_workflow(self, text: str, ctx) -> Dict[str, Any]:
         """
         Execute complete workflow with proper error handling and recovery
-        
+
         Args:
             text: Input narrative text for analysis
             ctx: Context object for logging and communication
-            
+
         Returns:
             Dictionary containing complete workflow results
         """
@@ -218,10 +218,10 @@ class FixedWorkflowManager:
     def get_tool_info(self, tool_name: str = None) -> Dict[str, Any]:
         """
         Get information about available tools
-        
+
         Args:
             tool_name: Optional specific tool name to get info for
-            
+
         Returns:
             Dictionary containing tool information
         """
@@ -254,7 +254,7 @@ class FixedWorkflowManager:
     def validate_tool_callability(self) -> Dict[str, Any]:
         """
         Validate that all registered tools are properly callable
-        
+
         Returns:
             Dictionary containing validation results
         """
@@ -338,9 +338,9 @@ async def test_complete_workflow_execution():
 
     # Test with sample narrative
     sample_text = """
-    Sarah walked through the bustling city streets, her violin case clutched tightly in her hand. 
-    As a street musician, she had learned to read the crowd, to understand what music would touch their hearts. 
-    Her melancholy melodies often drew people in, reflecting her own struggles with loneliness and her deep 
+    Sarah walked through the bustling city streets, her violin case clutched tightly in her hand.
+    As a street musician, she had learned to read the crowd, to understand what music would touch their hearts.
+    Her melancholy melodies often drew people in, reflecting her own struggles with loneliness and her deep
     desire to connect with others through her art.
     """
 

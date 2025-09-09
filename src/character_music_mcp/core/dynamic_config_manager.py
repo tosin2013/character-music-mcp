@@ -13,7 +13,6 @@ from typing import Callable, List, Optional
 
 from watchdog.events import FileModifiedEvent, FileSystemEventHandler
 from watchdog.observers import Observer
-
 from wiki_config_validator import ValidationResult, WikiConfigValidator
 from wiki_data_system import ConfigurationManager, WikiConfig
 
@@ -69,7 +68,7 @@ class DynamicConfigManager:
     async def initialize(self) -> WikiConfig:
         """
         Initialize the configuration manager and load initial config
-        
+
         Returns:
             Loaded WikiConfig
         """
@@ -185,7 +184,7 @@ class DynamicConfigManager:
     def add_change_callback(self, callback: Callable[[WikiConfig, WikiConfig], None]) -> None:
         """
         Add a callback to be notified when configuration changes
-        
+
         Args:
             callback: Function to call with (old_config, new_config)
         """
@@ -201,11 +200,11 @@ class DynamicConfigManager:
     async def update_config(self, new_config: WikiConfig, validate_urls: bool = True) -> ValidationResult:
         """
         Update configuration programmatically
-        
+
         Args:
             new_config: New configuration to apply
             validate_urls: Whether to validate URL accessibility
-            
+
         Returns:
             ValidationResult indicating success/failure
         """
@@ -240,12 +239,12 @@ class DynamicConfigManager:
     async def add_urls(self, url_type: str, urls: List[str], validate_urls: bool = True) -> ValidationResult:
         """
         Add new URLs to configuration
-        
+
         Args:
             url_type: Type of URLs ('genre_pages', 'meta_tag_pages', 'tip_pages')
             urls: List of URLs to add
             validate_urls: Whether to validate URL accessibility
-            
+
         Returns:
             ValidationResult indicating success/failure
         """
@@ -286,11 +285,11 @@ class DynamicConfigManager:
     async def remove_urls(self, url_type: str, urls: List[str]) -> ValidationResult:
         """
         Remove URLs from configuration
-        
+
         Args:
             url_type: Type of URLs ('genre_pages', 'meta_tag_pages', 'tip_pages')
             urls: List of URLs to remove
-            
+
         Returns:
             ValidationResult indicating success/failure
         """
@@ -320,10 +319,10 @@ class DynamicConfigManager:
     async def update_settings(self, **settings) -> ValidationResult:
         """
         Update specific configuration settings
-        
+
         Args:
             **settings: Settings to update (e.g., refresh_interval_hours=48)
-            
+
         Returns:
             ValidationResult indicating success/failure
         """
@@ -362,7 +361,7 @@ class DynamicConfigManager:
     async def reload_config(self) -> ValidationResult:
         """
         Manually reload configuration from file
-        
+
         Returns:
             ValidationResult indicating success/failure
         """

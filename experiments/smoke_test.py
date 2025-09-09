@@ -69,10 +69,10 @@ class SmokeTestResult:
 class MCPSmokeTest:
     """
     Smoke test for MCP server functionality
-    
+
     Based on pragmatic verification principles:
     - Tests core functionality without deep integration
-    - Provides confidence scores for recommendations  
+    - Provides confidence scores for recommendations
     - Acknowledges limitations and edge cases
     """
 
@@ -85,9 +85,9 @@ class MCPSmokeTest:
         """Prepare test data for smoke tests"""
         return {
             "character_text": """
-            Elena Rodriguez was a passionate software engineer living in San Francisco. 
-            She had immigrated from Mexico at age 12 and worked her way through college 
-            while supporting her family. Her determination and creativity made her a 
+            Elena Rodriguez was a passionate software engineer living in San Francisco.
+            She had immigrated from Mexico at age 12 and worked her way through college
+            while supporting her family. Her determination and creativity made her a
             respected team lead at a growing tech startup.
             """,
             "expected_traits": ["passionate", "determined", "creative", "supportive"],
@@ -98,7 +98,7 @@ class MCPSmokeTest:
     async def run_all_tests(self) -> SmokeTestResult:
         """
         Run all smoke tests
-        
+
         Confidence: 87% - Systematic testing approach with error handling
         """
         logger.info("🚀 Starting MCP Server Smoke Tests")
@@ -204,6 +204,7 @@ class MCPSmokeTest:
         test_name = "character_analysis"
         try:
             from server import CharacterAnalyzer
+
             from tests.fixtures.mock_contexts import create_mock_context
 
             analyzer = CharacterAnalyzer()
@@ -230,6 +231,7 @@ class MCPSmokeTest:
         try:
             from server import MusicPersonaGenerator
             from standard_character_profile import StandardCharacterProfile
+
             from tests.fixtures.mock_contexts import create_mock_context
 
             generator = MusicPersonaGenerator()
@@ -276,6 +278,7 @@ class MCPSmokeTest:
         try:
             from server import ArtistPersona, SunoCommandGenerator
             from standard_character_profile import StandardCharacterProfile
+
             from tests.fixtures.mock_contexts import create_mock_context
 
             cmd_gen = SunoCommandGenerator()
@@ -333,6 +336,7 @@ class MCPSmokeTest:
         test_name = "error_handling"
         try:
             from server import CharacterAnalyzer
+
             from tests.fixtures.mock_contexts import create_mock_context
 
             analyzer = CharacterAnalyzer()
@@ -340,7 +344,7 @@ class MCPSmokeTest:
 
             # Test with invalid input
             try:
-                result = await analyzer.analyze_characters(None, mock_ctx)
+                await analyzer.analyze_characters(None, mock_ctx)
                 # Should handle gracefully, not crash
                 logger.info("Handled None input gracefully")
             except Exception as e:
@@ -349,7 +353,7 @@ class MCPSmokeTest:
 
             # Test with empty string
             try:
-                result = await analyzer.analyze_characters("", mock_ctx)
+                await analyzer.analyze_characters("", mock_ctx)
                 logger.info("Handled empty string gracefully")
             except Exception as e:
                 logger.info(f"Exception properly raised for empty input: {e}")
@@ -406,7 +410,7 @@ class MCPSmokeTest:
     def generate_report(self) -> str:
         """
         Generate comprehensive test report
-        
+
         Confidence: 92% - Clear reporting based on systematic results
         """
         report = []

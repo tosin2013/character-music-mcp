@@ -16,7 +16,6 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import aiofiles
-
 from wiki_cache_manager import CacheEntry, WikiCacheManager
 
 # Configure logging
@@ -89,7 +88,7 @@ class EnhancedCacheManager(WikiCacheManager):
     def __init__(self, cache_root: str = "./data/wiki", config: Optional[CacheConfig] = None):
         """
         Initialize EnhancedCacheManager
-        
+
         Args:
             cache_root: Root directory for cache storage
             config: Cache configuration
@@ -196,10 +195,10 @@ class EnhancedCacheManager(WikiCacheManager):
     async def warm_cache(self, urls: Optional[List[str]] = None) -> CacheWarmupResult:
         """
         Warm cache with frequently accessed or priority URLs
-        
+
         Args:
             urls: Specific URLs to warm (defaults to configured warmup URLs)
-            
+
         Returns:
             CacheWarmupResult with warming statistics
         """
@@ -305,7 +304,7 @@ class EnhancedCacheManager(WikiCacheManager):
     async def optimize_cache(self) -> Dict[str, Any]:
         """
         Run comprehensive cache optimization
-        
+
         Returns:
             Optimization results and statistics
         """
@@ -356,7 +355,7 @@ class EnhancedCacheManager(WikiCacheManager):
     async def _intelligent_cleanup(self) -> int:
         """
         Perform intelligent cache cleanup based on access patterns and priorities
-        
+
         Returns:
             Number of entries removed
         """

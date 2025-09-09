@@ -39,7 +39,7 @@ class TestContentParser:
         <head><title>Music Genres</title></head>
         <body>
             <h1>List of Music Genres and Styles</h1>
-            
+
             <h3>Electronic Music</h3>
             <ul>
                 <li>Techno</li>
@@ -47,14 +47,14 @@ class TestContentParser:
                 <li>Trance</li>
                 <li>Dubstep (Heavy bass and syncopated drum patterns)</li>
             </ul>
-            
+
             <h3>Rock Music</h3>
             <ul>
                 <li>Alternative Rock</li>
                 <li>Indie Rock</li>
                 <li>Hard Rock (Aggressive guitar-driven sound)</li>
             </ul>
-            
+
             <h3>Jazz</h3>
             <ul>
                 <li>Bebop</li>
@@ -73,21 +73,21 @@ class TestContentParser:
         <head><title>Meta Tags</title></head>
         <body>
             <h1>List of Meta Tags</h1>
-            
+
             <h3>Structural Tags</h3>
             <ul>
                 <li><strong>verse</strong> : Defines verse sections of the song</li>
                 <li><strong>chorus</strong> : Defines chorus sections with repeated lyrics</li>
                 <li><strong>bridge</strong> : Connects different parts of the song</li>
             </ul>
-            
+
             <h3>Emotional Tags</h3>
             <ul>
                 <li>**happy** : Creates upbeat and joyful mood</li>
                 <li>**melancholic** : Evokes sad and reflective emotions</li>
                 <li>**energetic** : High-energy and dynamic feel</li>
             </ul>
-            
+
             <h3>Instrumental Tags</h3>
             <ul>
                 <li>guitar : Emphasizes guitar in the mix</li>
@@ -106,17 +106,17 @@ class TestContentParser:
         <head><title>Suno AI Techniques</title></head>
         <body>
             <h1>How to Structure Prompts for Suno AI</h1>
-            
+
             <h2>Basic Prompt Structure</h2>
             <p>Start with genre and style information, followed by mood and instrumentation.</p>
-            
+
             <h2>Advanced Techniques</h2>
             <ul>
                 <li>Use specific genre combinations for unique sounds</li>
                 <li>Include emotional descriptors for better mood control</li>
                 <li>Specify instruments to guide the AI's choices</li>
             </ul>
-            
+
             <h2>Examples</h2>
             <p>Example: "Indie folk with melancholic vocals and acoustic guitar"</p>
             <p>Example: "Electronic dance music with heavy bass and synthesizers"</p>
@@ -226,10 +226,10 @@ class TestContentParser:
         <body>
             <h2>Genre List</h2>
             <div>Content 1</div>
-            
+
             <h3>Meta Tags</h3>
             <section>Content 2</section>
-            
+
             <h1>Other Section</h1>
             <article>Content 3</article>
         </body>
@@ -250,17 +250,17 @@ class TestContentParser:
                 <li>Item 1</li>
                 <li>Item 2</li>
             </ul>
-            
+
             <ol>
                 <li>Ordered 1</li>
                 <li>Ordered 2</li>
             </ol>
-            
+
             <dl>
                 <dt>Term 1</dt>
                 <dd>Definition 1</dd>
             </dl>
-            
+
             <p>• Bullet point item</p>
             <p>1. Numbered item</p>
             <p>- Dash item</p>

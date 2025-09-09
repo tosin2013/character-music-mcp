@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class MCPToolWrapper:
     """
     Wrapper for MCP tools that handles callable issues
-    
+
     This class provides a way to call MCP tools that have been decorated
     with @mcp.tool and are not directly callable.
     """
@@ -54,15 +54,15 @@ class MCPToolWrapper:
     async def call_tool(self, tool_name: str, *args, **kwargs) -> Any:
         """
         Call an MCP tool by name with proper error handling
-        
+
         Args:
             tool_name: Name of the tool to call
             *args: Positional arguments for the tool
             **kwargs: Keyword arguments for the tool
-            
+
         Returns:
             Result from the tool call
-            
+
         Raises:
             ValueError: If tool is not found
             Exception: If tool execution fails

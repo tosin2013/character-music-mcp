@@ -53,17 +53,17 @@ class TestExampleGenerator:
 Here's a narrative example:
 
 ```
-Elena grew up in the shadow of the lighthouse, where her father kept watch over ships 
-that rarely came anymore. She had always been the responsible one, the sister who held 
-everything together when their parents divorced. At seventeen, she spent her days reading 
+Elena grew up in the shadow of the lighthouse, where her father kept watch over ships
+that rarely came anymore. She had always been the responsible one, the sister who held
+everything together when their parents divorced. At seventeen, she spent her days reading
 poetry on the rocky shore, writing in journals that she hid beneath her mattress.
 ```
 
 And another example:
 
 ```text
-Marcus stood at the crossroads of his career, torn between the security of his corporate 
-job and his dream of becoming a full-time musician. His guitar sat in the corner of his 
+Marcus stood at the crossroads of his career, torn between the security of his corporate
+job and his dream of becoming a full-time musician. His guitar sat in the corner of his
 apartment, gathering dust while he worked late nights on spreadsheets and quarterly reports.
 ```
         """
@@ -289,8 +289,8 @@ Your narrative text here...
 # Integration Test
 
 ```
-Elena grew up in the shadow of the lighthouse, where her father kept watch over ships 
-that rarely came anymore. She had always been the responsible one, the sister who held 
+Elena grew up in the shadow of the lighthouse, where her father kept watch over ships
+that rarely came anymore. She had always been the responsible one, the sister who held
 everything together when their parents divorced.
 ```
 

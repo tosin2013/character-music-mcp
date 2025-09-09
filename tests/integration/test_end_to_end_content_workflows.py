@@ -4,7 +4,7 @@ End-to-end integration tests for different content type workflows
 
 Tests the complete workflow from content input to album generation for:
 - Philosophical content processing creating meaningful characters and albums
-- Explicit character description handling producing consistent results  
+- Explicit character description handling producing consistent results
 - Narrative fiction processing remaining functional
 
 Requirements tested: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3
@@ -54,7 +54,7 @@ class TestPhilosophicalContentWorkflow:
         """
         philosophical_content = """
         The paradox of human existence lies in our simultaneous need for connection and solitude.
-        We are social beings who crave understanding, yet we are fundamentally alone in our 
+        We are social beings who crave understanding, yet we are fundamentally alone in our
         consciousness. This tension creates the most profound art - expressions that bridge
         the gap between inner experience and shared meaning. Music becomes the language
         that speaks to both our collective humanity and our individual souls.
@@ -360,16 +360,16 @@ class TestNarrativeFictionWorkflow:
         Requirements: 1.3
         """
         narrative_content = """
-        This is a story about Sarah, who had been walking the empty streets of downtown for hours. 
-        Her footsteps echoed off the wet pavement as she walked. The argument with her mother still 
-        rang in her ears, each harsh word replaying like a broken record. She was twenty-six years 
+        This is a story about Sarah, who had been walking the empty streets of downtown for hours.
+        Her footsteps echoed off the wet pavement as she walked. The argument with her mother still
+        rang in her ears, each harsh word replaying like a broken record. She was twenty-six years
         old, a successful graphic designer, yet she still felt like a child when her mother questioned her choices.
-        
+
         The rain had stopped, but the air still smelled of petrichor and possibility. As she
         turned the corner onto Fifth Street, she saw him standing there under the streetlight,
         waiting. Marcus, her childhood friend who had become something more complicated over
         the years. He held his guitar case in one hand and a coffee in the other.
-        
+
         "I thought you might need this," he said, offering her the coffee. His voice was gentle,
         understanding. He had always been able to read her moods, even when they were kids
         building forts in her backyard. Now he was a street musician, playing for tips and
@@ -435,7 +435,7 @@ class TestNarrativeFictionWorkflow:
                "Album should have an artist"
 
         # Verify tracks follow narrative progression
-        track_titles = [track.get("title", "") for track in result["tracks"]]
+        [track.get("title", "") for track in result["tracks"]]
         track_contents = []
 
         for track in result["tracks"]:
@@ -458,11 +458,11 @@ class TestNarrativeFictionWorkflow:
         She was working on her third novel, a story about redemption and second chances. At
         twenty-eight, she had already published two successful books, but this one felt different,
         more personal.
-        
+
         David, the barista, knew her order by heart: large coffee, black, with a blueberry muffin.
         He was an aspiring actor, working at the coffee shop to pay for acting classes. They had
         developed an easy friendship over the months, bonding over their shared artistic struggles.
-        
+
         Today, a new customer caught Elena's attention. An older woman, maybe sixty, sat alone
         at the corner table, sketching in a worn leather journal. Her name was Margaret, though
         Elena didn't know it yet. Margaret was a retired art teacher who had recently lost her

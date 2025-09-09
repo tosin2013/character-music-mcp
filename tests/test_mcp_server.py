@@ -13,22 +13,22 @@ import json
 
 # Test data
 TEST_NARRATIVE = """
-Elena Rodriguez stood in her cramped studio apartment, paintbrush trembling in her hand as she 
-stared at the blank canvas. At twenty-eight, she had already given up three different career 
-paths, each time running when success seemed within reach. Her mother called it self-sabotage; 
+Elena Rodriguez stood in her cramped studio apartment, paintbrush trembling in her hand as she
+stared at the blank canvas. At twenty-eight, she had already given up three different career
+paths, each time running when success seemed within reach. Her mother called it self-sabotage;
 Elena called it self-preservation.
 
-The phone rang, startling her from her thoughts. It was David, her best friend since art school 
-and the only person who truly understood her creative struggles. "Still avoiding the gallery 
+The phone rang, startling her from her thoughts. It was David, her best friend since art school
+and the only person who truly understood her creative struggles. "Still avoiding the gallery
 opening?" he asked, his voice gentle but knowing.
 
-Elena sighed, setting down her brush. David had always been the confident one, the artist who 
-embraced fame while she shrank from it. His paintings hung in galleries across the city while 
-hers gathered dust in storage. Yet he never made her feel small, never pushed too hard. That's 
+Elena sighed, setting down her brush. David had always been the confident one, the artist who
+embraced fame while she shrank from it. His paintings hung in galleries across the city while
+hers gathered dust in storage. Yet he never made her feel small, never pushed too hard. That's
 what made their friendship work - he knew when to offer support and when to give space.
 
-"I'm scared, David," she admitted, the words feeling foreign on her lips. Fear had been her 
-constant companion, the voice that whispered about failure and humiliation every time she 
+"I'm scared, David," she admitted, the words feeling foreign on her lips. Fear had been her
+constant companion, the voice that whispered about failure and humiliation every time she
 tried to share her work with the world.
 """
 
@@ -198,13 +198,6 @@ class TestMCPIntegration:
 
         # Get tool information (this is a conceptual test)
         # In practice, you'd use the MCP client to test this
-        expected_tools = [
-            "analyze_character_text",
-            "generate_artist_personas",
-            "create_suno_commands",
-            "complete_workflow",
-            "creative_music_generation"
-        ]
 
         # This is a placeholder - actual testing would require running MCP server
         # and connecting with a client
@@ -220,7 +213,7 @@ class TestMCPIntegration:
         # Test invalid JSON
         try:
             json.loads("invalid json")
-            assert False, "Should raise JSON decode error"
+            raise AssertionError("Should raise JSON decode error")
         except json.JSONDecodeError:
             assert True, "Should handle invalid JSON gracefully"
 

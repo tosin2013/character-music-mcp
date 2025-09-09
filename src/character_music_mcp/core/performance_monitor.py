@@ -225,7 +225,7 @@ class PerformanceMonitor:
     async def measure_operation(self, operation: str, context: Dict[str, Any] = None):
         """
         Context manager to measure operation performance
-        
+
         Usage:
             async with performance_monitor.measure_operation("download_page"):
                 await download_page(url)
@@ -260,7 +260,7 @@ class PerformanceMonitor:
     def measure_sync_operation(self, operation: str, context: Dict[str, Any] = None):
         """
         Context manager for synchronous operations
-        
+
         Usage:
             with performance_monitor.measure_sync_operation("parse_html"):
                 parse_html_content(html)
@@ -289,7 +289,7 @@ class PerformanceMonitor:
 
                 # Record the metric (synchronous)
                 try:
-                    loop = asyncio.get_running_loop()
+                    asyncio.get_running_loop()
                     asyncio.create_task(self.monitor._record_metric(
                         operation=self.operation,
                         duration=duration,

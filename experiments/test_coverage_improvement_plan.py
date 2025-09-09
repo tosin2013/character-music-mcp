@@ -21,7 +21,7 @@ class CoverageImprover:
         """Analyze current coverage and identify improvement areas"""
         try:
             # Run coverage analysis
-            result = subprocess.run([
+            subprocess.run([
                 'python', '-m', 'pytest', '--cov=.', '--cov-report=json', '--cov-report=term-missing'
             ], capture_output=True, text=True, cwd=self.project_root)
 
@@ -89,7 +89,7 @@ testpaths = tests
 python_files = test_*.py
 python_classes = Test*
 python_functions = test_*
-addopts = 
+addopts =
     --strict-markers
     --strict-config
     --cov=.
@@ -164,7 +164,7 @@ except ImportError as e:
 
 class Test{class_name}:
     """Test class for {module_name} module"""
-    
+
     @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
@@ -173,28 +173,28 @@ class Test{class_name}:
             'config': {{'test': True}},
             'session': AsyncMock()
         }}
-    
+
     def test_module_imports(self):
         """Test that module imports correctly"""
         # This test ensures the module can be imported
         assert True
-    
+
     @pytest.mark.asyncio
     async def test_async_functionality(self, mock_dependencies):
         """Test async functionality if present"""
         # Add async tests here
         assert True
-    
+
     def test_error_handling(self, mock_dependencies):
         """Test error handling scenarios"""
         # Add error handling tests here
         assert True
-    
+
     def test_edge_cases(self, mock_dependencies):
         """Test edge cases and boundary conditions"""
         # Add edge case tests here
         assert True
-    
+
     @pytest.mark.parametrize("input_data,expected", [
         ("test_input", "expected_output"),
         # Add more test cases
@@ -207,13 +207,13 @@ class Test{class_name}:
 
 class Test{class_name}Integration:
     """Integration tests for {module_name}"""
-    
+
     @pytest.mark.integration
     def test_integration_scenario(self):
         """Test integration scenarios"""
         # Add integration tests here
         assert True
-    
+
     @pytest.mark.slow
     def test_performance_scenario(self):
         """Test performance scenarios"""
@@ -243,7 +243,7 @@ if __name__ == "__main__":
         test_files = []
 
         # Find all test files
-        for root, dirs, files in os.walk('tests'):
+        for root, _dirs, files in os.walk('tests'):
             for file in files:
                 if file.startswith('test_') and file.endswith('.py'):
                     test_files.append(os.path.join(root, file))

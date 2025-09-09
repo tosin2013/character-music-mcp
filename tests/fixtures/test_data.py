@@ -50,9 +50,9 @@ class TestDataManager:
                 name="single_character_simple",
                 description="Simple narrative with one clear character",
                 narrative_text="""
-                Sarah Chen stood at the edge of the rooftop, tears streaming down her face. 
-                At twenty-seven, she had spent her entire life meeting everyone else's expectations. 
-                The perfect daughter, the perfect student, the perfect employee. But tonight, 
+                Sarah Chen stood at the edge of the rooftop, tears streaming down her face.
+                At twenty-seven, she had spent her entire life meeting everyone else's expectations.
+                The perfect daughter, the perfect student, the perfect employee. But tonight,
                 after losing the job she never wanted, she finally felt free to be herself.
                 """,
                 expected_character_count=1,
@@ -65,16 +65,16 @@ class TestDataManager:
                 name="multi_character_medium",
                 description="Medium complexity with multiple characters and relationships",
                 narrative_text="""
-                Elena Rodriguez stood in her cramped studio apartment, paintbrush trembling 
-                in her hand as she stared at the blank canvas. At twenty-eight, she had already 
+                Elena Rodriguez stood in her cramped studio apartment, paintbrush trembling
+                in her hand as she stared at the blank canvas. At twenty-eight, she had already
                 given up three different career paths, each time running when success seemed within reach.
-                
-                The phone rang, startling her from her thoughts. It was David, her best friend 
-                since art school and the only person who truly understood her creative struggles. 
+
+                The phone rang, startling her from her thoughts. It was David, her best friend
+                since art school and the only person who truly understood her creative struggles.
                 "Still avoiding the gallery opening?" he asked, his voice gentle but knowing.
-                
-                Elena sighed, setting down her brush. David had always been the confident one, 
-                the artist who embraced fame while she shrank from it. His paintings hung in 
+
+                Elena sighed, setting down her brush. David had always been the confident one,
+                the artist who embraced fame while she shrank from it. His paintings hung in
                 galleries across the city while hers gathered dust in storage.
                 """,
                 expected_character_count=2,
@@ -87,17 +87,17 @@ class TestDataManager:
                 name="concept_album_complex",
                 description="Complex philosophical narrative for concept album",
                 narrative_text="""
-                The Philosopher sat in his study, surrounded by the weight of centuries of human thought. 
-                Nietzsche's words echoed in his mind: "God is dead, and we have killed him." But what 
+                The Philosopher sat in his study, surrounded by the weight of centuries of human thought.
+                Nietzsche's words echoed in his mind: "God is dead, and we have killed him." But what
                 comes after the death of absolute meaning? What fills the void left by collapsed certainties?
-                
-                He had spent decades wrestling with existential questions, moving through phases of 
-                nihilistic despair, absurdist acceptance, and finally arriving at something resembling 
-                hope. Not the naive hope of youth, but the hard-won hope of someone who has stared 
+
+                He had spent decades wrestling with existential questions, moving through phases of
+                nihilistic despair, absurdist acceptance, and finally arriving at something resembling
+                hope. Not the naive hope of youth, but the hard-won hope of someone who has stared
                 into the abyss and chosen to create meaning anyway.
-                
-                The manuscript before him represented his life's work: a treatise on finding purpose 
-                in a purposeless universe. Each chapter was a movement in a symphony of human struggle, 
+
+                The manuscript before him represented his life's work: a treatise on finding purpose
+                in a purposeless universe. Each chapter was a movement in a symphony of human struggle,
                 from the initial shock of meaninglessness to the gradual construction of personal values.
                 """,
                 expected_character_count=1,
@@ -122,18 +122,18 @@ class TestDataManager:
                 name="emotional_intensity_high",
                 description="High emotional intensity for testing emotional framework",
                 narrative_text="""
-                Marcus collapsed to his knees in the hospital corridor, the doctor's words 
-                still echoing in his mind. "I'm sorry, we did everything we could." His wife 
+                Marcus collapsed to his knees in the hospital corridor, the doctor's words
+                still echoing in his mind. "I'm sorry, we did everything we could." His wife
                 of thirty years, his anchor, his reason for breathing, was gone.
-                
-                The rage came first, hot and consuming. How dare the universe take her now, 
-                just as they were planning their retirement, their golden years together? 
-                Then came the bargaining, the desperate prayers to a God he'd never believed in. 
+
+                The rage came first, hot and consuming. How dare the universe take her now,
+                just as they were planning their retirement, their golden years together?
+                Then came the bargaining, the desperate prayers to a God he'd never believed in.
                 Finally, the crushing weight of absolute emptiness settled over him like a shroud.
-                
-                But in that darkness, something unexpected stirred. A memory of her laugh, 
-                the way she hummed while cooking, her fierce love for their children. 
-                She wouldn't want him to disappear into grief. She would want him to live, 
+
+                But in that darkness, something unexpected stirred. A memory of her laugh,
+                the way she hummed while cooking, her fierce love for their children.
+                She wouldn't want him to disappear into grief. She would want him to live,
                 to carry their love forward into whatever time he had left.
                 """,
                 expected_character_count=1,
@@ -146,18 +146,18 @@ class TestDataManager:
                 name="sci_fi_adventure",
                 description="Science fiction narrative with adventure elements",
                 narrative_text="""
-                Captain Zara Okafor floated in the observation deck of the starship Meridian, 
-                watching the swirling nebula that had trapped them for three weeks. Her crew 
+                Captain Zara Okafor floated in the observation deck of the starship Meridian,
+                watching the swirling nebula that had trapped them for three weeks. Her crew
                 looked to her for answers she didn't have, for hope she struggled to maintain.
-                
-                At thirty-five, she had commanded vessels across seven star systems, but nothing 
-                had prepared her for this. The nebula's electromagnetic storms had disabled their 
-                jump drive, and their supplies were running dangerously low. Worse, the strange 
+
+                At thirty-five, she had commanded vessels across seven star systems, but nothing
+                had prepared her for this. The nebula's electromagnetic storms had disabled their
+                jump drive, and their supplies were running dangerously low. Worse, the strange
                 energy readings suggested they weren't alone in this cosmic maze.
-                
-                "Captain," came the voice of her first officer, Lieutenant Chen. "We're detecting 
-                movement in sector seven. It's... it's not natural." Zara straightened, her hand 
-                instinctively moving to her sidearm. Whatever was out there, she would face it 
+
+                "Captain," came the voice of her first officer, Lieutenant Chen. "We're detecting
+                movement in sector seven. It's... it's not natural." Zara straightened, her hand
+                instinctively moving to her sidearm. Whatever was out there, she would face it
                 head-on. Her crew depended on her courage, even when she felt none herself.
                 """,
                 expected_character_count=2,
@@ -170,18 +170,18 @@ class TestDataManager:
                 name="romance_contemporary",
                 description="Contemporary romance with emotional depth",
                 narrative_text="""
-                Maya Patel closed her laptop with a sigh, another day of remote work blending 
-                into the endless stream of video calls and deadlines. At twenty-nine, she had 
-                built a successful career in digital marketing, but the pandemic had left her 
+                Maya Patel closed her laptop with a sigh, another day of remote work blending
+                into the endless stream of video calls and deadlines. At twenty-nine, she had
+                built a successful career in digital marketing, but the pandemic had left her
                 feeling more isolated than ever.
-                
-                The coffee shop across from her apartment had become her lifeline to the outside 
-                world. Every morning at 8:15, she would see him - the man with kind eyes who 
+
+                The coffee shop across from her apartment had become her lifeline to the outside
+                world. Every morning at 8:15, she would see him - the man with kind eyes who
                 always ordered a simple black coffee and sat by the window with a worn paperback.
-                
-                Today, their eyes met through the glass. He smiled, raising his coffee cup in 
-                a small salute. Maya felt her heart skip, a warmth spreading through her chest 
-                that had nothing to do with her morning latte. Maybe it was time to be brave, 
+
+                Today, their eyes met through the glass. He smiled, raising his coffee cup in
+                a small salute. Maya felt her heart skip, a warmth spreading through her chest
+                that had nothing to do with her morning latte. Maybe it was time to be brave,
                 to step outside her carefully constructed comfort zone and take a chance on connection.
                 """,
                 expected_character_count=2,
@@ -194,19 +194,19 @@ class TestDataManager:
                 name="historical_drama",
                 description="Historical narrative with period-specific challenges",
                 narrative_text="""
-                Amelia Hartwell adjusted her corset with practiced efficiency, preparing for 
-                another day of pretending to be the perfect Victorian lady. But beneath the 
-                layers of silk and propriety, her mind raced with equations and theories that 
+                Amelia Hartwell adjusted her corset with practiced efficiency, preparing for
+                another day of pretending to be the perfect Victorian lady. But beneath the
+                layers of silk and propriety, her mind raced with equations and theories that
                 would scandalize London society.
-                
-                At twenty-four, she had already made groundbreaking discoveries in mathematics, 
-                publishing her work under her brother's name to avoid the scandal of a woman 
-                in academia. The Royal Society would never accept her contributions directly, 
+
+                At twenty-four, she had already made groundbreaking discoveries in mathematics,
+                publishing her work under her brother's name to avoid the scandal of a woman
+                in academia. The Royal Society would never accept her contributions directly,
                 but she refused to let societal constraints silence her brilliant mind.
-                
-                Tonight, she would attend another tedious social gathering, smiling demurely 
-                while men half her intellectual equal discussed politics and science. But in 
-                her private study, surrounded by forbidden books and hidden calculations, 
+
+                Tonight, she would attend another tedious social gathering, smiling demurely
+                while men half her intellectual equal discussed politics and science. But in
+                her private study, surrounded by forbidden books and hidden calculations,
                 she was building a legacy that would outlast all their narrow prejudices.
                 """,
                 expected_character_count=1,
@@ -219,18 +219,18 @@ class TestDataManager:
                 name="urban_fantasy",
                 description="Urban fantasy with supernatural elements",
                 narrative_text="""
-                Detective Riley Santos had seen enough crime scenes to last three lifetimes, 
-                but nothing had prepared her for this. The victim lay in the alley, completely 
+                Detective Riley Santos had seen enough crime scenes to last three lifetimes,
+                but nothing had prepared her for this. The victim lay in the alley, completely
                 drained of blood, with strange symbols carved into the brick wall above.
-                
-                What the other cops didn't know - what she could never tell them - was that 
-                Riley could see the lingering traces of magic around the body. Wisps of dark 
+
+                What the other cops didn't know - what she could never tell them - was that
+                Riley could see the lingering traces of magic around the body. Wisps of dark
                 energy that spoke of ancient powers and modern malevolence.
-                
-                Her grandmother's warnings echoed in her mind: "Mija, the old ways never truly 
-                died. They just learned to hide in the shadows of the city." Riley had spent 
-                years suppressing her inherited sight, trying to live a normal life. But now, 
-                with bodies piling up and the supernatural bleeding into her mundane world, 
+
+                Her grandmother's warnings echoed in her mind: "Mija, the old ways never truly
+                died. They just learned to hide in the shadows of the city." Riley had spent
+                years suppressing her inherited sight, trying to live a normal life. But now,
+                with bodies piling up and the supernatural bleeding into her mundane world,
                 she would have to embrace the very gifts she had tried so hard to deny.
                 """,
                 expected_character_count=1,
@@ -243,20 +243,20 @@ class TestDataManager:
                 name="coming_of_age",
                 description="Coming-of-age story with universal themes",
                 narrative_text="""
-                Sixteen-year-old Alex Kim stared at the acceptance letter from the prestigious 
-                music conservatory, the paper trembling in their hands. This was everything 
-                they had worked for, dreamed of, sacrificed for. So why did it feel like a 
+                Sixteen-year-old Alex Kim stared at the acceptance letter from the prestigious
+                music conservatory, the paper trembling in their hands. This was everything
+                they had worked for, dreamed of, sacrificed for. So why did it feel like a
                 prison sentence?
-                
-                Their parents had immigrated from Seoul with nothing but hope and determination, 
-                building a successful restaurant business through decades of eighteen-hour days. 
-                They saw Alex's musical talent as validation of their sacrifices, proof that 
+
+                Their parents had immigrated from Seoul with nothing but hope and determination,
+                building a successful restaurant business through decades of eighteen-hour days.
+                They saw Alex's musical talent as validation of their sacrifices, proof that
                 the American dream was real.
-                
-                But Alex's heart pulled in a different direction. The underground music scene 
-                downtown, where kids like them created raw, honest sounds that spoke to their 
-                generation's struggles. Classical training felt like wearing someone else's 
-                clothes - technically perfect but emotionally hollow. The choice ahead would 
+
+                But Alex's heart pulled in a different direction. The underground music scene
+                downtown, where kids like them created raw, honest sounds that spoke to their
+                generation's struggles. Classical training felt like wearing someone else's
+                clothes - technically perfect but emotionally hollow. The choice ahead would
                 define not just their career, but their very identity.
                 """,
                 expected_character_count=1,
@@ -269,19 +269,19 @@ class TestDataManager:
                 name="psychological_thriller",
                 description="Psychological thriller with unreliable narrator",
                 narrative_text="""
-                Dr. Catherine Wells reviewed her patient notes for the third time, but the 
-                words kept shifting on the page. Or maybe that was just the medication. She 
-                couldn't be sure anymore what was real and what was a symptom of her own 
+                Dr. Catherine Wells reviewed her patient notes for the third time, but the
+                words kept shifting on the page. Or maybe that was just the medication. She
+                couldn't be sure anymore what was real and what was a symptom of her own
                 unraveling mind.
-                
-                The irony wasn't lost on her - a psychiatrist losing her grip on reality. 
-                For fifteen years, she had helped others navigate their darkest thoughts, 
-                but now she was drowning in her own psychological maze. The line between 
+
+                The irony wasn't lost on her - a psychiatrist losing her grip on reality.
+                For fifteen years, she had helped others navigate their darkest thoughts,
+                but now she was drowning in her own psychological maze. The line between
                 doctor and patient had blurred beyond recognition.
-                
-                Her reflection in the office window looked wrong somehow, the features 
-                subtly distorted. Was someone watching her, or was paranoia finally claiming 
-                the last vestiges of her sanity? The truth felt like quicksand - the harder 
+
+                Her reflection in the office window looked wrong somehow, the features
+                subtly distorted. Was someone watching her, or was paranoia finally claiming
+                the last vestiges of her sanity? The truth felt like quicksand - the harder
                 she grasped for it, the deeper she sank into uncertainty.
                 """,
                 expected_character_count=1,
@@ -294,19 +294,19 @@ class TestDataManager:
                 name="family_saga",
                 description="Multi-generational family story",
                 narrative_text="""
-                Rosa Delgado stood in the kitchen where four generations of women had kneaded 
-                bread and shared secrets. At sixty-eight, she was the keeper of family stories, 
+                Rosa Delgado stood in the kitchen where four generations of women had kneaded
+                bread and shared secrets. At sixty-eight, she was the keeper of family stories,
                 the bridge between her grandmother's Mexico and her granddaughter's America.
-                
-                Her granddaughter Sofia, twenty-two and fresh from college, sat at the worn 
-                wooden table, laptop open, trying to document the family recipes before they 
-                were lost forever. But Rosa knew that recipes were just the beginning - each 
+
+                Her granddaughter Sofia, twenty-two and fresh from college, sat at the worn
+                wooden table, laptop open, trying to document the family recipes before they
+                were lost forever. But Rosa knew that recipes were just the beginning - each
                 dish carried the weight of history, love, and survival.
-                
-                "Mija," Rosa said, her weathered hands shaping masa with practiced ease, "the 
-                secret ingredient isn't in any cookbook. It's the stories we tell while we cook, 
-                the love we knead into every tortilla, the prayers we whisper over every pot." 
-                Sofia looked up from her screen, finally understanding that she was documenting 
+
+                "Mija," Rosa said, her weathered hands shaping masa with practiced ease, "the
+                secret ingredient isn't in any cookbook. It's the stories we tell while we cook,
+                the love we knead into every tortilla, the prayers we whisper over every pot."
+                Sofia looked up from her screen, finally understanding that she was documenting
                 more than food - she was preserving the soul of her family.
                 """,
                 expected_character_count=2,
@@ -1393,7 +1393,7 @@ class ComprehensiveValidator:
 
         album_fixture = self.test_data.create_album_test_fixture(scenario_name, len(album_tracks))
         expected_structure = album_fixture["expected_track_structure"]
-        validation_criteria = album_fixture["validation_criteria"]
+        album_fixture["validation_criteria"]
 
         track_results = []
         thematic_scores = []

@@ -273,11 +273,11 @@ class EnhancedBeatGenerator:
     def generate_beat_patterns(self, emotional_profile: EmotionalProfile, genre_preferences: List[str] = None) -> Dict[str, Any]:
         """
         Generate comprehensive beat patterns based on emotional analysis
-        
+
         Args:
             emotional_profile: Emotional analysis results
             genre_preferences: Optional genre preferences
-            
+
         Returns:
             Dictionary containing beat patterns and musical recommendations
         """
@@ -593,7 +593,7 @@ class EnhancedBeatGenerator:
     def _get_texture_characteristics(self, emotional_profile: EmotionalProfile) -> Dict[str, Any]:
         """Get texture characteristics based on emotional profile"""
         complexity = emotional_profile.emotional_complexity
-        primary_emotion = emotional_profile.primary_emotions[0].emotion
+        emotional_profile.primary_emotions[0].emotion
 
         if complexity > 0.7:
             return {

@@ -50,7 +50,7 @@ def divide(a, b):
 class Calculator:
     def __init__(self):
         self.history = []
-    
+
     def calculate(self, operation, a, b):
         if operation == "add":
             result = add(a, b)
@@ -58,7 +58,7 @@ class Calculator:
             result = divide(a, b)
         else:
             raise ValueError(f"Unknown operation: {operation}")
-        
+
         self.history.append((operation, a, b, result))
         return result
             """.strip())
@@ -628,8 +628,8 @@ I'm 85% confident in this analysis.
 
         assert isinstance(stats["total_entries"], int)
         assert isinstance(stats["total_size_bytes"], int)
-        assert isinstance(stats["total_size_mb"], (int, float))
-        assert isinstance(stats["ttl_hours"], (int, float))
+        assert isinstance(stats["total_size_mb"], int | float)
+        assert isinstance(stats["ttl_hours"], int | float)
 
     @pytest.mark.asyncio
     async def test_batch_analyze_failures(self, analyzer, mock_deepseek_response):

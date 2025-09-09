@@ -376,11 +376,11 @@ def get_config(
     require_github_auth: bool = False
 ) -> AgentConfig:
     """Get the agent configuration with validation
-    
+
     Args:
         config_file: Optional path to configuration file
         require_github_auth: Whether GitHub authentication is required
-    
+
     Returns:
         Validated AgentConfig instance
     """
@@ -395,7 +395,7 @@ def get_config(
 
 def create_default_config_file(config_path: Path) -> None:
     """Create a default configuration file template
-    
+
     Args:
         config_path: Path where to create the configuration file
     """

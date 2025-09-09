@@ -120,10 +120,10 @@ class MCPDataValidator:
     def validate_character_profile(self, data: Any) -> ValidationResult:
         """
         Validate character profile data structure
-        
+
         Args:
             data: Character profile data to validate
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -151,10 +151,10 @@ class MCPDataValidator:
     def validate_persona_data(self, data: Any) -> ValidationResult:
         """
         Validate persona data structure
-        
+
         Args:
             data: Persona data to validate
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -182,10 +182,10 @@ class MCPDataValidator:
     def validate_suno_command_data(self, data: Any) -> ValidationResult:
         """
         Validate Suno command data structure
-        
+
         Args:
             data: Suno command data to validate
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -213,12 +213,12 @@ class MCPDataValidator:
     def validate_text_input(self, text: Any, min_length: int = 10, max_length: int = 50000) -> ValidationResult:
         """
         Validate text input for analysis tools
-        
+
         Args:
             text: Text to validate
             min_length: Minimum required text length
             max_length: Maximum allowed text length
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -270,10 +270,10 @@ class MCPDataValidator:
     def validate_genre_specification(self, genre: Any) -> ValidationResult:
         """
         Validate genre specification
-        
+
         Args:
             genre: Genre specification to validate
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -313,11 +313,11 @@ class MCPDataValidator:
     def validate_content_type_detection(self, content: str, detected_type: str) -> ValidationResult:
         """
         Validate content type detection results
-        
+
         Args:
             content: Original content that was analyzed
             detected_type: The detected content type
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -379,10 +379,10 @@ class MCPDataValidator:
     def validate_workflow_state(self, workflow_state: Dict[str, Any]) -> ValidationResult:
         """
         Validate workflow state structure and completeness
-        
+
         Args:
             workflow_state: Workflow state dictionary to validate
-            
+
         Returns:
             ValidationResult with validation details
         """
@@ -449,11 +449,11 @@ class MCPDataValidator:
     def validate_processing_strategy(self, content_type: str, strategy_name: str) -> ValidationResult:
         """
         Validate that processing strategy matches content type
-        
+
         Args:
             content_type: Detected content type
             strategy_name: Name of processing strategy being used
-            
+
         Returns:
             ValidationResult with validation details
         """

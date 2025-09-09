@@ -2,7 +2,7 @@
 """
 Comprehensive unit tests for all wiki components
 
-This file contains unit tests for WikiDownloader, ContentParser, 
+This file contains unit tests for WikiDownloader, ContentParser,
 EnhancedGenreMapper, and SourceAttributionManager components.
 """
 
@@ -114,17 +114,17 @@ class TestWikiDownloaderUnit:
 
     def test_url_validation(self, downloader):
         """Test URL validation"""
-        assert downloader.validate_url("https://example.com") == True
-        assert downloader.validate_url("http://example.com") == True
-        assert downloader.validate_url("") == False
-        assert downloader.validate_url("invalid-url") == False
-        assert downloader.validate_url(None) == False
+        assert downloader.validate_url("https://example.com")
+        assert downloader.validate_url("http://example.com")
+        assert not downloader.validate_url("")
+        assert not downloader.validate_url("invalid-url")
+        assert not downloader.validate_url(None)
 
     @pytest.mark.asyncio
     async def test_is_refresh_needed_nonexistent(self, downloader):
         """Test refresh needed for non-existent file"""
         needs_refresh = await downloader.is_refresh_needed("https://example.com/test", 24)
-        assert needs_refresh == True
+        assert needs_refresh
 
     @pytest.mark.asyncio
     async def test_context_manager_basic(self, temp_cache_manager):

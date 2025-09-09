@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from server import generate_artist_personas
 from standard_character_profile import StandardCharacterProfile
+
 from tests.fixtures.mock_contexts import MockContext
 
 

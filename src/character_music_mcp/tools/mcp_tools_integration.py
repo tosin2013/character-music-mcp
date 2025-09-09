@@ -76,14 +76,14 @@ class EnhancedMCPTools:
     async def detect_input_format_and_route(self, text: str, user_preference: str = None, ctx: Context = None) -> str:
         """
         Detect input format and route to appropriate processing strategy
-        
+
         This implements requirement 8.1: Detect and route different input formats appropriately
-        
+
         Args:
             text: Input text to analyze and route
             user_preference: Optional user-specified processing preference
             ctx: Context for logging
-            
+
         Returns:
             JSON string containing detection results and routing information
         """
@@ -126,7 +126,7 @@ class EnhancedMCPTools:
     async def analyze_character_text_enhanced(self, text: str, processing_strategy: str = None, ctx: Context = None) -> str:
         """
         Enhanced character analysis with flexible input processing strategies
-        
+
         This version includes:
         - Input format detection and routing
         - Multiple processing strategies
@@ -387,15 +387,15 @@ class EnhancedMCPTools:
     async def request_input_clarification(self, text: str, detection_result: str = None, ctx: Context = None) -> str:
         """
         Request clarification from user when input type is unclear
-        
+
         This implements requirement 8.4: Ask clarifying questions rather than making incorrect assumptions
         and requirement 6.2: Provide clear feedback about what went wrong and suggest alternatives
-        
+
         Args:
             text: Original input text that needs clarification
             detection_result: JSON string of detection results (optional)
             ctx: Context for logging
-            
+
         Returns:
             JSON string containing clarification prompts and options
         """
@@ -434,15 +434,15 @@ class EnhancedMCPTools:
     async def process_with_user_guidance(self, text: str, user_choice: str, additional_context: str = "", ctx: Context = None) -> str:
         """
         Process content with user-provided guidance and context
-        
+
         This implements requirement 8.4: Interactive prompts to guide users toward appropriate processing modes
-        
+
         Args:
             text: Original input text to process
             user_choice: User's choice of processing method
             additional_context: Additional context provided by user
             ctx: Context for logging
-            
+
         Returns:
             JSON string containing processing results
         """
@@ -494,11 +494,11 @@ class EnhancedMCPTools:
     def _generate_clarification_prompts(self, text: str, detection_info: Dict) -> Dict:
         """
         Generate helpful clarification prompts based on detection results
-        
+
         Args:
             text: Original input text
             detection_info: Detection analysis results
-            
+
         Returns:
             Dictionary containing clarification prompts and options
         """
@@ -654,13 +654,13 @@ class EnhancedMCPTools:
     async def provide_processing_guidance(self, content_type: str = None, ctx: Context = None) -> str:
         """
         Provide guidance on different processing modes and when to use them
-        
+
         This implements requirement 6.4: Provide fallback options when automatic content detection fails
-        
+
         Args:
             content_type: Specific content type to get guidance for (optional)
             ctx: Context for logging
-            
+
         Returns:
             JSON string containing processing guidance
         """
@@ -761,7 +761,7 @@ class EnhancedMCPTools:
     async def generate_artist_personas_enhanced(self, characters_json: str, ctx: Context) -> str:
         """
         Enhanced persona generation with comprehensive error handling
-        
+
         This version includes:
         - JSON parsing error recovery
         - Character profile format validation
@@ -812,7 +812,7 @@ class EnhancedMCPTools:
     ) -> str:
         """
         Enhanced Suno command generation with comprehensive error handling
-        
+
         This version includes:
         - Multi-input validation
         - Command generation recovery
@@ -864,7 +864,7 @@ class EnhancedMCPTools:
     ) -> str:
         """
         Enhanced creative music generation with comprehensive error handling
-        
+
         This version includes:
         - Concept analysis validation
         - Creative variation generation
@@ -913,7 +913,7 @@ class EnhancedMCPTools:
     async def complete_workflow_enhanced(self, text: str, ctx: Context) -> str:
         """
         Enhanced complete workflow with comprehensive error handling and content type coordination
-        
+
         This version includes:
         - Content type detection and routing
         - Step-by-step error handling with content-aware recovery
@@ -1808,7 +1808,7 @@ def get_enhanced_tools() -> EnhancedMCPTools:
     async def _create_basic_character_from_description(self, text: str) -> Dict[str, Any]:
         """Create basic character from description text"""
         # Extract potential name from first line or sentence
-        first_sentence = text.split('.')[0].split('\n')[0]
+        text.split('.')[0].split('\n')[0]
 
         return {
             "characters": [{
@@ -2003,7 +2003,7 @@ def get_enhanced_tools() -> EnhancedMCPTools:
         tracks = []
         aspects = ["Introduction", "Background", "Struggles", "Growth", "Resolution"]
 
-        for i, aspect in enumerate(aspects):
+        for _i, aspect in enumerate(aspects):
             track = {
                 "title": f"{main_character.get('name', 'Character')} - {aspect}",
                 "concept": f"Exploring {aspect.lower()} of {main_character.get('name', 'character')}",
@@ -2106,7 +2106,7 @@ def get_enhanced_tools() -> EnhancedMCPTools:
 async def coordinate_album_workflow(content: str, content_type: str = None, ctx: Context = None) -> Dict[str, Any]:
     """
     Coordinate complete album generation workflow with enhanced error handling
-    
+
     This function provides a high-level interface for coordinating the entire
     album generation workflow with content type detection and intelligent fallbacks.
     """

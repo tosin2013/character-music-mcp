@@ -8,7 +8,6 @@ from pathlib import Path
 
 import aiofiles
 import pytest
-
 from wiki_config_validator import validate_config_full, validate_config_quick
 from wiki_data_system import WikiConfig, WikiDataManager
 
@@ -32,13 +31,13 @@ class TestConfigurationIntegration:
 
             # Validate configuration
             validation_result = await validate_config_quick(config)
-            assert validation_result.is_valid == True
+            assert validation_result.is_valid
 
             # Initialize WikiDataManager
             manager = WikiDataManager()
             await manager.initialize(config)
 
-            assert manager.initialized == True
+            assert manager.initialized
             assert manager.config == config
 
     @pytest.mark.asyncio
@@ -56,7 +55,7 @@ class TestConfigurationIntegration:
 
             # Validate configuration
             validation_result = await validate_config_quick(invalid_config)
-            assert validation_result.is_valid == False
+            assert not validation_result.is_valid
             assert len(validation_result.errors) >= 3
 
             # WikiDataManager should reject invalid config
@@ -90,11 +89,11 @@ class TestConfigurationIntegration:
             await manager.enable_dynamic_config(str(config_file))
 
             assert manager.dynamic_config_manager is not None
-            assert manager.dynamic_config_manager.is_watching() == True
+            assert manager.dynamic_config_manager.is_watching()
 
             # Test runtime configuration update
             success = await manager.update_config_runtime(refresh_interval_hours=48)
-            assert success == True
+            assert success
             assert manager.config.refresh_interval_hours == 48
 
             # Test adding URLs at runtime
@@ -103,7 +102,7 @@ class TestConfigurationIntegration:
                 ["https://example.com/new-genre-page"],
                 validate_urls=False
             )
-            assert success == True
+            assert success
             assert "https://example.com/new-genre-page" in manager.config.genre_pages
 
             # Test removing URLs at runtime
@@ -111,20 +110,20 @@ class TestConfigurationIntegration:
                 "genre_pages",
                 ["https://example.com/new-genre-page"]
             )
-            assert success == True
+            assert success
             assert "https://example.com/new-genre-page" not in manager.config.genre_pages
 
             # Get dynamic config status
             status = manager.get_dynamic_config_status()
-            assert status['enabled'] == True
-            assert status['watching'] == True
+            assert status['enabled']
+            assert status['watching']
 
             # Disable dynamic configuration
             manager.disable_dynamic_config()
 
             status = manager.get_dynamic_config_status()
-            assert status['enabled'] == False
-            assert status['watching'] == False
+            assert not status['enabled']
+            assert not status['watching']
 
     @pytest.mark.asyncio
     async def test_config_change_handling(self):
@@ -232,7 +231,7 @@ class TestConfigurationIntegration:
             await manager._handle_config_change(initial_config, new_config)
 
             # Verify cache was invalidated
-            assert manager._cache_valid == False
+            assert not manager._cache_valid
 
     @pytest.mark.asyncio
     async def test_runtime_operations_without_dynamic_config(self):
@@ -250,17 +249,17 @@ class TestConfigurationIntegration:
 
             # Runtime operations should fail gracefully
             success = await manager.update_config_runtime(refresh_interval_hours=48)
-            assert success == False
+            assert not success
 
             success = await manager.add_wiki_urls_runtime("genre_pages", ["https://example.com"])
-            assert success == False
+            assert not success
 
             success = await manager.remove_wiki_urls_runtime("genre_pages", ["https://example.com"])
-            assert success == False
+            assert not success
 
             # Status should indicate dynamic config is disabled
             status = manager.get_dynamic_config_status()
-            assert status['enabled'] == False
+            assert not status['enabled']
 
     @pytest.mark.asyncio
     async def test_full_validation_with_url_checks(self):
@@ -279,7 +278,7 @@ class TestConfigurationIntegration:
             validation_result = await validate_config_full(config, timeout=5)
 
             # Should be valid overall (warnings don't make it invalid)
-            assert validation_result.is_valid == True
+            assert validation_result.is_valid
 
             # Should have warnings about inaccessible URLs
             assert len(validation_result.warnings) > 0
@@ -290,7 +289,7 @@ class TestConfigurationIntegration:
             assert "https://invalid-domain-that-does-not-exist.com" in validation_result.url_checks
 
             # Storage should be validated successfully
-            assert validation_result.storage_info['writable'] == True
+            assert validation_result.storage_info['writable']
             assert 'available_space_gb' in validation_result.storage_info
 
 

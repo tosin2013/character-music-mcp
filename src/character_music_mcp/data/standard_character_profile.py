@@ -16,12 +16,12 @@ logger = logging.getLogger(__name__)
 class StandardCharacterProfile:
     """
     Standardized character profile for all MCP tools
-    
+
     This class implements the three-layer character analysis approach:
     - Skin Layer: Observable characteristics (physical, mannerisms, speech)
     - Flesh Layer: Background and relationships (backstory, connections)
     - Core Layer: Deep psychology (motivations, fears, desires)
-    
+
     All fields have sensible defaults to handle missing data gracefully.
     """
 
@@ -105,13 +105,13 @@ class StandardCharacterProfile:
     def from_dict(cls, data: Dict[str, Any]) -> 'StandardCharacterProfile':
         """
         Create StandardCharacterProfile from dictionary, handling missing fields gracefully
-        
+
         This method is essential for JSON deserialization and backward compatibility
         with existing character profile formats.
-        
+
         Args:
             data: Dictionary containing character profile data
-            
+
         Returns:
             StandardCharacterProfile instance with all fields properly initialized
         """
@@ -179,7 +179,7 @@ class StandardCharacterProfile:
     def to_dict(self) -> Dict[str, Any]:
         """
         Convert to dictionary for JSON serialization
-        
+
         Returns:
             Dictionary representation of the character profile
         """
@@ -188,13 +188,13 @@ class StandardCharacterProfile:
     def to_legacy_format(self, format_type: str = "simple") -> Dict[str, Any]:
         """
         Convert to legacy format for backward compatibility
-        
+
         Args:
             format_type: Type of legacy format to generate
                 - "simple": Just name and backstory (for old tests)
                 - "minimal": Name, aliases, basic traits
                 - "full": All fields (same as to_dict)
-        
+
         Returns:
             Dictionary in the requested legacy format
         """
@@ -222,11 +222,11 @@ class StandardCharacterProfile:
     def from_legacy_format(cls, data: Dict[str, Any], format_type: str = "auto") -> 'StandardCharacterProfile':
         """
         Create StandardCharacterProfile from legacy format data
-        
+
         Args:
             data: Legacy format data
             format_type: Type of legacy format ("auto" to detect automatically)
-        
+
         Returns:
             StandardCharacterProfile instance
         """
@@ -245,10 +245,10 @@ class StandardCharacterProfile:
     def merge_with(self, other: 'StandardCharacterProfile') -> 'StandardCharacterProfile':
         """
         Merge this character profile with another, combining information
-        
+
         Args:
             other: Another StandardCharacterProfile to merge with
-            
+
         Returns:
             New StandardCharacterProfile with merged information
         """
@@ -306,7 +306,7 @@ class StandardCharacterProfile:
     def is_conceptual(self) -> bool:
         """
         Check if this is a conceptual character (created from abstract concepts)
-        
+
         Returns:
             True if character is conceptual, False if narrative
         """
@@ -315,7 +315,7 @@ class StandardCharacterProfile:
     def is_narrative(self) -> bool:
         """
         Check if this is a narrative character (extracted from story)
-        
+
         Returns:
             True if character is from narrative, False if conceptual
         """
@@ -324,7 +324,7 @@ class StandardCharacterProfile:
     def get_processing_strategy(self) -> str:
         """
         Get the processing strategy used to create this character
-        
+
         Returns:
             String indicating processing strategy
         """
@@ -338,7 +338,7 @@ class StandardCharacterProfile:
     def is_complete(self) -> bool:
         """
         Check if the character profile has sufficient information for analysis
-        
+
         Returns:
             True if profile has enough information, False otherwise
         """
@@ -379,7 +379,7 @@ class StandardCharacterProfile:
     def get_summary(self) -> str:
         """
         Get a brief summary of the character profile
-        
+
         Returns:
             String summary of the character
         """
@@ -416,14 +416,14 @@ class StandardCharacterProfile:
 def create_character_profile_from_text(text: str, name: str = None) -> StandardCharacterProfile:
     """
     Create a basic character profile from text description
-    
+
     This is a simple utility function for quick character profile creation.
     For more sophisticated analysis, use the enhanced character analyzer.
-    
+
     Args:
         text: Text containing character information
         name: Optional character name (will be extracted from text if not provided)
-        
+
     Returns:
         StandardCharacterProfile instance
     """
@@ -470,10 +470,10 @@ def create_character_profile_from_text(text: str, name: str = None) -> StandardC
 def validate_character_profile_data(data: Dict[str, Any]) -> List[str]:
     """
     Validate character profile data and return list of issues
-    
+
     Args:
         data: Dictionary containing character profile data
-        
+
     Returns:
         List of validation error messages (empty if valid)
     """

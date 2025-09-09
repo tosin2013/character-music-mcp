@@ -25,6 +25,7 @@ except ImportError:
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from server import CharacterAnalyzer
+
 from tests.fixtures.mock_contexts import create_mock_context
 
 
@@ -40,23 +41,23 @@ def sample_text():
 @pytest_asyncio.fixture
 def complex_text():
     return """
-    Sarah Chen was a 28-year-old software engineer who had always dreamed of making music. 
-    She worked at a tech startup during the day but spent her evenings composing melodies 
-    on her old piano. Sarah was known for her analytical mind and creative spirit, often 
-    finding innovative solutions to complex problems. Her colleagues admired her dedication 
+    Sarah Chen was a 28-year-old software engineer who had always dreamed of making music.
+    She worked at a tech startup during the day but spent her evenings composing melodies
+    on her old piano. Sarah was known for her analytical mind and creative spirit, often
+    finding innovative solutions to complex problems. Her colleagues admired her dedication
     and her ability to see patterns others missed.
-    
-    Sarah's journey into music began during college when she took a music theory class. 
-    She discovered that the mathematical patterns in music resonated with her programming 
+
+    Sarah's journey into music began during college when she took a music theory class.
+    She discovered that the mathematical patterns in music resonated with her programming
     background. She was particularly drawn to electronic music and indie rock.
     """
 
 @pytest_asyncio.fixture
 def multi_character_text():
     return """
-    Elena Rodriguez stood in her art studio, paintbrush trembling in her hand. Her best 
-    friend David knocked on the door. "Elena, are you okay?" he called out. She had been 
-    struggling with creative block for weeks. David was always supportive, bringing her 
+    Elena Rodriguez stood in her art studio, paintbrush trembling in her hand. Her best
+    friend David knocked on the door. "Elena, are you okay?" he called out. She had been
+    struggling with creative block for weeks. David was always supportive, bringing her
     coffee and encouraging words. Elena appreciated his friendship more than she could express.
     """
 
@@ -311,8 +312,8 @@ class TestAliasDetection:
     async def test_title_and_role_aliases(self, mock_ctx):
         """Test detection of titles and role-based aliases"""
         test_text = """
-        Captain Zara Okafor stood on the bridge of her starship. The Captain 
-        had been exploring the galaxy for five years. Zara was known for her 
+        Captain Zara Okafor stood on the bridge of her starship. The Captain
+        had been exploring the galaxy for five years. Zara was known for her
         decisive leadership and strategic thinking.
         """
 
@@ -362,11 +363,11 @@ async def run_character_analysis_tests():
                 test_method = getattr(test_class, method_name)
                 # Create simple test data for each test
                 if "multi_character" in method_name:
-                    test_text = """Elena and David were friends. Elena was artistic, David was supportive."""
+                    pass
                 elif "complex" in method_name:
-                    test_text = """Sarah was a programmer who loved music. She was creative and analytical."""
+                    pass
                 else:
-                    test_text = "Emma was a creative person."
+                    pass
 
                 # Call test method with mock context and simple data
                 await test_method(ctx)

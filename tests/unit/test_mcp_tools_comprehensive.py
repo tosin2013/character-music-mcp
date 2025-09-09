@@ -43,8 +43,8 @@ class TestCharacterProfileFormatConsistency:
     @pytest.mark.asyncio
     async def test_analyze_character_text_format_consistency(self):
         """Test analyze_character_text returns consistent character profile format"""
-        ctx = create_mock_context("basic")
-        test_text = test_data_manager.scenarios["single_character_simple"].narrative_text
+        create_mock_context("basic")
+        test_data_manager.scenarios["single_character_simple"].narrative_text
 
     @pytest.mark.asyncio
     async def test_conceptual_character_creation_format_consistency(self):
@@ -94,7 +94,7 @@ class TestCharacterProfileFormatConsistency:
 
         processor = WorkingUniversalProcessor()
 
-        for content, expected_type in test_cases:
+        for content, _expected_type in test_cases:
             try:
                 if hasattr(processor, 'detect_content_type'):
                     detected_type = processor.detect_content_type(content)
@@ -280,8 +280,8 @@ class TestHardcodedContentRemoval:
 
         # Test with clear character descriptions
         test_narrative = """
-        Isabella Martinez stood on the stage of the Blue Note jazz club, her voice 
-        carrying the weight of three generations of musical tradition. At twenty-eight, 
+        Isabella Martinez stood on the stage of the Blue Note jazz club, her voice
+        carrying the weight of three generations of musical tradition. At twenty-eight,
         she had inherited her grandmother's gift for storytelling through song.
         """
 
@@ -635,7 +635,7 @@ class TestFixedToolFunctionality:
         ]
 
         themes_found = []
-        for scenario_name, expected_themes in test_scenarios:
+        for scenario_name, _expected_themes in test_scenarios:
             test_text = test_data_manager.scenarios[scenario_name].narrative_text
             result = await middleware.analyze_characters(test_text, ctx)
 

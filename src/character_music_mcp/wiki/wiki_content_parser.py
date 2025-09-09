@@ -89,7 +89,7 @@ class ContentParser:
     def __init__(self, parser: str = "lxml", performance_monitor: Optional[PerformanceMonitor] = None):
         """
         Initialize ContentParser
-        
+
         Args:
             parser: BeautifulSoup parser to use ('lxml', 'html.parser', etc.)
             performance_monitor: PerformanceMonitor instance for tracking metrics
@@ -109,14 +109,14 @@ class ContentParser:
     def parse_html(self, html_content: str, source_url: str = "") -> BeautifulSoup:
         """
         Parse HTML content with error handling
-        
+
         Args:
             html_content: Raw HTML content to parse
             source_url: Source URL for error reporting
-            
+
         Returns:
             BeautifulSoup object
-            
+
         Raises:
             MalformedHTMLError: If HTML cannot be parsed
         """
@@ -141,10 +141,10 @@ class ContentParser:
     def extract_text_content(self, element: Union[Tag, NavigableString, None]) -> str:
         """
         Safely extract text content from an element
-        
+
         Args:
             element: BeautifulSoup element
-            
+
         Returns:
             Cleaned text content
         """
@@ -169,11 +169,11 @@ class ContentParser:
     def extract_links(self, element: Tag, base_url: str = "") -> List[str]:
         """
         Extract all links from an element
-        
+
         Args:
             element: BeautifulSoup element to search
             base_url: Base URL for resolving relative links
-            
+
         Returns:
             List of absolute URLs
         """
@@ -196,11 +196,11 @@ class ContentParser:
                             section_indicators: List[str]) -> List[Tag]:
         """
         Find content sections based on various indicators
-        
+
         Args:
             soup: BeautifulSoup object
             section_indicators: List of text patterns to look for in headings
-            
+
         Returns:
             List of section elements
         """
@@ -232,10 +232,10 @@ class ContentParser:
     def extract_list_items(self, element: Tag) -> List[str]:
         """
         Extract items from lists (ul, ol, dl)
-        
+
         Args:
             element: Element to search for lists
-            
+
         Returns:
             List of text items
         """
@@ -268,10 +268,10 @@ class ContentParser:
     def extract_table_data(self, element: Tag) -> List[Dict[str, str]]:
         """
         Extract data from tables
-        
+
         Args:
             element: Element to search for tables
-            
+
         Returns:
             List of dictionaries representing table rows
         """
@@ -306,10 +306,10 @@ class ContentParser:
     def clean_text(self, text: str) -> str:
         """
         Clean and normalize text content
-        
+
         Args:
             text: Raw text to clean
-            
+
         Returns:
             Cleaned text
         """
@@ -332,19 +332,19 @@ class ContentParser:
                                  source_url: str = "") -> ParsedContent:
         """
         Extract structured content from HTML based on page type
-        
+
         Args:
             html_content: Raw HTML content
             page_type: Type of page ('genres', 'meta_tags', 'techniques')
             source_url: Source URL for attribution
-            
+
         Returns:
             ParsedContent object with extracted data
         """
         parsed_content = ParsedContent(page_type, source_url)
 
         try:
-            soup = self.parse_html(html_content, source_url)
+            self.parse_html(html_content, source_url)
 
             # Route to specific parsing method based on page type
             if page_type.lower() == 'genres':
@@ -366,11 +366,11 @@ class ContentParser:
     def parse_genre_page(self, html_content: str, source_url: str = "") -> List[Genre]:
         """
         Parse genre page content from Suno AI Wiki
-        
+
         Args:
             html_content: Raw HTML content
             source_url: Source URL for attribution
-            
+
         Returns:
             List of Genre objects
         """
@@ -458,10 +458,10 @@ class ContentParser:
     def _parse_genre_item(self, genre_item: str) -> tuple[str, str]:
         """
         Parse individual genre item to extract name and description
-        
+
         Args:
             genre_item: Raw genre item text
-            
+
         Returns:
             Tuple of (genre_name, description)
         """
@@ -490,11 +490,11 @@ class ContentParser:
     def _extract_genre_characteristics(self, category: str, genre_name: str) -> List[str]:
         """
         Extract or infer characteristics based on category and genre name
-        
+
         Args:
             category: Genre category (e.g., "Electronic", "Rock")
             genre_name: Specific genre name
-            
+
         Returns:
             List of characteristics
         """
@@ -539,11 +539,11 @@ class ContentParser:
     def _infer_typical_instruments(self, category: str, genre_name: str) -> List[str]:
         """
         Infer typical instruments based on category and genre
-        
+
         Args:
             category: Genre category
             genre_name: Specific genre name
-            
+
         Returns:
             List of typical instruments
         """
@@ -583,11 +583,11 @@ class ContentParser:
     def _infer_mood_associations(self, category: str, genre_name: str) -> List[str]:
         """
         Infer mood associations based on category and genre
-        
+
         Args:
             category: Genre category
             genre_name: Specific genre name
-            
+
         Returns:
             List of mood associations
         """
@@ -631,11 +631,11 @@ class ContentParser:
     def parse_meta_tag_page(self, html_content: str, source_url: str = "") -> List[MetaTag]:
         """
         Parse meta tag page content from Suno AI Wiki
-        
+
         Args:
             html_content: Raw HTML content
             source_url: Source URL for attribution
-            
+
         Returns:
             List of MetaTag objects
         """
@@ -706,10 +706,10 @@ class ContentParser:
     def _parse_meta_tag_item(self, tag_item: str) -> tuple[str, str, List[str]]:
         """
         Parse individual meta tag item to extract name, description, and examples
-        
+
         Args:
             tag_item: Raw meta tag item text or HTML
-            
+
         Returns:
             Tuple of (tag_name, description, examples)
         """
@@ -773,11 +773,11 @@ class ContentParser:
     def _categorize_meta_tag(self, category_name: str, tag_name: str) -> str:
         """
         Categorize meta tag based on category name and tag name
-        
+
         Args:
             category_name: Category heading text
             tag_name: Meta tag name
-            
+
         Returns:
             Category type string
         """
@@ -817,11 +817,11 @@ class ContentParser:
     def _infer_compatible_genres(self, category_type: str, tag_name: str) -> List[str]:
         """
         Infer compatible genres for a meta tag
-        
+
         Args:
             category_type: Category type of the meta tag
             tag_name: Meta tag name
-            
+
         Returns:
             List of compatible genres
         """
@@ -878,11 +878,11 @@ class ContentParser:
     def parse_tip_page(self, html_content: str, source_url: str = "") -> List[Technique]:
         """
         Parse tip page content from Suno AI Wiki to extract techniques
-        
+
         Args:
             html_content: Raw HTML content
             source_url: Source URL for attribution
-            
+
         Returns:
             List of Technique objects
         """
@@ -912,11 +912,11 @@ class ContentParser:
     def _extract_main_technique(self, soup, source_url: str) -> Optional[Technique]:
         """
         Extract the main technique from the page title and overall content
-        
+
         Args:
             soup: BeautifulSoup object
             source_url: Source URL for attribution
-            
+
         Returns:
             Main Technique object or None
         """
@@ -975,11 +975,11 @@ class ContentParser:
     def _extract_additional_techniques(self, soup, source_url: str) -> List[Technique]:
         """
         Extract additional techniques from numbered examples and sections
-        
+
         Args:
             soup: BeautifulSoup object
             source_url: Source URL for attribution
-            
+
         Returns:
             List of additional Technique objects
         """
@@ -1015,11 +1015,11 @@ class ContentParser:
     def _parse_technique_from_list_item(self, li_element, source_url: str) -> Optional[Technique]:
         """
         Parse a technique from a list item
-        
+
         Args:
             li_element: List item BeautifulSoup element
             source_url: Source URL for attribution
-            
+
         Returns:
             Technique object or None
         """
@@ -1082,11 +1082,11 @@ class ContentParser:
     def _parse_technique_from_section(self, heading_element, source_url: str) -> Optional[Technique]:
         """
         Parse a technique from a section with heading
-        
+
         Args:
             heading_element: Heading BeautifulSoup element
             source_url: Source URL for attribution
-            
+
         Returns:
             Technique object or None
         """
@@ -1131,10 +1131,10 @@ class ContentParser:
     def _extract_examples_from_content(self, content_element) -> List[str]:
         """
         Extract code examples and practical examples from content
-        
+
         Args:
             content_element: BeautifulSoup element containing content
-            
+
         Returns:
             List of example strings
         """
@@ -1175,11 +1175,11 @@ class ContentParser:
     def _determine_technique_type(self, technique_name: str, description: str) -> str:
         """
         Determine the type of technique based on name and description
-        
+
         Args:
             technique_name: Name of the technique
             description: Description of the technique
-            
+
         Returns:
             Technique type string
         """
@@ -1228,12 +1228,12 @@ class ContentParser:
                                     examples: List[str]) -> List[str]:
         """
         Extract applicable scenarios for the technique
-        
+
         Args:
             technique_name: Name of the technique
             description: Description of the technique
             examples: List of examples
-            
+
         Returns:
             List of applicable scenarios
         """
@@ -1279,11 +1279,11 @@ class ContentParser:
 def detect_page_type(url: str, html_content: str = "") -> str:
     """
     Detect the type of wiki page based on URL and content
-    
+
     Args:
         url: Page URL
         html_content: Optional HTML content for additional detection
-        
+
     Returns:
         Page type string ('genres', 'meta_tags', 'techniques', 'unknown')
     """
@@ -1312,10 +1312,10 @@ def detect_page_type(url: str, html_content: str = "") -> str:
 def validate_parsed_data(data: Union[Genre, MetaTag, Technique]) -> List[str]:
     """
     Validate parsed data object
-    
+
     Args:
         data: Parsed data object to validate
-        
+
     Returns:
         List of validation errors
     """

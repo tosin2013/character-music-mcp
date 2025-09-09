@@ -8,7 +8,7 @@ This test verifies that:
 
 Requirements tested:
 - 5.1: Character descriptions are used instead of hardcoded "Marcus" or Bristol references
-- 5.2: Genre specifications generate content in requested genre, not always alternative/philosophical  
+- 5.2: Genre specifications generate content in requested genre, not always alternative/philosophical
 - 5.3: Output reflects input parameters, not predetermined backstories
 - 5.4: Different characters generate unique content for each character
 """

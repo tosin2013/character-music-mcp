@@ -29,11 +29,11 @@ class FormatConverter:
     ) -> Tuple[StandardCharacterProfile, ValidationResult]:
         """
         Convert various character profile formats to StandardCharacterProfile
-        
+
         Args:
             data: Character profile data in any supported format
             source_format: Source format type ("auto", "legacy_simple", "legacy_full", "server_format")
-            
+
         Returns:
             Tuple of (StandardCharacterProfile, ValidationResult)
         """
@@ -112,11 +112,11 @@ class FormatConverter:
     ) -> Tuple[Dict[str, Any], ValidationResult]:
         """
         Convert persona data to specified format
-        
+
         Args:
             data: Persona data in any supported format
             target_format: Target format ("standard", "legacy", "suno_compatible")
-            
+
         Returns:
             Tuple of (converted_data, ValidationResult)
         """
@@ -183,11 +183,11 @@ class FormatConverter:
     ) -> Tuple[Dict[str, Any], ValidationResult]:
         """
         Convert Suno command data to specified format
-        
+
         Args:
             data: Suno command data in any supported format
             target_format: Target format ("standard", "simple", "detailed")
-            
+
         Returns:
             Tuple of (converted_data, ValidationResult)
         """
@@ -507,13 +507,13 @@ def convert_suno_commands(data: Any, target_format: str = "standard") -> Tuple[D
 def ensure_standard_character_profile(data: Any) -> StandardCharacterProfile:
     """
     Ensure data is converted to StandardCharacterProfile, raising exception on failure
-    
+
     Args:
         data: Character profile data in any format
-        
+
     Returns:
         StandardCharacterProfile instance
-        
+
     Raises:
         ValueError: If conversion fails
     """
@@ -529,13 +529,13 @@ def ensure_standard_character_profile(data: Any) -> StandardCharacterProfile:
 def ensure_valid_persona_data(data: Any) -> Dict[str, Any]:
     """
     Ensure data is converted to valid persona format, raising exception on failure
-    
+
     Args:
         data: Persona data in any format
-        
+
     Returns:
         Valid persona data dictionary
-        
+
     Raises:
         ValueError: If conversion fails
     """
@@ -551,13 +551,13 @@ def ensure_valid_persona_data(data: Any) -> Dict[str, Any]:
 def ensure_valid_suno_commands(data: Any) -> Dict[str, Any]:
     """
     Ensure data is converted to valid Suno command format, raising exception on failure
-    
+
     Args:
         data: Suno command data in any format
-        
+
     Returns:
         Valid Suno command data dictionary
-        
+
     Raises:
         ValueError: If conversion fails
     """

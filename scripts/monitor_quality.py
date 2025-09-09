@@ -251,7 +251,7 @@ class QualityMonitor:
 
     def collect_test_coverage(self) -> float:
         """Collect current test coverage percentage"""
-        coverage_files = [
+        [
             Path("coverage.xml"),
             Path("htmlcov/index.html"),
             Path(".coverage")

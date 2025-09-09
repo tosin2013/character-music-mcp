@@ -23,7 +23,7 @@ def mcp_tool_with_error_handling(
 ):
     """
     Decorator that adds comprehensive error handling to MCP tools
-    
+
     Args:
         tool_name: Name of the tool for logging purposes
         expected_input_format: Dictionary mapping parameter names to expected types

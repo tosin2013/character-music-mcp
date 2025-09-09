@@ -32,7 +32,7 @@ async def demonstrate_enhanced_crawl_tool():
         from server import ensure_wiki_data_manager
 
         # Create mock context
-        ctx = MockContext()
+        MockContext()
 
         print("--- BEFORE: What the tool used to return ---")
         print("The old crawl tool would return mostly empty fields:")

@@ -14,10 +14,9 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from enhanced_character_analyzer import EnhancedCharacterAnalyzer
 from fastmcp import Context, FastMCP
 from pydantic import BaseModel
-
-from enhanced_character_analyzer import EnhancedCharacterAnalyzer
 
 # Enhanced character analysis imports
 from standard_character_profile import StandardCharacterProfile
@@ -154,10 +153,10 @@ class ArtistPersona:
     def from_dict(cls, data: Dict[str, Any]) -> 'ArtistPersona':
         """
         Create ArtistPersona from dictionary, handling missing fields gracefully
-        
+
         Args:
             data: Dictionary containing artist persona data
-            
+
         Returns:
             ArtistPersona instance with all fields properly initialized
         """
@@ -355,7 +354,7 @@ class CreativeMusicEngine:
 
     def analyze_musical_concept(self, concept: str) -> Dict[str, Any]:
         """Analyze concept for musical elements instead of just repeating text"""
-        concept_lower = concept.lower()
+        concept.lower()
 
         # Extract musical elements from concept
         musical_elements = {
@@ -2476,7 +2475,7 @@ class EmotionalCoherenceValidator:
 
             # Calculate shift magnitude
             intensity_shift = abs(current_state.intensity - next_state.intensity)
-            authenticity_shift = abs(current_state.authenticity_score - next_state.authenticity_score)
+            abs(current_state.authenticity_score - next_state.authenticity_score)
 
             # Check emotional compatibility
             compatibility = self._check_emotion_compatibility(current_state.primary_emotion, [next_state.primary_emotion])
@@ -2505,7 +2504,7 @@ class EmotionalCoherenceValidator:
         if len(states) >= 3:
             # Look for narrative progression patterns
             intensities = [s.intensity for s in states]
-            authenticity_scores = [s.authenticity_score for s in states]
+            [s.authenticity_score for s in states]
 
             # Check if there's some form of progression (not just random)
             intensity_variance = sum((x - sum(intensities) / len(intensities)) ** 2 for x in intensities) / len(intensities)
@@ -3427,11 +3426,11 @@ class MusicPersonaGenerator:
 
     def build_attributed_context_for_llm(self, content: Any, content_type: str = "general") -> str:
         """Build LLM context with source attribution
-        
+
         Args:
             content: The content to include in LLM context
             content_type: Type of content ('genre', 'meta_tag', 'technique', 'general')
-            
+
         Returns:
             Formatted context string with source attribution
         """
@@ -3773,7 +3772,7 @@ class MusicPersonaGenerator:
             # Try to use genre intelligence for better fallback
             try:
                 from genre_production_intelligence import get_genre_intelligence
-                genre_intelligence = get_genre_intelligence()
+                get_genre_intelligence()
 
                 # Use character traits to determine better genre
                 character_traits = traits[:5]  # Use the traits already passed to this method
@@ -4111,10 +4110,10 @@ class MusicPersonaGenerator:
     def _generate_persona_description(self, character: StandardCharacterProfile, genre: str, vocal_style: str) -> str:
         """Generate comprehensive persona description"""
         return f"""
-        Musical persona derived from {character.name}: A {genre} artist with {vocal_style}. 
-        The persona reflects {character.name}'s core traits of {', '.join(character.personality_drivers[:2])}, 
-        channeling their {character.backstory[:100]}... into musical expression. 
-        This artist embodies the emotional depth and complexity of the character while translating 
+        Musical persona derived from {character.name}: A {genre} artist with {vocal_style}.
+        The persona reflects {character.name}'s core traits of {', '.join(character.personality_drivers[:2])},
+        channeling their {character.backstory[:100]}... into musical expression.
+        This artist embodies the emotional depth and complexity of the character while translating
         narrative elements into compelling musical compositions.
         """.strip()
 
@@ -4144,18 +4143,18 @@ class MusicPersonaGenerator:
 
         if requested_genre:
             return f"""
-            {genre.title()} genre applied as requested, with persona aligned to match genre characteristics. 
-            {character.name}'s {trait_text} has been adapted to fit {genre}'s emotional and thematic expressions. 
-            The character's {character.motivations[0] if character.motivations else 'core motivations'} 
-            and {character.conflicts[0] if character.conflicts else 'internal conflicts'} 
+            {genre.title()} genre applied as requested, with persona aligned to match genre characteristics.
+            {character.name}'s {trait_text} has been adapted to fit {genre}'s emotional and thematic expressions.
+            The character's {character.motivations[0] if character.motivations else 'core motivations'}
+            and {character.conflicts[0] if character.conflicts else 'internal conflicts'}
             are expressed through {genre}-specific musical elements and production techniques.
             """.strip()
         else:
             return f"""
-            {genre.title()} genre selected based on {character.name}'s {trait_text}. 
-            The character's {character.motivations[0] if character.motivations else 'core motivations'} 
-            and {character.conflicts[0] if character.conflicts else 'internal conflicts'} 
-            align with {genre}'s emotional and thematic expressions. 
+            {genre.title()} genre selected based on {character.name}'s {trait_text}.
+            The character's {character.motivations[0] if character.motivations else 'core motivations'}
+            and {character.conflicts[0] if character.conflicts else 'internal conflicts'}
+            align with {genre}'s emotional and thematic expressions.
             This mapping ensures authentic musical representation of the character's essence.
             """.strip()
 
@@ -4385,7 +4384,7 @@ class SunoCommandGenerator:
 
         resolved_tags = tags.copy()
 
-        for conflict_group, conflict_type in conflicts:
+        for conflict_group, _conflict_type in conflicts:
             found_tags = [tag for tag in resolved_tags if any(conflict in tag.lower() for conflict in conflict_group)]
             if len(found_tags) > 1:
                 # Keep the first one, remove others
@@ -5129,7 +5128,7 @@ class SunoCommandGenerator:
 
         # Check for tag compatibility
         all_tags = style_tags + structure_tags + vocal_tags
-        compatible_tags = self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
+        self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
 
         return SunoCommand(
             command_type="simple",
@@ -5202,7 +5201,7 @@ class SunoCommandGenerator:
             )
 
             # Collect correlated tags from all instruments
-            for instrument, tags in instrument_correlation.items():
+            for _instrument, tags in instrument_correlation.items():
                 sound_effects.extend(tags)
 
         # Add genre-specific production tags
@@ -5215,7 +5214,7 @@ class SunoCommandGenerator:
 
         # Check meta tag compatibility and resolve conflicts
         all_tags = style_tags + structure_tags + vocal_tags + sound_effects
-        compatible_tags = self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
+        self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
 
         return SunoCommand(
             command_type="custom",
@@ -5477,7 +5476,7 @@ class SunoCommandGenerator:
         )
 
         # Collect emotional tags from all states
-        for emotion, tags in emotion_mapping.items():
+        for _emotion, tags in emotion_mapping.items():
             style_tags.extend(tags[:2])
 
         # Add production-specific tags
@@ -5518,7 +5517,7 @@ class SunoCommandGenerator:
             )
 
             # Collect correlated tags from all instruments
-            for instrument, tags in instrument_correlation.items():
+            for _instrument, tags in instrument_correlation.items():
                 sound_effects.extend(tags)
 
         # Add genre-specific production tags
@@ -5532,7 +5531,7 @@ class SunoCommandGenerator:
 
         # Check meta tag compatibility
         all_tags = style_tags + structure_tags + vocal_tags + sound_effects
-        compatible_tags = self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
+        self.check_meta_tag_compatibility(all_tags, artist_persona.primary_genre)
 
         return SunoCommand(
             command_type="emotion_beat_driven",
@@ -5627,20 +5626,20 @@ async def initialize_server():
 async def _analyze_character_text_internal(text: str, ctx: Context) -> str:
     """
     Analyze narrative text to extract detailed character profiles using three-layer methodology.
-    
+
     Performs comprehensive character analysis including:
     - Skin Layer: Physical descriptions, mannerisms, speech patterns
-    - Flesh Layer: Relationships, backstory, formative experiences  
+    - Flesh Layer: Relationships, backstory, formative experiences
     - Core Layer: Motivations, fears, desires, psychological drivers
-    
+
     Uses enhanced character detection with:
     - Named Entity Recognition for robust character detection
     - Semantic analysis for multiple narrative themes beyond "friendship"
     - Varied emotional arc analysis instead of "neutral" defaults
-    
+
     Args:
         text: Narrative text content (unlimited length supported)
-        
+
     Returns:
         JSON string containing detailed character analysis results
     """
@@ -5673,20 +5672,20 @@ async def _analyze_character_text_internal(text: str, ctx: Context) -> str:
 async def analyze_character_text(text: str, ctx: Context) -> str:
     """
     Analyze narrative text to extract detailed character profiles using three-layer methodology.
-    
+
     Performs comprehensive character analysis including:
     - Skin Layer: Physical descriptions, mannerisms, speech patterns
-    - Flesh Layer: Relationships, backstory, formative experiences  
+    - Flesh Layer: Relationships, backstory, formative experiences
     - Core Layer: Motivations, fears, desires, psychological drivers
-    
+
     Uses enhanced character detection with:
     - Named Entity Recognition for robust character detection
     - Semantic analysis for multiple narrative themes beyond "friendship"
     - Varied emotional arc analysis instead of "neutral" defaults
-    
+
     Args:
         text: Narrative text content (unlimited length supported)
-        
+
     Returns:
         JSON string containing detailed character analysis results
     """
@@ -5697,13 +5696,13 @@ async def _generate_artist_personas_internal(characters_json: str, ctx: Context,
                                             requested_genre: Optional[str] = None) -> str:
     """
     Generate musical artist personas from character profiles.
-    
+
     Transforms character psychological profiles into coherent musical artist identities
     with genre mappings, vocal styles, and thematic content.
-    
+
     Args:
         characters_json: JSON string containing character profiles from analyze_character_text
-        
+
     Returns:
         JSON string containing generated artist personas
     """
@@ -5762,13 +5761,13 @@ async def _generate_artist_personas_internal(characters_json: str, ctx: Context,
 async def generate_artist_personas(characters_json: str, ctx: Context, requested_genre: Optional[str] = None) -> str:
     """
     Generate musical artist personas from character profiles.
-    
+
     Transforms character psychological profiles into coherent musical artist identities
     with genre mappings, vocal styles, and thematic content.
-    
+
     Args:
         characters_json: JSON string containing character profiles from analyze_character_text
-        
+
     Returns:
         JSON string containing generated artist personas
     """
@@ -5778,14 +5777,14 @@ async def generate_artist_personas(characters_json: str, ctx: Context, requested
 async def _create_suno_commands_internal(personas_json: str, characters_json: str, ctx: Context) -> str:
     """
     Generate optimized Suno AI commands from artist personas and character profiles.
-    
+
     Creates multiple command variations including simple prompts, custom mode,
     bracket notation, and specialized commands for different musical approaches.
-    
+
     Args:
         personas_json: JSON string containing artist personas from generate_artist_personas
         characters_json: JSON string containing character profiles
-        
+
     Returns:
         JSON string containing Suno AI commands with metadata
     """
@@ -5999,14 +5998,14 @@ async def _create_suno_commands_internal(personas_json: str, characters_json: st
 async def create_suno_commands(personas_json: str, characters_json: str, ctx: Context) -> str:
     """
     Generate optimized Suno AI commands from artist personas and character profiles.
-    
+
     Creates multiple command variations including simple prompts, custom mode,
     bracket notation, and specialized commands for different musical approaches.
-    
+
     Args:
         personas_json: JSON string containing artist personas from generate_artist_personas
         characters_json: JSON string containing character profiles
-        
+
     Returns:
         JSON string containing Suno AI commands with metadata
     """
@@ -6016,15 +6015,15 @@ async def create_suno_commands(personas_json: str, characters_json: str, ctx: Co
 async def _complete_workflow_internal(text: str, ctx: Context, requested_genre: Optional[str] = None) -> str:
     """
     Execute complete character-to-music workflow in one operation.
-    
+
     Performs full pipeline:
     1. Character analysis from narrative text
     2. Artist persona generation
     3. Suno AI command creation
-    
+
     Args:
         text: Input narrative text for analysis
-        
+
     Returns:
         JSON string containing complete workflow results
     """
@@ -6072,15 +6071,15 @@ async def _complete_workflow_internal(text: str, ctx: Context, requested_genre: 
 async def complete_workflow(text: str, ctx: Context, requested_genre: Optional[str] = None) -> str:
     """
     Execute complete character-to-music workflow in one operation.
-    
+
     Performs full pipeline:
     1. Character analysis from narrative text
     2. Artist persona generation
     3. Suno AI command creation
-    
+
     Args:
         text: Input narrative text for analysis
-        
+
     Returns:
         JSON string containing complete workflow results
     """
@@ -6090,17 +6089,17 @@ async def complete_workflow(text: str, ctx: Context, requested_genre: Optional[s
 async def creative_music_generation(concept: str, style_preference: str = "any", ctx: Context = None) -> str:
     """
     Generate creative music commands from abstract concepts with meaningful musical analysis.
-    
+
     Enhanced creative mode that provides:
     - Deep musical concept analysis extracting key elements
     - Creative variations based on musical theory and genre knowledge
     - Practical Suno AI commands using wiki data integration
     - Contextually appropriate responses instead of generic repetition
-    
+
     Args:
         concept: Abstract concept, theme, or idea for music generation
         style_preference: Preferred musical style/genre (optional, defaults to "any")
-        
+
     Returns:
         JSON string containing meaningful creative music generation with practical Suno commands
     """
@@ -6218,19 +6217,19 @@ async def _understand_topic_with_emotions_internal(
 ) -> str:
     """
     Enhanced internal version of understand_topic_with_emotions with meaningful emotional analysis.
-    
+
     Analyzes any topic or book content to extract:
     - Sophisticated emotional analysis with varied insights
     - Context-appropriate emotional responses for different topics
     - Genre-appropriate beat patterns and musical elements
     - Practical Suno AI commands based on emotional content
-    
+
     Args:
         topic_text: The topic or book content to analyze
         source_type: Type of content - "book", "topic", "article", "research", etc.
         focus_areas: Optional list of areas to focus on
         ctx: Context for logging
-        
+
     Returns:
         JSON with comprehensive emotional understanding and musical interpretation
     """
@@ -6364,20 +6363,20 @@ async def understand_topic_with_emotions(
 ) -> str:
     """
     Understand and ground topics/books using enhanced emotional analysis with meaningful insights.
-    
+
     Analyzes any topic or book content to extract:
     - Sophisticated emotional analysis with varied insights beyond "contemplative"
-    - Context-appropriate emotional responses for different topics  
+    - Context-appropriate emotional responses for different topics
     - Genre-appropriate beat patterns and musical elements
     - Practical Suno AI commands aligned with emotional content
-    
+
     Perfect for understanding complex topics through emotional and musical lens.
-    
+
     Args:
         topic_text: The topic or book content to analyze
         source_type: Type of content - "book", "topic", "article", "research", etc.
         focus_areas: Optional list of areas to focus on (e.g., ["character development", "philosophical themes"])
-        
+
     Returns:
         JSON with comprehensive emotional understanding and musical interpretation
     """
@@ -6689,23 +6688,23 @@ async def process_universal_content(
 ) -> str:
     """
     Process ANY content through character's psychological lens with Meta-Narrative & Self-Reflection analysis.
-    
+
     Enhanced universal content processor that uses emotional framework to:
     - Extract factual emotional triggers from content
     - Apply meta-narrative analysis for deeper meaning
     - Generate self-reflective insights
     - Create emotion-driven beat patterns and lyrics
     - Process through character's worldview for authentic personalization
-    
+
     Universal content processor that can handle:
     - Philosophical texts, Love stories, Science fiction
     - News articles, Poetry, Biographical content, Abstract concepts
-    
+
     Args:
         content: Any text content (unlimited length, any type)
         character_description: Detailed character profile and background
         track_title: Name for the resulting track
-        
+
     Returns:
         JSON containing meta-narrative analysis, emotional grounding, beat patterns,
         lyrical guidance, and comprehensive Suno AI commands
@@ -6880,13 +6879,13 @@ async def create_conceptual_album(
 ) -> str:
     """
     Create a comprehensive conceptual album with meaningful track progression.
-    
+
     This consolidated tool handles multiple content types and creation modes:
     1. Story-integrated albums from narrative content with character arcs
     2. Character-driven albums from explicit character descriptions
     3. Conceptual albums from philosophical or abstract content
     4. Ensures unique, thematic track titles and content progression
-    
+
     Args:
         content: Source content (narrative, character description, or concepts)
         album_concept: Album theme/title (auto-generated if None)
@@ -6895,7 +6894,7 @@ async def create_conceptual_album(
         track_count: Number of tracks (3-12)
         genre: Musical genre preference
         processing_mode: "narrative", "character", "conceptual", or "auto"
-    
+
     Returns:
         JSON containing complete album with meaningful track progression
     """
@@ -7164,7 +7163,7 @@ async def _generate_story_aware_suno_command(
 
         # Build enhanced story-aware command
         suno_command = f"""[{persona.primary_genre}] [{emotional_descriptor}] [{style_modifier}]
-    
+
 {track_concept['title']} - {narrative_position}
 
 Musical interpretation of {character.name}'s journey at this story moment.
@@ -7191,15 +7190,15 @@ async def analyze_artist_psychology(
 ) -> str:
     """
     Analyze the psychological motivations behind why a character creates music.
-    
+
     Explores the deep psychological drivers that transform a literary character
     into a musical artist, examining their backstory, traumas, desires, and
     how these manifest in their artistic expression.
-    
+
     Args:
         character_json: JSON string containing character profile from analyze_character_text
         persona_json: JSON string containing artist persona from generate_artist_personas
-        
+
     Returns:
         JSON containing deep psychological analysis of the artist's creative motivations,
         backstory influences, and artistic purpose according to character bible methodology
@@ -7730,13 +7729,13 @@ async def crawl_suno_wiki_best_practices(
 ) -> str:
     """
     Get current Suno AI best practices and format specifications from cached wiki data.
-    
-    This tool provides actual Suno AI documentation and best practices from the 
+
+    This tool provides actual Suno AI documentation and best practices from the
     cached wiki data system, replacing hardcoded assumptions with real specifications.
-    
+
     Args:
         topic: Specific topic to focus on (genres, meta_tags, techniques, prompt_formats, best_practices, all)
-        
+
     Returns:
         JSON containing current Suno AI specifications and best practices from cached data
     """
@@ -9144,38 +9143,38 @@ def _extract_character_genre(character_description: str) -> str:
 async def character_profiles_resource() -> str:
     """
     Comprehensive guide to character profile structure and three-layer analysis methodology.
-    
+
     Returns detailed information about the character analysis framework used by this MCP server.
     """
     return """
     # Character Profile Analysis Framework
-    
+
     ## Three-Layer Character Bible Methodology
-    
+
     ### Skin Layer - Observable Characteristics
     - **Physical Descriptions**: Appearance, clothing, distinctive features
     - **Mannerisms**: Gestures, habits, behavioral tics
     - **Speech Patterns**: Dialogue style, vocabulary, accent
     - **Behavioral Traits**: Observable actions and reactions
-    
+
     ### Flesh Layer - Background and Relationships
     - **Backstory**: Personal history, formative events
     - **Relationships**: Family, friends, enemies, mentors
     - **Formative Experiences**: Key life events that shaped character
     - **Social Connections**: Network and community ties
-    
+
     ### Core Layer - Deep Psychology
     - **Motivations**: What drives the character's actions
     - **Fears**: Deepest anxieties and phobias
     - **Desires**: Core wants and needs
     - **Conflicts**: Internal and external struggles
     - **Personality Drivers**: Fundamental psychological patterns
-    
+
     ## Analysis Confidence Scoring
     - Confidence scores range from 0.0 to 1.0
     - Based on mention frequency, information depth, and narrative prominence
     - Minimum threshold of 0.3 for character inclusion
-    
+
     ## Character Importance Ranking
     - Calculated using mention frequency, narrative position, and role significance
     - Characters sorted by importance score for optimal processing
@@ -9185,47 +9184,47 @@ async def character_profiles_resource() -> str:
 async def genre_mappings_resource() -> str:
     """
     Complete mapping system from character traits to musical genres and styles.
-    
+
     Returns the psychological-to-musical mapping framework used for artist persona generation.
     """
     return """
     # Character-to-Music Genre Mapping System
-    
+
     ## Personality Trait Mappings
-    
+
     ### Brave Characters → Power Genres
     - **Rock**: Electric guitar, driving rhythm, powerful vocals
     - **Metal**: Heavy, distorted, aggressive, intense
     - **Epic Orchestral**: Cinematic, heroic, triumphant
     - **Anthemic Pop**: Uplifting, inspirational, strong melodies
-    
-    ### Cunning Characters → Sophisticated Genres  
+
+    ### Cunning Characters → Sophisticated Genres
     - **Jazz**: Smooth, controlled, improvisation, sophisticated
     - **Classical**: Complex, refined, intellectual depth
     - **Experimental**: Innovative, unconventional, artistic
     - **Dark Ambient**: Atmospheric, mysterious, calculating
-    
+
     ### Compassionate Characters → Emotional Genres
     - **Folk**: Acoustic, organic, storytelling, traditional
     - **Soul**: Emotional depth, spiritual, heartfelt
     - **Gospel**: Community-focused, uplifting, spiritual
     - **Acoustic**: Intimate, personal, vulnerable
-    
+
     ### Ambitious Characters → Dynamic Genres
     - **Electronic**: Digital, rhythmic, modern, driving
     - **Hip-Hop**: Confident, assertive, rhythmic, urban
     - **Pop**: Mainstream, polished, accessible, catchy
     - **Industrial**: Mechanical, powerful, relentless
-    
+
     ### Mysterious Characters → Atmospheric Genres
     - **Darkwave**: Ethereal, haunting, atmospheric
     - **Ambient**: Floating, spacious, contemplative
     - **Trip-Hop**: Moody, experimental, downtempo
     - **Gothic**: Dark, romantic, dramatic
-    
+
     ## Vocal Style Mapping
     - **Brave** → Powerful, commanding vocals
-    - **Cunning** → Smooth, controlled delivery  
+    - **Cunning** → Smooth, controlled delivery
     - **Compassionate** → Warm, emotional singing
     - **Ambitious** → Confident, assertive vocals
     - **Mysterious** → Ethereal, haunting voice
@@ -9238,58 +9237,58 @@ async def genre_mappings_resource() -> str:
 async def suno_command_formats_resource() -> str:
     """
     Complete guide to Suno AI command formats and optimization strategies.
-    
+
     Returns comprehensive information about Suno AI integration and command generation.
     """
     return """
     # Suno AI Command Generation Guide
-    
+
     ## Command Types
-    
+
     ### 1. Simple Prompt Commands
     - Basic text prompts describing desired music
     - Natural language descriptions of style and content
     - Best for: Quick generation, straightforward concepts
     - Example: "A rock song about overcoming challenges with powerful vocals"
-    
+
     ### 2. Custom Mode Commands
     - Detailed parameters for precise control
     - Multiple style tags and specifications
     - Best for: Complex compositions, specific requirements
     - Includes: Style tags, structure, vocal directions
-    
+
     ### 3. Bracket Notation Commands
     - Precise element control using [brackets]
     - Specific musical elements and effects
     - Best for: Technical specifications, exact sound design
     - Example: "[rock] [powerful vocals] [electric guitar] [driving rhythm]"
-    
+
     ## Optimization Strategies
-    
+
     ### Style Tags (Genre/Sound)
     - Primary genre identification
     - Secondary style elements
     - Production characteristics
     - Instrument specifications
-    
+
     ### Structure Tags (Arrangement)
     - Song structure (verse-chorus, bridge, etc.)
     - Dynamic progression
     - Complexity level
     - Timing and pacing
-    
+
     ### Vocal Tags (Voice Characteristics)
     - Vocal style and delivery
     - Emotional expression
     - Technical approach
     - Multiple voice arrangements
-    
+
     ### Sound Effect Tags (Production)
     - Atmospheric elements
     - Reverb and effects
     - Spatial characteristics
     - Special audio processing
-    
+
     ## Effectiveness Scoring
     - Commands rated 0.0 to 1.0 for expected effectiveness
     - Based on clarity, specificity, and Suno AI compatibility
@@ -9300,79 +9299,79 @@ async def suno_command_formats_resource() -> str:
 async def workflow_integration_resource() -> str:
     """
     Complete workflow integration guide for character-driven music generation.
-    
+
     Returns step-by-step instructions for using the MCP server effectively.
     """
     return """
     # Character-Driven Music Generation Workflow
-    
+
     ## Complete Workflow Process
-    
+
     ### Phase 1: Text Input and Preparation
     1. Prepare narrative text (novels, stories, character descriptions)
     2. Ensure sufficient character detail (minimum 50 words)
     3. Include dialogue, actions, and character interactions
     4. Multiple characters increase analysis depth
-    
+
     ### Phase 2: Character Analysis
     1. Use `analyze_character_text` tool with narrative input
     2. Review extracted character profiles
     3. Verify character accuracy and completeness
     4. Note confidence scores and importance rankings
-    
+
     ### Phase 3: Artist Persona Generation
     1. Use `generate_artist_personas` with character analysis results
     2. Review psychological-to-musical mappings
     3. Examine genre selections and justifications
     4. Validate persona authenticity to source characters
-    
+
     ### Phase 4: Suno Command Creation
     1. Use `create_suno_commands` with personas and characters
     2. Review multiple command variations
     3. Select optimal commands based on effectiveness scores
     4. Consider different command types for varied results
-    
+
     ## Alternative Workflows
-    
+
     ### Quick Complete Workflow
     - Use `complete_workflow` tool for end-to-end processing
     - Single operation from text to final commands
     - Best for: Initial exploration, rapid prototyping
-    
+
     ### Creative Mode Workflow
     - Use `creative_music_generation` for abstract concepts
     - No character analysis required
     - Best for: Thematic music, conceptual compositions
-    
+
     ## Quality Assurance
-    
+
     ### Character Analysis Quality
     - Confidence scores above 0.5 indicate strong analysis
     - Multiple personality drivers suggest complex characters
     - Rich backstory and relationships improve persona generation
-    
+
     ### Artist Persona Quality
     - High mapping confidence (>0.7) indicates strong character-music connection
     - Multiple lyrical themes suggest depth
     - Clear genre justification validates mapping decisions
-    
+
     ### Command Effectiveness
     - Effectiveness scores above 0.8 indicate high-quality commands
     - Multiple command variations provide creative options
     - Clear rationales explain command construction logic
-    
+
     ## Integration with External Systems
-    
+
     ### Claude Desktop Integration
     - Access through MCP client configuration
     - Real-time character analysis and music generation
     - Seamless workflow execution
-    
+
     ### API Integration
     - JSON-based input/output for programmatic access
     - Structured data formats for easy parsing
     - Error handling and validation included
-    
+
     ### Batch Processing
     - Process multiple texts or characters simultaneously
     - Efficient for large-scale content analysis
@@ -9387,13 +9386,13 @@ async def workflow_integration_resource() -> str:
 async def character_analysis_prompt(text_sample: str) -> str:
     """
     Generate an optimized prompt for character analysis from a text sample.
-    
+
     Creates a detailed analysis prompt that guides effective character extraction
     and psychological profiling from narrative content.
-    
+
     Args:
         text_sample: Sample of the text to be analyzed
-        
+
     Returns:
         Formatted prompt for comprehensive character analysis
     """
@@ -9436,14 +9435,14 @@ async def character_analysis_prompt(text_sample: str) -> str:
 async def music_persona_prompt(character_name: str, personality_traits: str) -> str:
     """
     Generate a prompt for creating musical artist personas from character analysis.
-    
+
     Creates a detailed prompt for transforming character psychological profiles
     into coherent musical artist identities.
-    
+
     Args:
         character_name: Name of the character being analyzed
         personality_traits: Key personality traits identified
-        
+
     Returns:
         Formatted prompt for artist persona generation
     """
@@ -9489,14 +9488,14 @@ async def music_persona_prompt(character_name: str, personality_traits: str) -> 
 async def suno_optimization_prompt(artist_persona: str, character_background: str) -> str:
     """
     Generate an optimization prompt for Suno AI command creation.
-    
+
     Creates a detailed prompt for generating effective Suno AI commands
     from artist personas and character backgrounds.
-    
+
     Args:
         artist_persona: Description of the generated artist persona
         character_background: Background information about the source character
-        
+
     Returns:
         Formatted prompt for Suno command optimization
     """
@@ -9551,11 +9550,11 @@ async def suno_optimization_prompt(artist_persona: str, character_background: st
 
 async def _build_wiki_attribution_context(analysis_data: Dict[str, Any], ctx: Context) -> str:
     """Build attribution context for wiki-sourced content used in analysis
-    
+
     Args:
         analysis_data: The analysis data that may contain wiki-sourced information
         ctx: Context for logging
-        
+
     Returns:
         Attribution text for LLM context
     """
@@ -9610,14 +9609,14 @@ async def _build_wiki_attribution_context(analysis_data: Dict[str, Any], ctx: Co
 async def detect_input_format(text: str, ctx: Context) -> str:
     """
     Detect input format and provide processing recommendations
-    
+
     This tool analyzes input text to determine its type (character description, narrative fiction,
     philosophical content, etc.) and provides recommendations for processing approach.
-    
+
     Args:
         text: Input text to analyze
         ctx: Context for logging
-        
+
     Returns:
         JSON string containing detection results and processing recommendations
     """
@@ -9659,15 +9658,15 @@ async def detect_input_format(text: str, ctx: Context) -> str:
 async def request_clarification(text: str, detection_result: str = None, ctx: Context = None) -> str:
     """
     Request clarification for ambiguous input content
-    
+
     This tool generates clarification prompts when input content type is unclear,
     helping users specify the appropriate processing approach.
-    
+
     Args:
         text: Original input text that needs clarification
         detection_result: Optional JSON string of previous detection results
         ctx: Context for logging
-        
+
     Returns:
         JSON string containing clarification prompts and processing options
     """
@@ -9706,16 +9705,16 @@ async def request_clarification(text: str, detection_result: str = None, ctx: Co
 async def process_with_guidance(text: str, user_choice: str, additional_context: str = "", ctx: Context = None) -> str:
     """
     Process content with user-provided guidance
-    
+
     This tool processes content using the user's specified approach, incorporating
     any additional context provided to improve results.
-    
+
     Args:
         text: Original input text to process
         user_choice: User's chosen processing method (character_description, narrative_fiction, etc.)
         additional_context: Additional context to help with processing
         ctx: Context for logging
-        
+
     Returns:
         JSON string containing processing results
     """
@@ -9779,14 +9778,14 @@ async def process_with_guidance(text: str, user_choice: str, additional_context:
 async def get_processing_guidance(content_type: str = None, ctx: Context = None) -> str:
     """
     Get guidance on different processing modes and when to use them
-    
+
     This tool provides detailed information about available processing modes,
     when to use each one, and examples of appropriate content types.
-    
+
     Args:
         content_type: Specific content type to get guidance for (optional)
         ctx: Context for logging
-        
+
     Returns:
         JSON string containing processing guidance and examples
     """

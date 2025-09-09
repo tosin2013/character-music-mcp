@@ -26,6 +26,7 @@ from server import (
     create_suno_commands,
     generate_artist_personas,
 )
+
 from tests.fixtures.mock_contexts import MockBatchContext, MockContext
 from tests.fixtures.test_data import TestDataManager
 
@@ -503,8 +504,7 @@ class TestAlbumCreation:
         """Validate philosophical progression in concept album"""
 
         # Check narrative progression
-        positions = [movement["narrative_position"] for movement in concept_album]
-        expected_positions = ["opening", "development", "development", "development", "climax", "resolution"]
+        [movement["narrative_position"] for movement in concept_album]
 
         # Validate effectiveness progression (should build to climax)
         effectiveness_scores = [movement["command"]["effectiveness_score"] for movement in concept_album]

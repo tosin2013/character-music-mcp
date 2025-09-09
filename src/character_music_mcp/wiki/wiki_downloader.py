@@ -17,7 +17,6 @@ from urllib.parse import urlparse
 
 import aiofiles
 import aiohttp
-
 from performance_monitor import PerformanceMonitor
 from wiki_cache_manager import WikiCacheManager
 
@@ -109,7 +108,7 @@ class WikiDownloader:
                  user_agent: str = "WikiDownloader/1.0"):
         """
         Initialize WikiDownloader
-        
+
         Args:
             cache_manager: WikiCacheManager instance for local file management
             performance_monitor: PerformanceMonitor instance for tracking metrics
@@ -157,12 +156,12 @@ class WikiDownloader:
                           content_type: str = "general") -> DownloadResult:
         """
         Download a single page with error handling and retry logic
-        
+
         Args:
             url: URL to download
             local_path: Local file path to save content (auto-generated if None)
             content_type: Type of content for organized storage
-            
+
         Returns:
             DownloadResult with download status and metadata
         """
@@ -273,12 +272,12 @@ class WikiDownloader:
     async def _attempt_download(self, url: str, local_path: str, attempt: int) -> DownloadResult:
         """
         Single download attempt
-        
+
         Args:
             url: URL to download
             local_path: Local file path to save content
             attempt: Current attempt number (0-based)
-            
+
         Returns:
             DownloadResult with attempt status
         """
@@ -368,10 +367,10 @@ class WikiDownloader:
     def validate_url(self, url: str) -> bool:
         """
         Validate and sanitize URL
-        
+
         Args:
             url: URL to validate
-            
+
         Returns:
             True if URL is valid, False otherwise
         """
@@ -402,10 +401,10 @@ class WikiDownloader:
     def _sanitize_path(self, path: str) -> str:
         """
         Sanitize local file path
-        
+
         Args:
             path: File path to sanitize
-            
+
         Returns:
             Sanitized file path
         """
@@ -447,11 +446,11 @@ class WikiDownloader:
     async def is_refresh_needed(self, url: str, max_age_hours: int) -> bool:
         """
         Check if a file needs to be refreshed based on age
-        
+
         Args:
             url: URL to check
             max_age_hours: Maximum age in hours before refresh is needed
-            
+
         Returns:
             True if refresh is needed, False otherwise
         """
@@ -465,10 +464,10 @@ class WikiDownloader:
     async def get_cached_file_path(self, url: str) -> Optional[str]:
         """
         Get cached file path for a URL if it exists
-        
+
         Args:
             url: URL to look up
-            
+
         Returns:
             Local file path if cached, None otherwise
         """
@@ -480,10 +479,10 @@ class WikiDownloader:
     async def get_file_age(self, url: str) -> Optional[timedelta]:
         """
         Get age of a cached file
-        
+
         Args:
             url: URL to check
-            
+
         Returns:
             Age as timedelta, or None if not cached
         """
@@ -495,11 +494,11 @@ class WikiDownloader:
     def _generate_local_path(self, url: str, content_type: str = "general") -> str:
         """
         Generate local path when no cache manager is available
-        
+
         Args:
             url: Source URL
             content_type: Type of content
-            
+
         Returns:
             Generated local file path
         """
@@ -525,13 +524,13 @@ class WikiDownloader:
                                           progress_callback: Optional[Callable[[DownloadProgress], None]] = None) -> BatchDownloadResult:
         """
         Download all configured pages with progress tracking and concurrent handling
-        
+
         Args:
             urls: List of URLs to download
             max_age_hours: Maximum age before refresh is needed
             max_concurrent: Maximum number of concurrent downloads
             progress_callback: Optional callback for progress updates
-            
+
         Returns:
             BatchDownloadResult with overall status and individual results
         """
@@ -614,14 +613,14 @@ class WikiDownloader:
                                      progress_callback: Optional[Callable[[DownloadProgress], None]]) -> Optional[DownloadResult]:
         """
         Download a single URL with semaphore control and progress tracking
-        
+
         Args:
             semaphore: Semaphore for controlling concurrency
             url: URL to download
             max_age_hours: Maximum age before refresh is needed
             progress: Progress tracking object
             progress_callback: Optional progress callback
-            
+
         Returns:
             DownloadResult or None if skipped
         """
@@ -678,10 +677,10 @@ class WikiDownloader:
     def _determine_content_type(self, url: str) -> str:
         """
         Determine content type from URL pattern
-        
+
         Args:
             url: URL to analyze
-            
+
         Returns:
             Content type string
         """
@@ -704,14 +703,14 @@ class WikiDownloader:
                                       progress_callback: Optional[Callable[[DownloadProgress], None]] = None) -> BatchDownloadResult:
         """
         Download URLs with retry logic for failed downloads
-        
+
         Args:
             urls: List of URLs to download
             max_age_hours: Maximum age before refresh is needed
             max_concurrent: Maximum number of concurrent downloads
             max_batch_retries: Maximum number of retry attempts for failed downloads
             progress_callback: Optional callback for progress updates
-            
+
         Returns:
             BatchDownloadResult with overall status
         """

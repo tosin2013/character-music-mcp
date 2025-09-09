@@ -37,13 +37,13 @@ class EnhancedTopicEmotionAnalyzer:
     ) -> str:
         """
         Enhanced topic analysis with meaningful emotional insights and beat patterns
-        
+
         Args:
             topic_text: The topic or book content to analyze
             source_type: Type of content - "book", "topic", "article", "research", etc.
             focus_areas: Optional list of areas to focus on
             ctx: Context for logging
-            
+
         Returns:
             JSON with comprehensive emotional understanding and musical interpretation
         """

@@ -33,6 +33,7 @@ from server import (
     SunoCommand,
     SunoCommandGenerator,
 )
+
 from tests.fixtures.mock_contexts import create_mock_context
 
 
@@ -226,8 +227,8 @@ class TestBasicServerFunctionality:
 
         # Simple test text
         test_text = """
-        Sarah was a thoughtful programmer who loved creating music in her spare time. 
-        She had always been passionate about both technology and art, finding ways to 
+        Sarah was a thoughtful programmer who loved creating music in her spare time.
+        She had always been passionate about both technology and art, finding ways to
         blend her two interests. Her friends often described her as creative and dedicated.
         """
 

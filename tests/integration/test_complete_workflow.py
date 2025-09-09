@@ -27,6 +27,7 @@ from server import (
     creative_music_generation,
     generate_artist_personas,
 )
+
 from tests.fixtures.mock_contexts import MockContext, MockPerformanceContext
 from tests.fixtures.test_data import TestDataManager
 
@@ -280,7 +281,7 @@ class TestCompleteWorkflow:
         # Command generation performance
         persona_data = json.loads(persona_result)["artist_persona"]
         start_time = time.time()
-        command_result = await create_suno_commands(
+        await create_suno_commands(
             self.performance_context,
             character_data=character_data,
             artist_persona=persona_data,
@@ -402,12 +403,12 @@ class TestCompleteWorkflow:
         artist_persona = persona_data["artist_persona"]
 
         # Character traits should influence genre selection
-        character_traits = primary_character.get("behavioral_traits", [])
+        primary_character.get("behavioral_traits", [])
         persona_genre = artist_persona.get("primary_genre", "")
 
         # Emotional consistency
-        character_emotions = primary_character.get("fears", []) + primary_character.get("desires", [])
-        persona_vocal_style = artist_persona.get("vocal_style", "")
+        primary_character.get("fears", []) + primary_character.get("desires", [])
+        artist_persona.get("vocal_style", "")
 
         # Persona to command consistency
         suno_commands = command_data["suno_commands"]

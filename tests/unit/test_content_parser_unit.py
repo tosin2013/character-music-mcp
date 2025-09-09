@@ -35,7 +35,7 @@ class TestContentParser:
         <head><title>Music Genres</title></head>
         <body>
             <h1>List of Music Genres and Styles</h1>
-            
+
             <h3>Electronic</h3>
             <ul>
                 <li>Ambient (atmospheric and textural music)</li>
@@ -43,14 +43,14 @@ class TestContentParser:
                 <li>House (four-on-the-floor beat pattern)</li>
                 <li>Dubstep (syncopated drum patterns)</li>
             </ul>
-            
+
             <h3>Rock</h3>
             <ul>
                 <li>Alternative Rock</li>
                 <li>Progressive Rock (complex compositions)</li>
                 <li>Hard Rock</li>
             </ul>
-            
+
             <h3>Jazz</h3>
             <ul>
                 <li>Bebop (fast tempo and improvisation)</li>
@@ -69,21 +69,21 @@ class TestContentParser:
         <head><title>Meta Tags</title></head>
         <body>
             <h1>List of Meta Tags</h1>
-            
+
             <h3>Structural Tags</h3>
             <ul>
                 <li><strong>verse</strong> : Indicates verse section of song</li>
                 <li><strong>chorus</strong> : Indicates chorus section</li>
                 <li><strong>bridge</strong> : Indicates bridge section</li>
             </ul>
-            
+
             <h3>Emotional Tags</h3>
             <ul>
                 <li>**upbeat** : Creates energetic and positive mood</li>
                 <li>**melancholic** : Creates sad and reflective atmosphere</li>
                 <li>**aggressive** : Creates intense and powerful feeling</li>
             </ul>
-            
+
             <h3>Instrumental Tags</h3>
             <ul>
                 <li>guitar-driven : Emphasizes guitar in the mix</li>
@@ -102,23 +102,23 @@ class TestContentParser:
         <head><title>Suno AI Techniques</title></head>
         <body>
             <h1>How to Structure Prompts for Suno AI</h1>
-            
+
             <h2>Prompt Structure Techniques</h2>
             <p>Use clear and specific language when describing your desired output.</p>
-            
+
             <h3>Lyric Writing Tips</h3>
             <ul>
                 <li>Start with a strong hook in the first line</li>
                 <li>Use concrete imagery rather than abstract concepts</li>
                 <li>Maintain consistent rhyme scheme throughout</li>
             </ul>
-            
+
             <h3>Genre Specification</h3>
-            <p>Be specific about the genre you want. Instead of just "rock", 
+            <p>Be specific about the genre you want. Instead of just "rock",
             try "alternative rock with grunge influences" for better results.</p>
-            
+
             <h3>Vocal Style Direction</h3>
-            <p>Describe the vocal style you want: "raspy male vocals", 
+            <p>Describe the vocal style you want: "raspy male vocals",
             "smooth female harmonies", or "aggressive rap delivery".</p>
         </body>
         </html>
@@ -523,7 +523,7 @@ class TestParsedContent:
 
         assert len(content.errors) == 1
         assert content.errors[0] == "Test error message"
-        assert content.has_errors() == True
+        assert content.has_errors()
 
     def test_add_warning(self):
         """Test warning addition"""
@@ -533,7 +533,7 @@ class TestParsedContent:
 
         assert len(content.warnings) == 1
         assert content.warnings[0] == "Test warning message"
-        assert content.has_errors() == False  # Warnings don't count as errors
+        assert not content.has_errors()  # Warnings don't count as errors
 
     def test_get_total_items(self):
         """Test total items count"""

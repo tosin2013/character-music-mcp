@@ -19,6 +19,7 @@ from dataclasses import asdict
 
 from server import persona_generator
 from standard_character_profile import StandardCharacterProfile
+
 from tests.fixtures.mock_contexts import MockContext
 
 
@@ -114,7 +115,7 @@ async def test_full_integration():
                 await ctx.error(f"Failed to process character data {char_data}: {str(e)}")
                 continue
 
-        result = {
+        {
             "artist_personas": artist_personas,
             "total_personas": len(artist_personas),
             "generation_summary": f"Generated {len(artist_personas)} unique artist personas from character analysis"

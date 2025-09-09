@@ -127,7 +127,7 @@ class TestWikiPersonaIntegration:
         generator = MusicPersonaGenerator()
 
         # Generate persona
-        persona = await generator.generate_artist_persona(sample_character, mock_context)
+        await generator.generate_artist_persona(sample_character, mock_context)
 
         # If source attribution is available, it should be working
         if hasattr(generator, 'source_attribution_manager') and generator.source_attribution_manager:

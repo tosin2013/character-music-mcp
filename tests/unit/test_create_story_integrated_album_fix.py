@@ -34,7 +34,7 @@ async def create_story_integrated_album_fixed(
 ) -> str:
     """
     Fixed version of create_story_integrated_album using middleware
-    
+
     This implementation avoids the 'FunctionTool' object not callable errors
     by using the middleware layer instead of direct MCP tool calls.
     """
@@ -185,43 +185,43 @@ async def test_create_story_integrated_album():
 
     # Test narrative with clear characters
     narrative = '''
-    Sarah Chen stood at the edge of the rooftop, tears streaming down her face. 
-    At twenty-seven, she had spent her entire life meeting everyone else's expectations. 
+    Sarah Chen stood at the edge of the rooftop, tears streaming down her face.
+    At twenty-seven, she had spent her entire life meeting everyone else's expectations.
     Perfect grades, perfect job, perfect smile - but inside, she felt completely empty.
-    
-    "I can't do this anymore," Sarah whispered to herself, her voice barely audible 
-    over the city noise below. The wind whipped her long black hair across her face 
+
+    "I can't do this anymore," Sarah whispered to herself, her voice barely audible
+    over the city noise below. The wind whipped her long black hair across her face
     as she gripped the railing tighter.
-    
-    Behind her, the door to the roof opened. "Sarah?" called Marcus, her best friend 
+
+    Behind her, the door to the roof opened. "Sarah?" called Marcus, her best friend
     since college. "What are you doing up here?"
-    
-    Sarah turned to face Marcus, her eyes red from crying. "I'm thinking about jumping," 
+
+    Sarah turned to face Marcus, her eyes red from crying. "I'm thinking about jumping,"
     she said quietly. Marcus rushed forward, his heart pounding.
-    
+
     "Don't say that," Marcus pleaded, reaching out his hand. "Talk to me. What's wrong?"
-    
-    Sarah looked at her friend, seeing the genuine concern in his eyes. "I feel like 
-    I'm drowning, Marcus. Every day is the same. Work, sleep, repeat. I'm successful 
+
+    Sarah looked at her friend, seeing the genuine concern in his eyes. "I feel like
+    I'm drowning, Marcus. Every day is the same. Work, sleep, repeat. I'm successful
     on paper, but I feel completely empty inside."
-    
-    Marcus stepped closer, his voice gentle. "Sarah, you don't have to carry this alone. 
+
+    Marcus stepped closer, his voice gentle. "Sarah, you don't have to carry this alone.
     I've been worried about you for months. You've been different, distant."
-    
-    "I didn't want to burden anyone," Sarah replied, her voice breaking. "Everyone 
-    thinks I have it all figured out. The perfect job, the perfect apartment, the 
+
+    "I didn't want to burden anyone," Sarah replied, her voice breaking. "Everyone
+    thinks I have it all figured out. The perfect job, the perfect apartment, the
     perfect life. But it's all a lie."
-    
-    Marcus reached out and gently took her hand. "It's not a lie, Sarah. You're human. 
-    You're allowed to struggle. You're allowed to feel lost. But you don't have to 
+
+    Marcus reached out and gently took her hand. "It's not a lie, Sarah. You're human.
+    You're allowed to struggle. You're allowed to feel lost. But you don't have to
     face it alone."
-    
-    Sarah felt tears streaming down her face as she looked at her friend. For the first 
-    time in months, she felt a glimmer of hope. Maybe there was a way forward. Maybe 
+
+    Sarah felt tears streaming down her face as she looked at her friend. For the first
+    time in months, she felt a glimmer of hope. Maybe there was a way forward. Maybe
     she didn't have to carry this burden alone.
-    
+
     "Will you help me?" she asked quietly.
-    
+
     "Always," Marcus replied without hesitation. "We'll figure this out together."
     '''
 
@@ -274,24 +274,24 @@ async def test_character_name_specification():
     """Test specifying a specific character name"""
 
     narrative = '''
-    Elena Rodriguez stood in her cramped studio apartment, paintbrush trembling 
-    in her hand as she stared at the blank canvas. At twenty-eight, she had already 
-    spent three years working as a graphic designer for a corporate firm, but her 
+    Elena Rodriguez stood in her cramped studio apartment, paintbrush trembling
+    in her hand as she stared at the blank canvas. At twenty-eight, she had already
+    spent three years working as a graphic designer for a corporate firm, but her
     heart belonged to fine art.
-    
-    "You're wasting your talent," her mother, Carmen Rodriguez, had said during 
+
+    "You're wasting your talent," her mother, Carmen Rodriguez, had said during
     their last phone call. "Art doesn't pay the bills, mija. You have a good job."
-    
-    But Elena couldn't shake the feeling that she was slowly dying inside. Every 
-    morning, she put on her business attire and walked into the sterile office 
-    building, spending eight hours creating marketing materials for products she 
+
+    But Elena couldn't shake the feeling that she was slowly dying inside. Every
+    morning, she put on her business attire and walked into the sterile office
+    building, spending eight hours creating marketing materials for products she
     didn't care about.
-    
-    Her best friend Jake Thompson had been encouraging her to quit and pursue art 
-    full-time. "You're incredibly talented, Elena," he'd said over coffee last week. 
+
+    Her best friend Jake Thompson had been encouraging her to quit and pursue art
+    full-time. "You're incredibly talented, Elena," he'd said over coffee last week.
     "I've seen your paintings. They're extraordinary."
-    
-    Elena picked up her brush and dipped it in paint. Tonight, she would create 
+
+    Elena picked up her brush and dipped it in paint. Tonight, she would create
     something beautiful. Tonight, she would remember who she really was.
     '''
 
@@ -370,15 +370,15 @@ async def test_error_cases():
     # Test 3: Character not found
     print("Test 3: Character not found")
     narrative = '''
-    Sarah Chen stood at the edge of the rooftop, tears streaming down her face. 
+    Sarah Chen stood at the edge of the rooftop, tears streaming down her face.
     At twenty-seven, she had spent her entire life meeting everyone else's expectations.
     Perfect grades, perfect job, perfect smile - but inside, she felt completely empty.
-    
-    "I can't do this anymore," Sarah whispered to herself, her voice barely audible 
-    over the city noise below. The wind whipped her long black hair across her face 
+
+    "I can't do this anymore," Sarah whispered to herself, her voice barely audible
+    over the city noise below. The wind whipped her long black hair across her face
     as she gripped the railing tighter.
-    
-    Behind her, the door to the roof opened. "Sarah?" called Marcus, her best friend 
+
+    Behind her, the door to the roof opened. "Sarah?" called Marcus, her best friend
     since college. "What are you doing up here?"
     '''
     result = await create_story_integrated_album_fixed(

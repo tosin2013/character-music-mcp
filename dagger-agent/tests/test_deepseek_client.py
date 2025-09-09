@@ -474,7 +474,7 @@ from unittest.mock import Mock, patch
 
 def test_api_call():
     from missing_package import MissingClass
-    
+
     client = MissingClass()
     result = client.call_api()
     assert result.status_code == 200

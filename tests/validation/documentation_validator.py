@@ -92,7 +92,7 @@ class CompletionReport:
 class DocumentationValidator:
     """
     Validates comprehensive documentation coverage and currency
-    
+
     This class ensures that all aspects of the system are properly documented
     and that documentation stays synchronized with code changes.
     """
@@ -142,7 +142,7 @@ class DocumentationValidator:
     def discover_documentation_files(self) -> Dict[str, List[Path]]:
         """
         Discover all documentation files organized by area
-        
+
         Returns:
             Dictionary mapping area names to lists of file paths
         """
@@ -174,7 +174,7 @@ class DocumentationValidator:
     def analyze_documentation_coverage(self) -> List[DocumentationCoverage]:
         """
         Analyze coverage for each documentation area
-        
+
         Returns:
             List of DocumentationCoverage objects
         """
@@ -285,7 +285,7 @@ class DocumentationValidator:
     def discover_code_elements(self) -> List[Dict[str, Any]]:
         """
         Discover code elements that require documentation
-        
+
         Returns:
             List of code element dictionaries
         """
@@ -354,10 +354,10 @@ class DocumentationValidator:
     def map_code_to_documentation(self, code_elements: List[Dict[str, Any]]) -> List[CodeDocumentationMapping]:
         """
         Map code elements to their documentation
-        
+
         Args:
             code_elements: List of code element dictionaries
-            
+
         Returns:
             List of CodeDocumentationMapping objects
         """
@@ -432,11 +432,11 @@ class DocumentationValidator:
                                   mappings: List[CodeDocumentationMapping]) -> List[DocumentationGap]:
         """
         Identify gaps in documentation coverage
-        
+
         Args:
             coverage: Documentation coverage analysis
             mappings: Code to documentation mappings
-            
+
         Returns:
             List of DocumentationGap objects
         """
@@ -536,7 +536,7 @@ class DocumentationValidator:
     def check_documentation_completeness(self) -> CompletionReport:
         """
         Perform comprehensive documentation completeness check
-        
+
         Returns:
             CompletionReport with detailed analysis
         """
@@ -623,7 +623,7 @@ class DocumentationValidator:
                                    output_path: str = "documentation_completeness_report.json"):
         """
         Generate comprehensive documentation completeness report
-        
+
         Args:
             report: CompletionReport to save
             output_path: Path to save the report
@@ -704,10 +704,10 @@ Generated: {report.validation_timestamp}
     def ensure_documentation_stays_current_with_code(self, changed_files: List[str]) -> List[str]:
         """
         Identify documentation that needs updating when code changes
-        
+
         Args:
             changed_files: List of code files that have changed
-            
+
         Returns:
             List of documentation files that may need updating
         """

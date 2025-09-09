@@ -18,10 +18,10 @@ def test_metatag_parsing():
             <div class="sl-markdown-content">
                 <h2>What are Meta Tags?</h2>
                 <p>Meta tags in music AI are directives...</p>
-                
+
                 <h3>How to Use Meta Tags in Suno AI</h3>
                 <p>Using meta tags can significantly enhance...</p>
-                
+
                 <h3>Sound Effects Meta Tags</h3>
                 <ul>
                     <li><strong>Barking</strong> : Sound of a dog barking.</li>
@@ -30,7 +30,7 @@ def test_metatag_parsing():
                     <li><strong>Birds chirping</strong> : Sound of birds chirping.</li>
                     <li><strong>Cheering</strong> : Sound of people cheering.</li>
                 </ul>
-                
+
                 <h3>Vocal Expressions Meta Tags</h3>
                 <ul>
                     <li><strong>Announcer</strong> : Voice of an announcer.</li>
@@ -38,7 +38,7 @@ def test_metatag_parsing():
                     <li><strong>Man</strong> : Voice of a man.</li>
                     <li><strong>Woman</strong> : Voice of a woman.</li>
                 </ul>
-                
+
                 <h3>Structural Tags</h3>
                 <ul>
                     <li><strong>Chorus</strong> : The chorus part of the song.</li>
@@ -46,7 +46,7 @@ def test_metatag_parsing():
                     <li><strong>Outro</strong> : Ending part of the song.</li>
                     <li><strong>Verse</strong> : The verse sections of the song.</li>
                 </ul>
-                
+
                 <h3>Styles and Genres Meta Tags</h3>
                 <ul>
                     <li><strong>Acoustic</strong> : Acoustic style.</li>

@@ -94,10 +94,10 @@ class GracefulDegradationSystem:
     async def get_genres_with_fallback(self, max_age_hours: int = 24) -> Tuple[List[Genre], DataQualityMetrics]:
         """
         Get genres with graceful fallback to cached and hardcoded data
-        
+
         Args:
             max_age_hours: Maximum age for cached data
-            
+
         Returns:
             Tuple of (genres_list, quality_metrics)
         """
@@ -150,11 +150,11 @@ class GracefulDegradationSystem:
                                         max_age_hours: int = 24) -> Tuple[List[MetaTag], DataQualityMetrics]:
         """
         Get meta tags with graceful fallback to cached and hardcoded data
-        
+
         Args:
             category: Optional category filter
             max_age_hours: Maximum age for cached data
-            
+
         Returns:
             Tuple of (meta_tags_list, quality_metrics)
         """
@@ -212,11 +212,11 @@ class GracefulDegradationSystem:
                                          max_age_hours: int = 24) -> Tuple[List[Technique], DataQualityMetrics]:
         """
         Get techniques with graceful fallback to cached and hardcoded data
-        
+
         Args:
             technique_type: Optional technique type filter
             max_age_hours: Maximum age for cached data
-            
+
         Returns:
             Tuple of (techniques_list, quality_metrics)
         """
@@ -269,12 +269,12 @@ class GracefulDegradationSystem:
                                         error: Exception) -> Tuple[Any, DataQualityMetrics]:
         """
         Handle partial data failure by mixing partial data with fallbacks
-        
+
         Args:
             data_type: Type of data ('genres', 'meta_tags', 'techniques')
             partial_data: Partially recovered data
             error: Original error that caused partial failure
-            
+
         Returns:
             Tuple of (combined_data, quality_metrics)
         """
@@ -602,11 +602,6 @@ class GracefulDegradationSystem:
     def _calculate_completeness_score(self, total_items: int) -> float:
         """Calculate completeness score based on total items available"""
         # Define expected minimum items for each data type
-        expected_minimums = {
-            'genres': 20,
-            'meta_tags': 30,
-            'techniques': 10
-        }
 
         # Use a reasonable default if we can't determine the type
         expected_minimum = 20

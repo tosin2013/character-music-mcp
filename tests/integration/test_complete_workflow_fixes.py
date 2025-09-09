@@ -73,9 +73,9 @@ async def test_internal_functions_callable():
 
     # Test sample narrative
     sample_text = """
-    Marcus Thompson stood in his Bristol warehouse studio, surrounded by vintage synthesizers 
-    and analog equipment. As a producer, he had always been drawn to the philosophical depths 
-    of alternative music, seeking to create sounds that would make listeners question their 
+    Marcus Thompson stood in his Bristol warehouse studio, surrounded by vintage synthesizers
+    and analog equipment. As a producer, he had always been drawn to the philosophical depths
+    of alternative music, seeking to create sounds that would make listeners question their
     place in the universe.
     """
 
@@ -102,7 +102,7 @@ async def test_internal_functions_callable():
                 print("Testing _create_suno_commands_internal...")
                 command_result = await _create_suno_commands_internal(persona_result, char_result, ctx)
                 assert command_result is not None
-                command_data = json.loads(command_result)
+                json.loads(command_result)
                 print("✅ Command generation internal function works")
 
         # Test 4: Complete Workflow Internal
@@ -128,9 +128,9 @@ async def test_mcp_tool_wrappers():
     ctx = MockContext("mcp_test")
 
     sample_text = """
-    Elena Rodriguez was a jazz pianist who performed in small clubs around the city. 
-    Her music was deeply emotional, drawing from her experiences with heartbreak and 
-    her journey toward self-discovery. She had a gift for improvisation that allowed 
+    Elena Rodriguez was a jazz pianist who performed in small clubs around the city.
+    Her music was deeply emotional, drawing from her experiences with heartbreak and
+    her journey toward self-discovery. She had a gift for improvisation that allowed
     her to channel her feelings directly into her performances.
     """
 
@@ -161,7 +161,7 @@ async def test_mcp_tool_wrappers():
         print("Testing complete_workflow MCP tool...")
         workflow_result = await call_complete_workflow(sample_text, ctx)
         assert workflow_result is not None
-        workflow_data = json.loads(workflow_result)
+        json.loads(workflow_result)
         print("✅ Complete workflow MCP tool works")
 
         return True
@@ -197,9 +197,9 @@ async def test_workflow_manager():
         # Test workflow execution
         ctx = MockContext("workflow_manager_test")
         sample_text = """
-        David Kim was a electronic music producer who specialized in ambient soundscapes. 
-        His work was influenced by his meditation practice and his fascination with the 
-        intersection of technology and spirituality. He often incorporated field recordings 
+        David Kim was a electronic music producer who specialized in ambient soundscapes.
+        His work was influenced by his meditation practice and his fascination with the
+        intersection of technology and spirituality. He often incorporated field recordings
         of nature into his compositions.
         """
 
@@ -262,10 +262,10 @@ async def test_data_consistency():
     ctx = MockContext("consistency_test")
 
     sample_text = """
-    Maria Santos was a folk singer-songwriter from a small coastal town. Her music was 
-    deeply rooted in her cultural heritage and family traditions. She wrote songs about 
-    love, loss, and the connection between people and the sea. Her voice carried the 
-    weight of generations of storytellers, and her guitar playing was both delicate 
+    Maria Santos was a folk singer-songwriter from a small coastal town. Her music was
+    deeply rooted in her cultural heritage and family traditions. She wrote songs about
+    love, loss, and the connection between people and the sea. Her voice carried the
+    weight of generations of storytellers, and her guitar playing was both delicate
     and powerful.
     """
 

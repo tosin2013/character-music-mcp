@@ -8,7 +8,6 @@ Tests the implementation of requirements 1.1, 1.2, 1.3, 1.4, 1.5 from the MCP to
 import asyncio
 
 import pytest
-
 from enhanced_character_analyzer import EnhancedCharacterAnalyzer, validate_analysis_results
 from standard_character_profile import StandardCharacterProfile
 
@@ -22,27 +21,27 @@ class TestEnhancedCharacterAnalyzer:
 
         # Test text with clear characters and themes
         self.test_text = """
-        Elena stood at the lighthouse, her heart heavy with the weight of her decision. 
-        She had grown up in this coastal town, watching ships come and go, but now she faced 
-        her greatest challenge. The letter from Marcus lay crumpled in her hand - a betrayal 
+        Elena stood at the lighthouse, her heart heavy with the weight of her decision.
+        She had grown up in this coastal town, watching ships come and go, but now she faced
+        her greatest challenge. The letter from Marcus lay crumpled in her hand - a betrayal
         that cut deeper than any storm.
-        
-        "I trusted you," she whispered to the wind, her voice breaking with emotion. 
-        Elena had always been brave, but this felt different. The fear of losing everything 
+
+        "I trusted you," she whispered to the wind, her voice breaking with emotion.
+        Elena had always been brave, but this felt different. The fear of losing everything
         she held dear consumed her thoughts.
-        
-        Marcus had been her closest friend since childhood. They had shared dreams of 
-        adventure, of sailing beyond the horizon together. But his deception changed everything. 
+
+        Marcus had been her closest friend since childhood. They had shared dreams of
+        adventure, of sailing beyond the horizon together. But his deception changed everything.
         Now Elena must choose between forgiveness and justice, between love and self-respect.
-        
-        As the sun set over the turbulent waters, Elena felt a mixture of sadness and 
-        determination. She would not let this betrayal define her. Tomorrow, she would 
+
+        As the sun set over the turbulent waters, Elena felt a mixture of sadness and
+        determination. She would not let this betrayal define her. Tomorrow, she would
         confront Marcus and demand the truth, no matter how much it hurt.
         """
 
         # Simple test text for basic functionality
         self.simple_text = """
-        John walked into the room. He was nervous about the meeting. 
+        John walked into the room. He was nervous about the meeting.
         Sarah greeted him with a smile. "Don't worry," she said, "everything will be fine."
         John nodded, feeling slightly better.
         """
@@ -273,7 +272,7 @@ if __name__ == "__main__":
         analyzer = EnhancedCharacterAnalyzer()
 
         test_text = """
-        Elena stood at the lighthouse, her heart heavy with betrayal. 
+        Elena stood at the lighthouse, her heart heavy with betrayal.
         Marcus had been her friend, but his deception changed everything.
         She felt a mixture of sadness and determination.
         """

@@ -31,7 +31,7 @@ async def test_enhanced_crawl_tool():
         from wiki_data_system import WikiDataManager
 
         # Create mock context
-        ctx = MockContext()
+        MockContext()
 
         # Simulate the enhanced crawl tool logic directly
         print("\n--- Simulating Enhanced Crawl Tool Logic ---")

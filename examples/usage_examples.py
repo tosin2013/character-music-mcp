@@ -13,53 +13,53 @@ import json
 # Sample narrative texts for testing
 SAMPLE_NARRATIVES = {
     "fantasy_adventure": """
-    Elara stood at the edge of the ancient forest, her silver bow gleaming in the moonlight. 
-    She had always been the fearless one among her companions, the elf who charged into danger 
-    while others hesitated. Her emerald eyes held centuries of wisdom, yet they also carried 
-    the weight of loss - her family had been destroyed by the dark sorcerer Malachar, and 
+    Elara stood at the edge of the ancient forest, her silver bow gleaming in the moonlight.
+    She had always been the fearless one among her companions, the elf who charged into danger
+    while others hesitated. Her emerald eyes held centuries of wisdom, yet they also carried
+    the weight of loss - her family had been destroyed by the dark sorcerer Malachar, and
     revenge burned in her heart like an unquenchable flame.
-    
-    "We move at dawn," she whispered to her companion, Marcus, a gruff human warrior whose 
-    loyalty had never wavered despite the dangers they faced. Marcus nodded, understanding 
-    the pain that drove her forward. He had his own demons - a past as a royal guard who 
+
+    "We move at dawn," she whispered to her companion, Marcus, a gruff human warrior whose
+    loyalty had never wavered despite the dangers they faced. Marcus nodded, understanding
+    the pain that drove her forward. He had his own demons - a past as a royal guard who
     had failed to protect his king, leading to a life of wandering and self-imposed exile.
-    
-    In the distance, they could see the flickering lights of the enemy camp. Tonight would 
-    determine their fate, and Elara felt the familiar mix of fear and determination that 
+
+    In the distance, they could see the flickering lights of the enemy camp. Tonight would
+    determine their fate, and Elara felt the familiar mix of fear and determination that
     had carried her through countless battles.
     """,
 
     "modern_drama": """
-    Sarah Chen stared at her reflection in the coffee shop window, wondering when she had 
-    become so tired. At thirty-five, she was a successful architect with a corner office 
-    and a reputation for innovative designs, but something felt hollow inside. Her phone 
-    buzzed with another message from her mother, asking when she would settle down and 
+    Sarah Chen stared at her reflection in the coffee shop window, wondering when she had
+    become so tired. At thirty-five, she was a successful architect with a corner office
+    and a reputation for innovative designs, but something felt hollow inside. Her phone
+    buzzed with another message from her mother, asking when she would settle down and
     give her grandchildren.
-    
-    "Another late night at the office?" asked David, sliding into the seat across from her. 
-    Her oldest friend since college, David had always been the dreamer while she was the 
+
+    "Another late night at the office?" asked David, sliding into the seat across from her.
+    Her oldest friend since college, David had always been the dreamer while she was the
     practical one. Now he ran a small nonprofit and seemed more fulfilled than she had ever felt.
-    
-    "I've been thinking about what you said," Sarah admitted, pushing her untouched latte 
-    away. "About finding something that matters." David smiled knowingly - he had been 
-    waiting for this conversation for years, watching his ambitious friend climb the 
+
+    "I've been thinking about what you said," Sarah admitted, pushing her untouched latte
+    away. "About finding something that matters." David smiled knowingly - he had been
+    waiting for this conversation for years, watching his ambitious friend climb the
     corporate ladder while losing pieces of herself along the way.
     """,
 
     "mystery_thriller": """
-    Detective Ray Morrison lit his third cigarette of the morning as he studied the crime 
-    scene photos spread across his cluttered desk. Twenty years on the force had taught 
-    him to read between the lines, to see the stories that evidence told. This case was 
+    Detective Ray Morrison lit his third cigarette of the morning as he studied the crime
+    scene photos spread across his cluttered desk. Twenty years on the force had taught
+    him to read between the lines, to see the stories that evidence told. This case was
     different though - personal in a way that made his hands shake as he reached for his coffee.
-    
-    The victim, Maria Santos, had been a witness in a case he'd worked five years ago. 
-    Back then, she'd been terrified but brave, willing to testify against the crime family 
-    that had destroyed her neighborhood. Ray had promised her protection, assured her that 
-    justice would prevail. Now she was dead, and he couldn't shake the feeling that his 
+
+    The victim, Maria Santos, had been a witness in a case he'd worked five years ago.
+    Back then, she'd been terrified but brave, willing to testify against the crime family
+    that had destroyed her neighborhood. Ray had promised her protection, assured her that
+    justice would prevail. Now she was dead, and he couldn't shake the feeling that his
     failure to keep that promise had cost an innocent woman her life.
-    
-    His partner, Detective Lisa Wong, watched him with concern. She was younger, more optimistic, 
-    still believing that the system worked. "Ray, we'll find who did this," she said quietly. 
+
+    His partner, Detective Lisa Wong, watched him with concern. She was younger, more optimistic,
+    still believing that the system worked. "Ray, we'll find who did this," she said quietly.
     But Ray knew that some promises, once broken, could never be repaired.
     """
 }
@@ -218,17 +218,17 @@ async def demo_mcp_client_integration():
         # List available tools
         tools = await client.list_tools()
         print(f"Available tools: {[tool.name for tool in tools]}")
-        
+
         # Analyze narrative text
         result = await client.call_tool("analyze_character_text", {
             "text": narrative_content
         })
-        
+
         # Generate artist personas
         personas = await client.call_tool("generate_artist_personas", {
             "characters_json": result.text
         })
-        
+
         # Create Suno commands
         commands = await client.call_tool("create_suno_commands", {
             "personas_json": personas.text,

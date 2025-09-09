@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import aiofiles
-
 from wiki_cache_manager import WikiCacheManager
 from wiki_content_parser import ContentParser
 from wiki_data_models import Genre, MetaTag, RefreshResult, Technique, WikiConfig
@@ -408,7 +407,7 @@ class WikiDataManager:
     async def enable_dynamic_config(self, config_path: Optional[str] = None) -> None:
         """
         Enable dynamic configuration management with file watching
-        
+
         Args:
             config_path: Optional path to configuration file
         """
@@ -441,7 +440,7 @@ class WikiDataManager:
     async def _handle_config_change(self, old_config: WikiConfig, new_config: WikiConfig) -> None:
         """
         Handle configuration changes from dynamic config manager
-        
+
         Args:
             old_config: Previous configuration
             new_config: New configuration
@@ -486,10 +485,10 @@ class WikiDataManager:
     async def update_config_runtime(self, **settings) -> bool:
         """
         Update configuration settings at runtime
-        
+
         Args:
             **settings: Configuration settings to update
-            
+
         Returns:
             True if update was successful, False otherwise
         """
@@ -507,12 +506,12 @@ class WikiDataManager:
     async def add_wiki_urls_runtime(self, url_type: str, urls: List[str], validate_urls: bool = True) -> bool:
         """
         Add wiki URLs at runtime
-        
+
         Args:
             url_type: Type of URLs ('genre_pages', 'meta_tag_pages', 'tip_pages')
             urls: List of URLs to add
             validate_urls: Whether to validate URL accessibility
-            
+
         Returns:
             True if addition was successful, False otherwise
         """
@@ -530,11 +529,11 @@ class WikiDataManager:
     async def remove_wiki_urls_runtime(self, url_type: str, urls: List[str]) -> bool:
         """
         Remove wiki URLs at runtime
-        
+
         Args:
             url_type: Type of URLs ('genre_pages', 'meta_tag_pages', 'tip_pages')
             urls: List of URLs to remove
-            
+
         Returns:
             True if removal was successful, False otherwise
         """
@@ -552,7 +551,7 @@ class WikiDataManager:
     def get_dynamic_config_status(self) -> Dict[str, Any]:
         """
         Get status of dynamic configuration management
-        
+
         Returns:
             Dictionary with status information
         """

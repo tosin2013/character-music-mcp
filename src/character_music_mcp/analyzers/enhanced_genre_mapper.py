@@ -52,7 +52,7 @@ class EnhancedGenreMapper:
     def __init__(self, wiki_data_manager: WikiDataManager, performance_monitor: Optional[PerformanceMonitor] = None):
         """
         Initialize EnhancedGenreMapper
-        
+
         Args:
             wiki_data_manager: WikiDataManager instance for accessing genre data
             performance_monitor: PerformanceMonitor instance for tracking metrics
@@ -67,12 +67,12 @@ class EnhancedGenreMapper:
                                   use_hierarchical: bool = True) -> List[GenreMatch]:
         """
         Map character traits to wiki-sourced genres using intelligent semantic analysis
-        
+
         Args:
             traits: List of character traits to match
             max_results: Maximum number of genre matches to return
             use_hierarchical: Whether to consider genre hierarchies in matching
-            
+
         Returns:
             List of GenreMatch objects sorted by confidence
         """
@@ -150,11 +150,11 @@ class EnhancedGenreMapper:
     def calculate_genre_confidence(self, traits: List[str], genre: Genre) -> float:
         """
         Calculate confidence score for a trait-genre match
-        
+
         Args:
             traits: List of character traits
             genre: Genre to match against
-            
+
         Returns:
             Confidence score between 0.0 and 1.0
         """
@@ -183,10 +183,10 @@ class EnhancedGenreMapper:
     async def get_genre_hierarchy(self, genre_name: str) -> Optional[GenreHierarchy]:
         """
         Get comprehensive genre hierarchy information with intelligent analysis
-        
+
         Args:
             genre_name: Name of the genre
-            
+
         Returns:
             GenreHierarchy object or None if not found
         """
@@ -223,12 +223,12 @@ class EnhancedGenreMapper:
                                  similarity_threshold: float = 0.2) -> List[Tuple[Genre, float]]:
         """
         Find genres similar to the target genre using multiple similarity algorithms
-        
+
         Args:
             target_genre: Target genre name
             max_results: Maximum number of similar genres to return
             similarity_threshold: Minimum similarity score to include
-            
+
         Returns:
             List of tuples (Genre, similarity_score) sorted by similarity
         """
@@ -670,11 +670,11 @@ class EnhancedGenreMapper:
     async def find_fallback_matches(self, traits: List[str], max_results: int = 5) -> List[GenreMatch]:
         """
         Find genre matches using intelligent fallback algorithms when direct matches fail
-        
+
         Args:
             traits: List of character traits
             max_results: Maximum number of matches to return
-            
+
         Returns:
             List of GenreMatch objects using fallback algorithms
         """
@@ -844,11 +844,11 @@ class EnhancedGenreMapper:
     async def get_genre_instruments(self, genre_name: str, fallback_instruments: Optional[List[str]] = None) -> List[str]:
         """
         Get typical instruments for a genre from wiki data
-        
+
         Args:
             genre_name: Name of the genre
             fallback_instruments: Fallback instruments if genre not found
-            
+
         Returns:
             List of typical instruments for the genre
         """
@@ -902,11 +902,11 @@ class EnhancedGenreMapper:
     async def _fuzzy_find_genre(self, genre_name: str, threshold: float = 0.6) -> Optional[Genre]:
         """
         Find a genre using fuzzy string matching
-        
+
         Args:
             genre_name: Name of the genre to find
             threshold: Minimum similarity threshold
-            
+
         Returns:
             Best matching Genre or None if no good match found
         """

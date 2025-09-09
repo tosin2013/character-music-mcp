@@ -41,7 +41,7 @@ class NarrativeTheme:
 class EnhancedCharacterAnalyzer:
     """
     Enhanced character analyzer with robust detection and three-layer analysis
-    
+
     This replaces the basic CharacterAnalyzer with improved:
     - Character detection using multiple NER techniques
     - Three-layer analysis (skin/flesh/core) as specified
@@ -182,7 +182,7 @@ class EnhancedCharacterAnalyzer:
     def _detect_content_type(self, text: str) -> str:
         """
         Detect the type of content to determine processing strategy
-        
+
         Returns:
             Content type: "narrative", "conceptual", "descriptive", or "mixed"
         """
@@ -264,7 +264,7 @@ class EnhancedCharacterAnalyzer:
     def _determine_processing_strategy(self, content_type: str, text: str) -> str:
         """
         Determine the processing strategy based on content type
-        
+
         Returns:
             Processing strategy: "extract", "create", "use_explicit", or "hybrid"
         """
@@ -284,13 +284,13 @@ class EnhancedCharacterAnalyzer:
     async def _detect_characters_by_type(self, text: str, content_type: str, strategy: str, ctx=None) -> List[StandardCharacterProfile]:
         """
         Detect or create characters based on content type and strategy
-        
+
         Args:
             text: Input text
             content_type: Detected content type
             strategy: Processing strategy
             ctx: Optional context for logging
-            
+
         Returns:
             List of StandardCharacterProfile instances
         """
@@ -318,11 +318,11 @@ class EnhancedCharacterAnalyzer:
     async def _create_conceptual_characters(self, text: str, ctx=None) -> List[StandardCharacterProfile]:
         """
         Create characters from philosophical themes and concepts
-        
+
         Args:
             text: Input text containing concepts/themes
             ctx: Optional context for logging
-            
+
         Returns:
             List of conceptual character profiles
         """
@@ -355,11 +355,11 @@ class EnhancedCharacterAnalyzer:
     async def _process_explicit_descriptions(self, text: str, ctx=None) -> List[StandardCharacterProfile]:
         """
         Process explicit character descriptions
-        
+
         Args:
             text: Input text with character descriptions
             ctx: Optional context for logging
-            
+
         Returns:
             List of character profiles from descriptions
         """
@@ -646,11 +646,11 @@ class EnhancedCharacterAnalyzer:
     async def analyze_text(self, text: str, ctx=None) -> Dict[str, Any]:
         """
         Perform comprehensive character analysis on input text
-        
+
         Args:
             text: Input narrative text
             ctx: Optional context for logging
-            
+
         Returns:
             Dictionary containing analysis results with characters, themes, and emotional arc
         """
@@ -703,16 +703,16 @@ class EnhancedCharacterAnalyzer:
     async def analyze_character_text(self, ctx, text: str, user_guidance: str = None) -> Dict[str, Any]:
         """
         Analyze character text with content type detection and clarification support
-        
+
         This method is the main entry point for character analysis that detects
         content type before processing and handles different input formats appropriately.
         It includes clarification request functionality for ambiguous input.
-        
+
         Args:
             ctx: Context for logging and communication
             text: Input text to analyze
             user_guidance: Optional user guidance for processing approach
-            
+
         Returns:
             Dictionary containing character analysis results or clarification request
         """
@@ -775,10 +775,10 @@ class EnhancedCharacterAnalyzer:
     def _analyze_content_for_clarification(self, text: str) -> Dict[str, Any]:
         """
         Analyze content to determine if clarification is needed
-        
+
         Args:
             text: Input text to analyze
-            
+
         Returns:
             Dictionary containing analysis results and clarification indicators
         """
@@ -978,12 +978,12 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_with_guidance(self, text: str, user_guidance: str, ctx) -> Dict[str, Any]:
         """
         Analyze text with user-provided guidance
-        
+
         Args:
             text: Input text to analyze
             user_guidance: User's chosen processing approach
             ctx: Context for logging
-            
+
         Returns:
             Analysis results using the specified approach
         """
@@ -1016,7 +1016,7 @@ class EnhancedCharacterAnalyzer:
     async def _detect_characters_enhanced(self, text: str, ctx=None) -> List[StandardCharacterProfile]:
         """
         Enhanced character detection using multiple NER techniques
-        
+
         Implements requirement 1.1: Replace empty character detection with actual name entity recognition
         """
         if ctx:
@@ -1155,7 +1155,7 @@ class EnhancedCharacterAnalyzer:
     async def _build_three_layer_profile(self, name: str, text: str, ctx=None) -> StandardCharacterProfile:
         """
         Build comprehensive character profile using three-layer analysis
-        
+
         Implements requirements 1.2, 1.3, 1.4: Add three-layer character analysis (skin/flesh/core)
         """
         # Extract character-related text segments
@@ -1234,7 +1234,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_skin_layer(self, name: str, segments: List[str], full_text: str) -> Dict[str, Any]:
         """
         Analyze skin layer - observable characteristics
-        
+
         Physical descriptions, mannerisms, speech patterns, behavioral traits
         """
         skin_layer = {
@@ -1347,7 +1347,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_flesh_layer(self, name: str, segments: List[str], full_text: str) -> Dict[str, Any]:
         """
         Analyze flesh layer - background and relationships
-        
+
         Backstory, relationships, formative experiences, social connections
         """
         flesh_layer = {
@@ -1429,7 +1429,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_core_layer(self, name: str, segments: List[str], full_text: str) -> Dict[str, Any]:
         """
         Analyze core layer - deep psychology
-        
+
         Motivations, fears, desires, conflicts, personality drivers
         """
         core_layer = {
@@ -1636,7 +1636,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_narrative_themes_semantic(self, text: str, ctx=None) -> List[NarrativeTheme]:
         """
         Semantic analysis to identify multiple narrative themes
-        
+
         Implements requirement 1.2: Fix narrative theme analysis beyond "friendship"
         """
         if ctx:
@@ -1702,8 +1702,8 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_emotional_arc_varied(self, text: str, ctx=None) -> List[EmotionalState]:
         """
         Analyze emotional progression with deeper psychological analysis
-        
-        Enhanced implementation for requirement 4.1: Replace superficial emotion detection 
+
+        Enhanced implementation for requirement 4.1: Replace superficial emotion detection
         with deeper psychological analysis and complex emotional state tracking
         """
         if ctx:
@@ -1752,7 +1752,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_section_emotions_deep(self, section: str, position: int, section_idx: int, ctx=None) -> List[EmotionalState]:
         """
         Analyze emotions in a specific text section with deep psychological analysis
-        
+
         Enhanced for requirement 4.1: Deeper psychological analysis beyond surface emotions
         """
         section_emotions = []
@@ -1894,7 +1894,7 @@ class EnhancedCharacterAnalyzer:
     def _analyze_emotional_context(self, section: str, keyword: str) -> Dict[str, Any]:
         """
         Analyze the psychological context around an emotional keyword
-        
+
         Returns depth score and contextual information for deeper emotional analysis
         """
         sentences = re.split(r'[.!?]+', section)
@@ -1960,7 +1960,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_philosophical_emotional_connections(self, text: str, ctx=None) -> List[EmotionalState]:
         """
         Analyze connections between philosophical concepts and emotional states
-        
+
         Implements requirement 4.2: Add connection logic between philosophical concepts and emotional states
         """
         if ctx:
@@ -2044,7 +2044,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_complex_emotional_patterns(self, text: str, existing_emotions: List[EmotionalState], ctx=None) -> List[EmotionalState]:
         """
         Analyze complex emotional patterns and transitions across the text
-        
+
         Implements requirement 4.3: Complex emotional state tracking across album tracks
         """
         if ctx:
@@ -2240,7 +2240,7 @@ class EnhancedCharacterAnalyzer:
     async def _analyze_deep_contextual_emotions(self, text: str, ctx=None) -> List[EmotionalState]:
         """
         Perform deep contextual emotional analysis when surface emotions aren't found
-        
+
         Enhanced version of contextual emotion inference with psychological depth
         """
         if ctx:
@@ -2543,11 +2543,11 @@ def create_enhanced_analyzer() -> EnhancedCharacterAnalyzer:
 async def analyze_text_enhanced(text: str, ctx=None) -> Dict[str, Any]:
     """
     Convenience function for enhanced text analysis
-    
+
     Args:
         text: Input narrative text
         ctx: Optional context for logging
-        
+
     Returns:
         Dictionary containing enhanced analysis results
     """
@@ -2579,7 +2579,7 @@ class AlbumCoherenceValidation:
 class ThematicCoherenceValidator:
     """
     Validates thematic coherence and consistency across album content
-    
+
     Implements requirement 4.2: Add thematic coherence validation
     """
 
@@ -2608,11 +2608,11 @@ class ThematicCoherenceValidator:
     async def validate_album_coherence(self, album_content: Dict[str, Any], ctx=None) -> AlbumCoherenceValidation:
         """
         Validate coherence across an entire album
-        
+
         Args:
             album_content: Dictionary containing album tracks and metadata
             ctx: Optional context for logging
-            
+
         Returns:
             AlbumCoherenceValidation with detailed analysis
         """
@@ -3305,12 +3305,12 @@ class ThematicCoherenceValidator:
 def validate_analysis_results(results: Dict[str, Any]) -> List[str]:
     """
     Validate analysis results and return any issues
-    
+
     Enhanced with thematic coherence validation for requirement 4.2
-    
+
     Args:
         results: Analysis results dictionary
-        
+
     Returns:
         List of validation issues (empty if valid)
     """
@@ -3353,7 +3353,7 @@ def validate_analysis_results(results: Dict[str, Any]) -> List[str]:
 def validate_thematic_coherence(album_content: Dict[str, Any]) -> List[str]:
     """
     Validate thematic coherence of album content
-    
+
     Implements requirement 4.2: Thematic coherence validation
     """
     issues = []

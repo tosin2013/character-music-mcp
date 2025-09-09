@@ -35,7 +35,7 @@ async def main():
     # Test 2: Validate a few examples if available
     if examples:
         print("\n2. Testing example validation (first 3 examples)...")
-        for i, example in enumerate(examples[:3]):
+        for _i, example in enumerate(examples[:3]):
             print(f"   Validating: {example['name']}")
             try:
                 result = await generator.validate_example(example)

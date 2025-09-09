@@ -61,7 +61,7 @@ class ValidationReport:
 class ExampleGenerator:
     """
     Generates and validates testable documentation examples
-    
+
     This class automatically tests all documentation examples to ensure they
     work correctly and produce expected results, maintaining documentation
     accuracy as the codebase evolves.
@@ -95,7 +95,7 @@ class ExampleGenerator:
     def discover_examples(self) -> List[Dict[str, Any]]:
         """
         Discover all examples in documentation files
-        
+
         Returns:
             List of example dictionaries with metadata
         """
@@ -225,10 +225,10 @@ class ExampleGenerator:
     async def validate_example(self, example: Dict[str, Any]) -> ExampleValidationResult:
         """
         Validate a single documentation example
-        
+
         Args:
             example: Example dictionary with metadata
-            
+
         Returns:
             ExampleValidationResult with validation details
         """
@@ -449,7 +449,7 @@ class ExampleGenerator:
     async def validate_all_examples(self) -> ValidationReport:
         """
         Validate all discovered documentation examples
-        
+
         Returns:
             ValidationReport with comprehensive results
         """
@@ -531,7 +531,7 @@ class ExampleGenerator:
     def generate_validation_report(self, report: ValidationReport, output_path: str = "validation_report.json"):
         """
         Generate a comprehensive validation report
-        
+
         Args:
             report: ValidationReport to save
             output_path: Path to save the report
@@ -601,10 +601,10 @@ Generated: {report.validation_timestamp}
     def update_examples_when_code_changes(self, changed_files: List[str]) -> List[str]:
         """
         Identify examples that need updating when code changes
-        
+
         Args:
             changed_files: List of file paths that have changed
-            
+
         Returns:
             List of example names that may need updating
         """

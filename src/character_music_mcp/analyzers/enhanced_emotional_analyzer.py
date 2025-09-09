@@ -207,11 +207,11 @@ class EnhancedEmotionalAnalyzer:
     def analyze_emotional_content(self, text: str, source_type: str = "general") -> EmotionalProfile:
         """
         Perform comprehensive emotional analysis of text content
-        
+
         Args:
             text: The text content to analyze
             source_type: Type of source material (book, article, etc.)
-            
+
         Returns:
             EmotionalProfile with detailed emotional insights
         """

@@ -295,7 +295,7 @@ class TestWikiDataManager:
 
         result = await temp_manager.refresh_data()
 
-        assert result.success == True
+        assert result.success
         assert result.downloaded_pages == 1
         assert result.failed_pages == 0
         assert len(result.errors) == 0
@@ -340,7 +340,7 @@ class TestWikiDataManager:
 
         result = await temp_manager.refresh_data()
 
-        assert result.success == True  # Partial success is still success
+        assert result.success  # Partial success is still success
         assert result.downloaded_pages == 1
         assert result.failed_pages == 1
         assert len(result.errors) == 1
@@ -355,7 +355,7 @@ class TestWikiDataManager:
             results=[]
         )
 
-        result = await temp_manager.refresh_data(force=True)
+        await temp_manager.refresh_data(force=True)
 
         # Should call download with force parameter
         temp_manager.downloader.download_all_configured_pages.assert_called()
@@ -371,7 +371,7 @@ class TestWikiDataManager:
 
         result = await manager.refresh_data()
 
-        assert result.success == False
+        assert not result.success
         assert "Wiki integration is disabled" in result.errors[0]
 
     def test_get_source_urls_genres(self, temp_manager):
@@ -518,10 +518,10 @@ class TestWikiConfig:
         """Test WikiConfig default values"""
         config = WikiConfig()
 
-        assert config.enabled == True
+        assert config.enabled
         assert config.local_storage_path == "./data/wiki"
         assert config.refresh_interval_hours == 24
-        assert config.fallback_to_hardcoded == True
+        assert config.fallback_to_hardcoded
         assert len(config.genre_pages) > 0
         assert len(config.meta_tag_pages) > 0
         assert len(config.tip_pages) > 0
@@ -538,10 +538,10 @@ class TestWikiConfig:
             tip_pages=["https://custom.com/tips"]
         )
 
-        assert config.enabled == False
+        assert not config.enabled
         assert config.local_storage_path == "/custom/path"
         assert config.refresh_interval_hours == 12
-        assert config.fallback_to_hardcoded == False
+        assert not config.fallback_to_hardcoded
         assert config.genre_pages == ["https://custom.com/genres"]
         assert config.meta_tag_pages == ["https://custom.com/tags"]
         assert config.tip_pages == ["https://custom.com/tips"]
@@ -559,7 +559,7 @@ class TestRefreshResult:
             errors=["Error 1", "Error 2"]
         )
 
-        assert result.success == True
+        assert result.success
         assert result.downloaded_pages == 5
         assert result.failed_pages == 1
         assert isinstance(result.refresh_time, datetime)
@@ -569,7 +569,7 @@ class TestRefreshResult:
         """Test RefreshResult with default values"""
         result = RefreshResult(success=True)
 
-        assert result.success == True
+        assert result.success
         assert result.downloaded_pages == 0
         assert result.failed_pages == 0
         assert isinstance(result.refresh_time, datetime)

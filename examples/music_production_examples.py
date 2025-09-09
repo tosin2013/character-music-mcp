@@ -20,13 +20,13 @@ async def example_complete_production_workflow():
 
     # Sample narrative text
     narrative_text = """
-    Sarah Chen stood at the edge of the rooftop, city lights blurring through tears she refused 
-    to acknowledge. Twenty-seven years of perfect grades, perfect smile, perfect daughter—all 
-    crumbling like the facade it had always been. The weight of others' expectations had carved 
-    hollows in her chest where dreams used to live. Her phone buzzed with another message from 
-    her mother about the promotion she'd just rejected, choosing instead this moment of raw truth. 
-    The wind carried away her whispered confession: "I never wanted to be perfect. I wanted to be 
-    real." Below, the city hummed its indifferent symphony, but for the first time, Sarah heard 
+    Sarah Chen stood at the edge of the rooftop, city lights blurring through tears she refused
+    to acknowledge. Twenty-seven years of perfect grades, perfect smile, perfect daughter—all
+    crumbling like the facade it had always been. The weight of others' expectations had carved
+    hollows in her chest where dreams used to live. Her phone buzzed with another message from
+    her mother about the promotion she'd just rejected, choosing instead this moment of raw truth.
+    The wind carried away her whispered confession: "I never wanted to be perfect. I wanted to be
+    real." Below, the city hummed its indifferent symphony, but for the first time, Sarah heard
     her own voice rising above the noise—fragile, frightened, but finally, devastatingly free.
     """
 
@@ -177,26 +177,6 @@ async def example_complete_production_workflow():
 
     # Step 5: Get Suno Knowledge
     print("\nStep 5: Fetching Suno AI best practices...")
-    suno_knowledge = {
-        "tool": "get_suno_knowledge",
-        "input": {
-            "topic": "genres",
-            "specific_area": "indie"
-        },
-        "expected_output": {
-            "topic": "genres",
-            "specific_area": "indie",
-            "knowledge": {
-                "tags": ["[Lo-fi]", "[Intimate]", "[Raw Production]", "[Bedroom Pop]"],
-                "prompts": [
-                    "melancholic indie with vulnerable vocals",
-                    "lo-fi bedroom pop with jangly guitars"
-                ],
-                "avoid": ["overproduced effects", "heavy compression"],
-                "tips": ["Use [Raw Vocals] for authenticity", "Keep production minimal"]
-            }
-        }
-    }
 
     # Step 6: Create Music Bible
     print("\nStep 6: Creating comprehensive music bible...")

@@ -128,11 +128,11 @@ class SourceAttributionManager:
 
     def build_attributed_context(self, content: Any, sources: List[str]) -> AttributedContent:
         """Build attributed content with source references
-        
+
         Args:
             content: The content to attribute
             sources: List of source URLs
-            
+
         Returns:
             AttributedContent with proper attribution
         """
@@ -173,10 +173,10 @@ class SourceAttributionManager:
 
     def format_source_references(self, sources: List[str]) -> str:
         """Format source URLs for LLM context
-        
+
         Args:
             sources: List of source URLs
-            
+
         Returns:
             Formatted source reference string
         """
@@ -210,7 +210,7 @@ class SourceAttributionManager:
 
     def track_content_usage(self, content_id: str, source_url: str, context: str = "") -> None:
         """Track usage of attributed content
-        
+
         Args:
             content_id: ID of the content being used
             source_url: URL of the source being used
@@ -239,7 +239,7 @@ class SourceAttributionManager:
 
     def register_source(self, url: str, content_type: str, title: str, download_date: datetime) -> None:
         """Register a new content source
-        
+
         Args:
             url: Source URL
             content_type: Type of content ('genre', 'meta_tag', 'technique', 'general')
@@ -257,10 +257,10 @@ class SourceAttributionManager:
 
     def get_source_urls(self, content_type: Optional[str] = None) -> List[str]:
         """Get source URLs, optionally filtered by content type
-        
+
         Args:
             content_type: Optional content type filter
-            
+
         Returns:
             List of source URLs
         """
@@ -271,7 +271,7 @@ class SourceAttributionManager:
 
     def get_usage_statistics(self) -> Dict[str, Any]:
         """Get usage statistics for all sources
-        
+
         Returns:
             Dictionary with usage statistics
         """

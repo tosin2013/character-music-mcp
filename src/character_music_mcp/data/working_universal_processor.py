@@ -36,7 +36,7 @@ class WorkingUniversalProcessor:
     def detect_content_type(self, text: str) -> Dict[str, Any]:
         """
         Enhanced content type detection with confidence scoring and processing strategy selection
-        
+
         Returns detailed analysis including content type, confidence, and recommended processing strategy
         """
         if not text or len(text.strip()) < 10:
@@ -237,11 +237,11 @@ class WorkingUniversalProcessor:
     def route_content_processing(self, text: str, user_preference: str = None) -> Dict[str, Any]:
         """
         Route content to appropriate processing strategy based on detection and user preference
-        
+
         Args:
             text: Input text to process
             user_preference: Optional user-specified processing preference
-            
+
         Returns:
             Dictionary containing processing results and metadata
         """
@@ -277,11 +277,11 @@ class WorkingUniversalProcessor:
     def extract_or_create_characters(self, text: str, detection_result: Dict[str, Any] = None) -> List[Dict]:
         """
         Enhanced character extraction/creation with flexible routing based on detection results
-        
+
         Args:
             text: Input text to process
             detection_result: Result from detect_content_type() or content type string for backward compatibility
-            
+
         Returns:
             List of character dictionaries
         """
@@ -542,7 +542,7 @@ class WorkingUniversalProcessor:
         ]
 
         text_lower = text.lower()
-        name_lower = name.lower()
+        name.lower()
 
         return any(context.lower() in text_lower for context in character_contexts)
 
@@ -777,7 +777,7 @@ class WorkingUniversalProcessor:
     def _create_characters_from_poetry(self, text: str) -> List[Dict]:
         """Create characters from poetic voice and themes"""
         # Analyze poetic voice and themes
-        poetic_voice = self._analyze_poetic_voice(text)
+        self._analyze_poetic_voice(text)
         poetic_themes = self._extract_poetic_themes(text)
 
         character = {
@@ -1445,9 +1445,9 @@ class WorkingUniversalProcessor:
         """How the character would interpret content based on their worldview and content type"""
 
         character = self.character_worldview
-        filter_type = character.get('filter', 'introspective')
-        questions = character.get('questions', [])
-        name = character.get('name', 'Artist').split()[0]
+        character.get('filter', 'introspective')
+        character.get('questions', [])
+        character.get('name', 'Artist').split()[0]
 
         # Content-type specific interpretation strategies
         if content_type == "philosophical_conceptual":
@@ -1539,7 +1539,7 @@ class WorkingUniversalProcessor:
         """Connect content to character's current life situation based on their profile"""
 
         character = self.character_worldview
-        name = character['name'].split()[0]  # First name only
+        character['name'].split()[0]  # First name only
         age = character['context']['age']
         location = character['context']['location']
         time = character['context']['time']
@@ -1561,7 +1561,6 @@ class WorkingUniversalProcessor:
     def _create_authentic_lyrics(self, content: str, title: str) -> str:
         """Create authentic lyrics based on character's voice and perspective"""
 
-        character = self.character_worldview
 
         # Extract key theme from content
         theme = self._extract_theme_from_content(content)
@@ -1651,10 +1650,10 @@ class WorkingUniversalProcessor:
         """Generate lyrics based on character's perspective and theme"""
 
         character = self.character_worldview
-        name = character['name'].split()[0]  # First name only
-        age = character['context']['age']
-        location = character['context']['location']
-        genre = character['context']['genre']
+        character['name'].split()[0]  # First name only
+        character['context']['age']
+        character['context']['location']
+        character['context']['genre']
         struggles = character['struggles']
         questions = character['questions']
 
@@ -1700,7 +1699,7 @@ Title: {title}
         character = self.character_worldview
         location = character['context']['location']
         time = character['context']['time']
-        genre = character['context']['genre']
+        character['context']['genre']
 
         if "warehouse" in location.lower():
             return f"(Industrial ambience, analog warmth)\n{time}, {location}\nSearching for truth in the sound"
@@ -1879,9 +1878,9 @@ Production Notes:
         """Create track-specific personal connection"""
 
         character = self.character_worldview
-        name = character['name'].split()[0]
+        character['name'].split()[0]
         age = character['context']['age']
-        location = character['context']['location']
+        character['context']['location']
         genre = character['context']['genre']
         struggles = character['struggles']
 
@@ -1920,7 +1919,7 @@ Production Notes:
         """Create unique lyrics for each track based on theme and perspective"""
 
         character = self.character_worldview
-        name = character['name'].split()[0]
+        character['name'].split()[0]
 
         # Generate unique verses based on track theme
         verse1 = self._create_theme_verse(track_theme, track_perspective, 1)
@@ -2023,9 +2022,9 @@ Title: {track_title}
     def _create_theme_chorus(self, track_theme: str, character: Dict) -> str:
         """Create chorus specific to track theme and character"""
 
-        name = character['name'].split()[0]
+        character['name'].split()[0]
         genre = character['context']['genre']
-        filter_type = character['filter']
+        character['filter']
 
         theme_choruses = {
             "love_and_connection": f"Love's frequency, love's the key\nTo the harmony we're meant to be\nIn this {genre} symphony\nConnection sets the spirit free",
@@ -2115,7 +2114,6 @@ Title: {track_title}
     def _create_track_suno_command(self, track_title: str, lyrics: str, track_theme: str) -> str:
         """Create track-specific Suno command"""
 
-        character = self.character_worldview
 
         # Base command structure
         base_command = self._create_suno_command(track_title, lyrics)

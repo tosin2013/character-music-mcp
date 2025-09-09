@@ -7,7 +7,6 @@ from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
-
 from enhanced_genre_mapper import EnhancedGenreMapper
 from wiki_data_system import Genre, WikiDataManager
 
@@ -113,7 +112,7 @@ class TestIntelligentMatchingRequirements:
     @pytest.mark.asyncio
     async def test_requirement_5_3_hierarchical_relationships(self, enhanced_mapper, comprehensive_genres):
         """
-        Test Requirement 5.3: WHEN wiki genres include subgenres 
+        Test Requirement 5.3: WHEN wiki genres include subgenres
         THEN the system SHALL consider hierarchical relationships in matching
         """
         # Set up the cache
@@ -148,7 +147,7 @@ class TestIntelligentMatchingRequirements:
     @pytest.mark.asyncio
     async def test_requirement_5_4_similarity_algorithms_fallback(self, enhanced_mapper, comprehensive_genres):
         """
-        Test Requirement 5.4: WHEN no direct matches exist 
+        Test Requirement 5.4: WHEN no direct matches exist
         THEN the system SHALL use similarity algorithms to find closest genre matches
         """
         # Set up the cache

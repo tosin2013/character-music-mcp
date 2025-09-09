@@ -6,7 +6,7 @@ Comprehensive test for the analyze_artist_psychology tool format fixes
 
 This test verifies all the requirements for task 9:
 - Update tool to accept correct CharacterProfile format without 'age' parameter errors
-- Fix CharacterProfile object creation to use proper initialization parameters  
+- Fix CharacterProfile object creation to use proper initialization parameters
 - Add meaningful psychological analysis instead of format error responses
 - Test psychology analysis with various character profiles
 """

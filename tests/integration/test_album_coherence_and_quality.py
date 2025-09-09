@@ -109,7 +109,7 @@ class TestAlbumTrackProgression:
         # Note: Current implementation may generate similar content - this is a known area for improvement
         similar_track_pairs = 0
         for i, content1 in enumerate(track_contents):
-            for j, content2 in enumerate(track_contents[i+1:], i+1):
+            for _j, content2 in enumerate(track_contents[i+1:], i+1):
                 words1 = set(content1.split())
                 words2 = set(content2.split())
                 if len(words1) > 5 and len(words2) > 5:  # Only check substantial content
@@ -435,7 +435,7 @@ class TestGenreSpecificElements:
             track_content = (track.get("title", "") + " " + track.get("description", "")).lower()
 
             # Should have some connection to digital/electronic themes
-            found_digital_themes = [theme for theme in digital_themes if theme in track_content]
+            [theme for theme in digital_themes if theme in track_content]
             # Not every track needs digital themes, but the album overall should have them
 
         # Check overall album has some thematic content (digital themes would be ideal but not required)
@@ -444,7 +444,7 @@ class TestGenreSpecificElements:
             all_content += track.get("title", "") + " " + track.get("description", "") + " "
 
         all_content = all_content.lower()
-        found_digital_themes = [theme for theme in digital_themes if theme in all_content]
+        [theme for theme in digital_themes if theme in all_content]
 
         # Current implementation may not maintain digital themes - this is an area for improvement
         # At minimum, tracks should have some content

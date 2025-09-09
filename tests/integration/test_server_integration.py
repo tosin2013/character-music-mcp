@@ -35,17 +35,17 @@ async def test_server_integration():
 
     # Test text
     test_text = """
-    Elena stood at the lighthouse, her heart heavy with the weight of her decision. 
-    She had grown up in this coastal town, watching ships come and go, but now she faced 
-    her greatest challenge. The letter from Marcus lay crumpled in her hand - a betrayal 
+    Elena stood at the lighthouse, her heart heavy with the weight of her decision.
+    She had grown up in this coastal town, watching ships come and go, but now she faced
+    her greatest challenge. The letter from Marcus lay crumpled in her hand - a betrayal
     that cut deeper than any storm.
-    
-    "I trusted you," she whispered to the wind, her voice breaking with emotion. 
-    Elena had always been brave, but this felt different. The fear of losing everything 
+
+    "I trusted you," she whispered to the wind, her voice breaking with emotion.
+    Elena had always been brave, but this felt different. The fear of losing everything
     she held dear consumed her thoughts.
-    
-    Marcus had been her closest friend since childhood. They had shared dreams of 
-    adventure, of sailing beyond the horizon together. But his deception changed everything. 
+
+    Marcus had been her closest friend since childhood. They had shared dreams of
+    adventure, of sailing beyond the horizon together. But his deception changed everything.
     Now Elena must choose between forgiveness and justice, between love and self-respect.
     """
 

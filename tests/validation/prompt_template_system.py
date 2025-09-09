@@ -78,7 +78,7 @@ class TemplateValidationReport:
 class PromptTemplateSystem:
     """
     Manages and validates prompt templates for character-driven music generation
-    
+
     This class provides automated testing of prompt templates to ensure they
     produce high-quality, consistent results across different use cases.
     """
@@ -109,7 +109,7 @@ class PromptTemplateSystem:
     def load_templates(self) -> Dict[str, PromptTemplate]:
         """
         Load all prompt templates from the templates directory
-        
+
         Returns:
             Dictionary of template name to PromptTemplate objects
         """
@@ -282,11 +282,11 @@ class PromptTemplateSystem:
     def fill_template(self, template: PromptTemplate, custom_values: Optional[Dict[str, str]] = None) -> str:
         """
         Fill a template with example values or custom values
-        
+
         Args:
             template: PromptTemplate to fill
             custom_values: Optional custom values to use instead of example values
-            
+
         Returns:
             Filled template text
         """
@@ -313,11 +313,11 @@ class PromptTemplateSystem:
     async def test_template(self, template: PromptTemplate, custom_values: Optional[Dict[str, str]] = None) -> TemplateTestResult:
         """
         Test a single prompt template by filling it and processing through MCP tools
-        
+
         Args:
             template: PromptTemplate to test
             custom_values: Optional custom values for testing
-            
+
         Returns:
             TemplateTestResult with validation details
         """
@@ -552,7 +552,7 @@ class PromptTemplateSystem:
     async def test_all_templates(self) -> TemplateValidationReport:
         """
         Test all loaded templates and generate comprehensive report
-        
+
         Returns:
             TemplateValidationReport with detailed results
         """
@@ -637,7 +637,7 @@ class PromptTemplateSystem:
     def generate_template_report(self, report: TemplateValidationReport, output_path: str = "template_validation_report.json"):
         """
         Generate comprehensive template validation report
-        
+
         Args:
             report: TemplateValidationReport to save
             output_path: Path to save the report
@@ -701,14 +701,14 @@ Generated: {report.validation_timestamp}
                        example_values: Dict[str, str]) -> PromptTemplate:
         """
         Create a new prompt template
-        
+
         Args:
             name: Template name
             use_case: Description of when to use this template
             template_text: Template text with placeholders
             placeholder_descriptions: Descriptions of each placeholder
             example_values: Example values for placeholders
-            
+
         Returns:
             New PromptTemplate object
         """
@@ -728,10 +728,10 @@ Generated: {report.validation_timestamp}
     def verify_templates_produce_expected_results(self, templates: List[str]) -> Dict[str, bool]:
         """
         Verify that specific templates produce expected results
-        
+
         Args:
             templates: List of template names to verify
-            
+
         Returns:
             Dictionary mapping template names to verification status
         """

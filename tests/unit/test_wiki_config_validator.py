@@ -7,7 +7,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
 from wiki_config_validator import (
     ValidationResult,
     WikiConfigValidator,
@@ -25,7 +24,7 @@ class TestValidationResult:
     def test_initialization(self):
         """Test ValidationResult initialization"""
         result = ValidationResult()
-        assert result.is_valid == True
+        assert result.is_valid
         assert result.errors == []
         assert result.warnings == []
         assert result.url_checks == {}
@@ -36,7 +35,7 @@ class TestValidationResult:
         result = ValidationResult()
         result.add_error("Test error")
 
-        assert result.is_valid == False
+        assert not result.is_valid
         assert "Test error" in result.errors
 
     def test_add_warning(self):
@@ -44,7 +43,7 @@ class TestValidationResult:
         result = ValidationResult()
         result.add_warning("Test warning")
 
-        assert result.is_valid == True  # Warnings don't affect validity
+        assert result.is_valid  # Warnings don't affect validity
         assert "Test warning" in result.warnings
 
     def test_to_dict(self):
@@ -56,7 +55,7 @@ class TestValidationResult:
         result.storage_info["writable"] = True
 
         data = result.to_dict()
-        assert data['is_valid'] == False
+        assert not data['is_valid']
         assert data['errors'] == ["Error"]
         assert data['warnings'] == ["Warning"]
         assert data['url_checks'] == {"http://test.com": True}
@@ -79,14 +78,14 @@ class TestWikiConfigValidator:
         validator = WikiConfigValidator()
 
         # Valid URLs
-        assert validator._is_valid_url_format("https://example.com") == True
-        assert validator._is_valid_url_format("http://test.org/path") == True
+        assert validator._is_valid_url_format("https://example.com")
+        assert validator._is_valid_url_format("http://test.org/path")
 
         # Invalid URLs
-        assert validator._is_valid_url_format("not-a-url") == False
-        assert validator._is_valid_url_format("ftp://example.com") == False
-        assert validator._is_valid_url_format("") == False
-        assert validator._is_valid_url_format("https://") == False
+        assert not validator._is_valid_url_format("not-a-url")
+        assert not validator._is_valid_url_format("ftp://example.com")
+        assert not validator._is_valid_url_format("")
+        assert not validator._is_valid_url_format("https://")
 
     def test_basic_parameter_validation(self):
         """Test basic parameter validation"""
@@ -96,34 +95,34 @@ class TestWikiConfigValidator:
         config = WikiConfig()
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == True
+        assert result.is_valid
 
         # Invalid refresh interval
         config = WikiConfig(refresh_interval_hours=0)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == False
+        assert not result.is_valid
         assert any("refresh_interval_hours" in error for error in result.errors)
 
         # Invalid timeout
         config = WikiConfig(request_timeout=0)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == False
+        assert not result.is_valid
         assert any("request_timeout" in error for error in result.errors)
 
         # Invalid retries
         config = WikiConfig(max_retries=-1)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == False
+        assert not result.is_valid
         assert any("max_retries" in error for error in result.errors)
 
         # Invalid retry delay
         config = WikiConfig(retry_delay=-1)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == False
+        assert not result.is_valid
         assert any("retry_delay" in error for error in result.errors)
 
     def test_basic_parameter_warnings(self):
@@ -134,28 +133,28 @@ class TestWikiConfigValidator:
         config = WikiConfig(refresh_interval_hours=10000)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == True
+        assert result.is_valid
         assert any("very large" in warning for warning in result.warnings)
 
         # Large timeout
         config = WikiConfig(request_timeout=400)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == True
+        assert result.is_valid
         assert any("very large" in warning for warning in result.warnings)
 
         # High retries
         config = WikiConfig(max_retries=15)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == True
+        assert result.is_valid
         assert any("very high" in warning for warning in result.warnings)
 
         # Large retry delay
         config = WikiConfig(retry_delay=100)
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
-        assert result.is_valid == True
+        assert result.is_valid
         assert any("very large" in warning for warning in result.warnings)
 
     def test_empty_page_lists_warning(self):
@@ -170,7 +169,7 @@ class TestWikiConfigValidator:
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
 
-        assert result.is_valid == True
+        assert result.is_valid
         assert any("No wiki pages configured" in warning for warning in result.warnings)
 
     def test_duplicate_urls_warning(self):
@@ -186,7 +185,7 @@ class TestWikiConfigValidator:
         result = ValidationResult()
         validator._validate_basic_parameters(config, result)
 
-        assert result.is_valid == True
+        assert result.is_valid
         assert any("Duplicate URLs" in warning for warning in result.warnings)
 
     @pytest.mark.asyncio
@@ -200,8 +199,8 @@ class TestWikiConfigValidator:
 
             await validator._validate_storage(config, result)
 
-            assert result.is_valid == True
-            assert result.storage_info['writable'] == True
+            assert result.is_valid
+            assert result.storage_info['writable']
             assert 'available_space_gb' in result.storage_info
 
     @pytest.mark.asyncio
@@ -214,7 +213,7 @@ class TestWikiConfigValidator:
 
         await validator._validate_storage(config, result)
 
-        assert result.is_valid == False
+        assert not result.is_valid
         assert any("cannot be empty" in error for error in result.errors)
 
     @pytest.mark.asyncio
@@ -229,8 +228,8 @@ class TestWikiConfigValidator:
 
             await validator._validate_storage(config, result)
 
-            assert result.is_valid == True
-            assert result.storage_info['path_created'] == True
+            assert result.is_valid
+            assert result.storage_info['path_created']
             assert new_dir.exists()
 
     @pytest.mark.asyncio
@@ -275,7 +274,7 @@ class TestWikiConfigValidator:
 
         validator._validate_url_format(config, result)
 
-        assert result.is_valid == False
+        assert not result.is_valid
         assert any("Invalid URL format: invalid-url" in error for error in result.errors)
         assert result.url_checks["https://valid.com"] is None
         assert result.url_checks["https://another-valid.com"] is None
@@ -291,7 +290,7 @@ class TestWikiConfigValidator:
 
             accessible, status_code, error = await validator._check_url_accessibility("https://example.com")
 
-            assert accessible == True
+            assert accessible
             assert status_code == 200
             assert error is None
 
@@ -306,7 +305,7 @@ class TestWikiConfigValidator:
 
             accessible, status_code, error = await validator._check_url_accessibility("https://example.com")
 
-            assert accessible == False
+            assert not accessible
             assert status_code == 404
             assert error is None
 
@@ -321,7 +320,7 @@ class TestWikiConfigValidator:
 
             accessible, status_code, error = await validator._check_url_accessibility("https://example.com")
 
-            assert accessible == False
+            assert not accessible
             assert status_code is None
             assert "Network error" in error
 
@@ -342,9 +341,9 @@ class TestWikiConfigValidator:
 
             results = await validator.validate_new_urls(urls)
 
-            assert results["https://valid.com"] == True
-            assert results["invalid-url"] == False  # Invalid format
-            assert results["https://another-valid.com"] == True
+            assert results["https://valid.com"]
+            assert not results["invalid-url"]  # Invalid format
+            assert results["https://another-valid.com"]
 
     @pytest.mark.asyncio
     async def test_full_config_validation(self):
@@ -360,13 +359,13 @@ class TestWikiConfigValidator:
 
                 result = await validator.validate_config(config, check_urls=True)
 
-                assert result.is_valid == True
-                assert result.storage_info['writable'] == True
+                assert result.is_valid
+                assert result.storage_info['writable']
                 # Should have checked all URLs
                 all_urls = config.genre_pages + config.meta_tag_pages + config.tip_pages
                 for url in all_urls:
                     assert url in result.url_checks
-                    assert result.url_checks[url] == True
+                    assert result.url_checks[url]
 
 
 class TestConvenienceFunctions:
@@ -399,7 +398,7 @@ class TestConvenienceFunctions:
                 assert isinstance(result, ValidationResult)
                 # Should have checked URL accessibility
                 for url_status in result.url_checks.values():
-                    assert url_status == True
+                    assert url_status
 
     @pytest.mark.asyncio
     async def test_validate_storage_only(self):
@@ -409,7 +408,7 @@ class TestConvenienceFunctions:
             result = await validate_storage_only(config)
 
             assert isinstance(result, ValidationResult)
-            assert result.storage_info['writable'] == True
+            assert result.storage_info['writable']
             assert result.url_checks == {}  # No URL checks
 
     @pytest.mark.asyncio
@@ -424,8 +423,8 @@ class TestConvenienceFunctions:
             results = await check_urls_accessibility(urls, timeout=5)
 
             assert isinstance(results, dict)
-            assert results["https://example.com"] == True
-            assert results["https://test.org"] == True
+            assert results["https://example.com"]
+            assert results["https://test.org"]
 
 
 if __name__ == "__main__":

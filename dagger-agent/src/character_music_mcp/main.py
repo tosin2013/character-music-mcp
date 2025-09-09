@@ -542,18 +542,18 @@ async def detect_failures():
     github_token = os.environ["GITHUB_TOKEN"]
     repository = os.environ["REPOSITORY"]
     workflow_run_id = os.environ["WORKFLOW_RUN_ID"]
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     async with httpx.AsyncClient() as client:
         # Get workflow run details
         workflow_url = f"https://api.github.com/repos/{repository}/actions/runs/{workflow_run_id}"
         workflow_response = await client.get(workflow_url, headers=headers)
         workflow_data = workflow_response.json()
-        
+
         if workflow_data.get("conclusion") != "failure":
             result = {
                 "has-failures": "false",
@@ -562,12 +562,12 @@ async def detect_failures():
             }
             print(json.dumps(result))
             return
-        
+
         # Get jobs for this workflow run
         jobs_url = f"https://api.github.com/repos/{repository}/actions/runs/{workflow_run_id}/jobs"
         jobs_response = await client.get(jobs_url, headers=headers)
         jobs_data = jobs_response.json()
-        
+
         failure_types = []
         for job in jobs_data.get("jobs", []):
             if job.get("conclusion") == "failure":
@@ -587,16 +587,16 @@ async def detect_failures():
                     failure_types.append("security-scan")
                 elif "coverage" in job_name:
                     failure_types.append("coverage")
-        
+
         # Remove duplicates
         failure_types = list(set(failure_types))
-        
+
         result = {
             "has-failures": "true" if failure_types else "false",
             "failure-types": json.dumps(failure_types),
             "workflow-run-id": workflow_run_id
         }
-        
+
         print(json.dumps(result))
 
 if __name__ == "__main__":
@@ -617,18 +617,18 @@ async def fetch_logs():
     repository = os.environ["REPOSITORY"]
     workflow_run_id = os.environ["WORKFLOW_RUN_ID"]
     job_name = os.environ.get("JOB_NAME", "")
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     async with httpx.AsyncClient() as client:
         # Get jobs for this workflow run
         jobs_url = f"https://api.github.com/repos/{repository}/actions/runs/{workflow_run_id}/jobs"
         jobs_response = await client.get(jobs_url, headers=headers)
         jobs_data = jobs_response.json()
-        
+
         logs = {}
         for job in jobs_data.get("jobs", []):
             if job.get("conclusion") == "failure":
@@ -639,7 +639,7 @@ async def fetch_logs():
                     logs_response = await client.get(logs_url, headers=headers)
                     if logs_response.status_code == 200:
                         logs[current_job_name] = logs_response.text
-        
+
         print(json.dumps(logs))
 
 if __name__ == "__main__":
@@ -663,7 +663,7 @@ async def analyze_and_fix():
     workflow_run_id = os.environ["WORKFLOW_RUN_ID"]
     python_version = os.environ["PYTHON_VERSION"]
     failure_type = os.environ["FAILURE_TYPE"]
-    
+
     # This is a placeholder implementation
     # In the actual implementation, this would:
     # 1. Fetch failure logs from GitHub API
@@ -671,7 +671,7 @@ async def analyze_and_fix():
     # 3. Use DeepSeek API to generate a fix
     # 4. Apply the fix to the source code
     # 5. Validate the fix
-    
+
     result = {
         "fix-generated": "false",
         "fix-validation": "skipped",
@@ -682,7 +682,7 @@ async def analyze_and_fix():
             "status": "placeholder_implementation"
         })
     }
-    
+
     print(json.dumps(result))
 
 if __name__ == "__main__":
@@ -706,12 +706,12 @@ async def create_pr():
     github_token = os.environ["GITHUB_TOKEN"]
     repository = os.environ["REPOSITORY"]
     fix_data = json.loads(os.environ["FIX_DATA"])
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     try:
         async with httpx.AsyncClient() as client:
             # Check if similar PR already exists
@@ -725,14 +725,14 @@ async def create_pr():
                 }
                 print(json.dumps(result))
                 return
-            
+
             # Generate branch name
             branch_name = generate_branch_name(fix_data)
-            
+
             # Get default branch
             repo_response = await client.get(f"https://api.github.com/repos/{repository}", headers=headers)
             default_branch = repo_response.json().get("default_branch", "main")
-            
+
             # Create new branch
             branch_created = await create_branch(client, headers, repository, branch_name, default_branch)
             if not branch_created:
@@ -743,7 +743,7 @@ async def create_pr():
                 }
                 print(json.dumps(result))
                 return
-            
+
             # Apply fix changes (placeholder - actual implementation would modify files)
             changes_applied = await apply_fix_changes(fix_data)
             if not changes_applied:
@@ -754,7 +754,7 @@ async def create_pr():
                 }
                 print(json.dumps(result))
                 return
-            
+
             # Create pull request
             pr_data = generate_pr_data(fix_data, branch_name, default_branch)
             pr_response = await client.post(
@@ -762,13 +762,13 @@ async def create_pr():
                 headers=headers,
                 json=pr_data
             )
-            
+
             if pr_response.status_code == 201:
                 pr = pr_response.json()
-                
+
                 # Add labels
                 await add_pr_labels(client, headers, repository, pr["number"], fix_data)
-                
+
                 result = {
                     "pr-created": "true",
                     "pr-url": pr["html_url"],
@@ -783,7 +783,7 @@ async def create_pr():
                     "status": f"pr_creation_failed_{pr_response.status_code}",
                     "error": pr_response.text
                 }
-                
+
     except Exception as e:
         result = {
             "pr-created": "false",
@@ -791,7 +791,7 @@ async def create_pr():
             "status": "error",
             "error": str(e)
         }
-    
+
     print(json.dumps(result))
 
 async def check_existing_pr(client, headers, repository, fix_data):
@@ -803,7 +803,7 @@ async def check_existing_pr(client, headers, repository, fix_data):
             headers=headers,
             params={"state": "open", "sort": "created", "direction": "desc"}
         )
-        
+
         if search_response.status_code == 200:
             prs = search_response.json()
             for pr in prs:
@@ -823,10 +823,10 @@ def generate_branch_name(fix_data):
     failure_type = fix_data.get("failure_type", "unknown")
     workflow_run_id = fix_data.get("workflow_run_id", "")
     timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
-    
+
     # Create a short hash for uniqueness
     content_hash = hashlib.md5(json.dumps(fix_data, sort_keys=True).encode()).hexdigest()[:8]
-    
+
     return f"fix/{failure_type}-{timestamp}-{content_hash}"
 
 async def create_branch(client, headers, repository, branch_name, base_branch):
@@ -837,24 +837,24 @@ async def create_branch(client, headers, repository, branch_name, base_branch):
             f"https://api.github.com/repos/{repository}/git/ref/heads/{base_branch}",
             headers=headers
         )
-        
+
         if ref_response.status_code != 200:
             return False
-            
+
         base_sha = ref_response.json()["object"]["sha"]
-        
+
         # Create new branch
         branch_data = {
             "ref": f"refs/heads/{branch_name}",
             "sha": base_sha
         }
-        
+
         branch_response = await client.post(
             f"https://api.github.com/repos/{repository}/git/refs",
             headers=headers,
             json=branch_data
         )
-        
+
         return branch_response.status_code == 201
     except Exception:
         return False
@@ -866,7 +866,7 @@ async def apply_fix_changes(fix_data):
     # 1. Read the fix data
     # 2. Apply changes to the appropriate files
     # 3. Commit the changes to the branch
-    
+
     # For now, we'll just return True to indicate success
     return True
 
@@ -875,11 +875,11 @@ def generate_pr_data(fix_data, branch_name, base_branch):
     failure_type = fix_data.get("failure_type", "unknown")
     workflow_run_id = fix_data.get("workflow_run_id", "")
     python_version = fix_data.get("python_version", "")
-    
+
     title = f"🤖 Automated fix for {failure_type} failure"
-    
+
     description = f"""## Automated Test Repair
-    
+
 This pull request was automatically generated by the Dagger Test Repair Agent to fix a {failure_type} failure.
 
 ### Details
@@ -897,7 +897,7 @@ The fix has been validated using the same test environment that detected the ori
 ---
 *This PR was created automatically by the Dagger Test Repair Agent. If you have questions or concerns, please review the workflow logs or contact the maintainers.*
 """
-    
+
     return {
         "title": title,
         "body": description,
@@ -909,13 +909,13 @@ The fix has been validated using the same test environment that detected the ori
 async def add_pr_labels(client, headers, repository, pr_number, fix_data):
     """Add appropriate labels to the PR"""
     failure_type = fix_data.get("failure_type", "")
-    
+
     labels = ["automated-fix", "test-repair"]
-    
+
     # Add failure-type specific labels
     if failure_type:
         labels.append(f"fix-{failure_type}")
-    
+
     # Add priority label based on failure type
     if failure_type in ["unit-tests", "integration-tests"]:
         labels.append("priority-high")
@@ -923,7 +923,7 @@ async def add_pr_labels(client, headers, repository, pr_number, fix_data):
         labels.append("priority-medium")
     else:
         labels.append("priority-low")
-    
+
     try:
         await client.post(
             f"https://api.github.com/repos/{repository}/issues/{pr_number}/labels",
@@ -949,14 +949,14 @@ def validate_fixes():
     """Validate all generated fixes"""
     repository = os.environ["REPOSITORY"]
     python_version = os.environ["PYTHON_VERSION"]
-    
+
     validation_results = {
         "unit_tests": "not_run",
         "integration_tests": "not_run",
         "quality_checks": "not_run",
         "overall_status": "pending"
     }
-    
+
     try:
         # Run unit tests
         result = subprocess.run(
@@ -966,7 +966,7 @@ def validate_fixes():
             timeout=300
         )
         validation_results["unit_tests"] = "passed" if result.returncode == 0 else "failed"
-        
+
         # Run integration tests
         result = subprocess.run(
             ["pytest", "tests/integration/", "-v", "--timeout=300"],
@@ -975,7 +975,7 @@ def validate_fixes():
             timeout=600
         )
         validation_results["integration_tests"] = "passed" if result.returncode == 0 else "failed"
-        
+
         # Run quality checks
         result = subprocess.run(
             ["ruff", "check", "."],
@@ -984,17 +984,17 @@ def validate_fixes():
             timeout=60
         )
         validation_results["quality_checks"] = "passed" if result.returncode == 0 else "failed"
-        
+
         # Determine overall status
         if all(status == "passed" for status in validation_results.values() if status != "pending"):
             validation_results["overall_status"] = "passed"
         else:
             validation_results["overall_status"] = "failed"
-            
+
     except Exception as e:
         validation_results["overall_status"] = "error"
         validation_results["error"] = str(e)
-    
+
     print(json.dumps(validation_results))
 
 if __name__ == "__main__":
@@ -1015,7 +1015,7 @@ def generate_report():
     has_failures = os.environ["HAS_FAILURES"]
     analyze_result = os.environ["ANALYZE_RESULT"]
     validate_result = os.environ["VALIDATE_RESULT"]
-    
+
     report = {
         "timestamp": datetime.utcnow().isoformat(),
         "repository": repository,
@@ -1026,7 +1026,7 @@ def generate_report():
         "summary": f"Dagger Test Repair Agent processed workflow run {workflow_run_id} for {repository}",
         "report-generated": "true"
     }
-    
+
     # Generate markdown summary
     summary = f"""
 # Dagger Test Repair Agent Report
@@ -1045,7 +1045,7 @@ The Dagger Test Repair Agent processed the workflow run and attempted to detect 
 
 This is an automated report generated by the Dagger Test Repair Agent.
 """
-    
+
     report["summary"] = summary
     print(json.dumps(report))
 
@@ -1068,12 +1068,12 @@ async def manage_labels():
     pr_number = os.environ["PR_NUMBER"]
     action = os.environ["ACTION"]
     labels = json.loads(os.environ["LABELS"])
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     try:
         async with httpx.AsyncClient() as client:
             if action == "add":
@@ -1097,14 +1097,14 @@ async def manage_labels():
                 )
             else:
                 raise ValueError(f"Unknown action: {action}")
-            
+
             result = {
                 "success": response.status_code in [200, 201],
                 "action": action,
                 "labels": labels,
                 "status_code": response.status_code
             }
-            
+
     except Exception as e:
         result = {
             "success": False,
@@ -1112,7 +1112,7 @@ async def manage_labels():
             "labels": labels,
             "error": str(e)
         }
-    
+
     print(json.dumps(result))
 
 if __name__ == "__main__":
@@ -1132,12 +1132,12 @@ async def check_conflicts():
     github_token = os.environ["GITHUB_TOKEN"]
     repository = os.environ["REPOSITORY"]
     pr_number = os.environ["PR_NUMBER"]
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     try:
         async with httpx.AsyncClient() as client:
             # Get PR details
@@ -1145,7 +1145,7 @@ async def check_conflicts():
                 f"https://api.github.com/repos/{repository}/pulls/{pr_number}",
                 headers=headers
             )
-            
+
             if pr_response.status_code != 200:
                 result = {
                     "has_conflicts": False,
@@ -1156,7 +1156,7 @@ async def check_conflicts():
                 pr_data = pr_response.json()
                 mergeable = pr_data.get("mergeable")
                 mergeable_state = pr_data.get("mergeable_state")
-                
+
                 result = {
                     "has_conflicts": mergeable is False,
                     "mergeable": mergeable,
@@ -1165,14 +1165,14 @@ async def check_conflicts():
                     "head_sha": pr_data.get("head", {}).get("sha"),
                     "base_sha": pr_data.get("base", {}).get("sha")
                 }
-                
+
     except Exception as e:
         result = {
             "has_conflicts": False,
             "mergeable": None,
             "error": str(e)
         }
-    
+
     print(json.dumps(result))
 
 if __name__ == "__main__":
@@ -1195,12 +1195,12 @@ async def update_description():
     pr_number = os.environ["PR_NUMBER"]
     description_update = os.environ["DESCRIPTION_UPDATE"]
     append = os.environ["APPEND"].lower() == "true"
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     try:
         async with httpx.AsyncClient() as client:
             # Get current PR details
@@ -1208,7 +1208,7 @@ async def update_description():
                 f"https://api.github.com/repos/{repository}/pulls/{pr_number}",
                 headers=headers
             )
-            
+
             if pr_response.status_code != 200:
                 result = {
                     "success": False,
@@ -1216,35 +1216,35 @@ async def update_description():
                 }
                 print(json.dumps(result))
                 return
-            
+
             pr_data = pr_response.json()
             current_body = pr_data.get("body", "")
-            
+
             if append:
                 new_body = current_body + "\\n\\n---\\n\\n" + description_update
                 new_body += f"\\n\\n*Updated: {datetime.utcnow().isoformat()}Z*"
             else:
                 new_body = description_update
-            
+
             # Update PR description
             update_response = await client.patch(
                 f"https://api.github.com/repos/{repository}/pulls/{pr_number}",
                 headers=headers,
                 json={"body": new_body}
             )
-            
+
             result = {
                 "success": update_response.status_code == 200,
                 "append": append,
                 "status_code": update_response.status_code
             }
-            
+
     except Exception as e:
         result = {
             "success": False,
             "error": str(e)
         }
-    
+
     print(json.dumps(result))
 
 if __name__ == "__main__":
@@ -1265,15 +1265,15 @@ async def close_outdated_prs():
     github_token = os.environ["GITHUB_TOKEN"]
     repository = os.environ["REPOSITORY"]
     max_age_days = int(os.environ["MAX_AGE_DAYS"])
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     cutoff_date = datetime.utcnow() - timedelta(days=max_age_days)
     closed_prs = []
-    
+
     try:
         async with httpx.AsyncClient() as client:
             # Get open PRs
@@ -1282,7 +1282,7 @@ async def close_outdated_prs():
                 headers=headers,
                 params={"state": "open", "sort": "created", "direction": "asc"}
             )
-            
+
             if prs_response.status_code != 200:
                 result = {
                     "success": False,
@@ -1291,20 +1291,20 @@ async def close_outdated_prs():
                 }
                 print(json.dumps(result))
                 return
-            
+
             prs = prs_response.json()
-            
+
             for pr in prs:
                 # Check if it's an automated fix PR
                 labels = [label["name"] for label in pr.get("labels", [])]
                 if "automated-fix" not in labels:
                     continue
-                
+
                 # Check if it's older than the cutoff
                 created_at = datetime.fromisoformat(pr["created_at"].replace("Z", "+00:00"))
                 if created_at.replace(tzinfo=None) > cutoff_date:
                     continue
-                
+
                 # Close the PR
                 close_response = await client.patch(
                     f"https://api.github.com/repos/{repository}/pulls/{pr['number']}",
@@ -1314,27 +1314,27 @@ async def close_outdated_prs():
                         "body": pr.get("body", "") + f"\\n\\n---\\n\\n**Automatically closed:** This automated fix PR was older than {max_age_days} days and has been closed to keep the repository clean. If the fix is still needed, a new PR will be created when the issue is detected again."
                     }
                 )
-                
+
                 if close_response.status_code == 200:
                     closed_prs.append({
                         "number": pr["number"],
                         "title": pr["title"],
                         "created_at": pr["created_at"]
                     })
-            
+
             result = {
                 "success": True,
                 "closed_prs": closed_prs,
                 "total_closed": len(closed_prs)
             }
-            
+
     except Exception as e:
         result = {
             "success": False,
             "closed_prs": closed_prs,
             "error": str(e)
         }
-    
+
     print(json.dumps(result))
 
 if __name__ == "__main__":
@@ -1353,18 +1353,18 @@ async def cleanup():
     """Cleanup temporary resources created by the agent"""
     github_token = os.environ["GITHUB_TOKEN"]
     repository = os.environ["REPOSITORY"]
-    
+
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    
+
     cleanup_results = {
         "branches_cleaned": 0,
         "prs_closed": 0,
         "errors": []
     }
-    
+
     try:
         async with httpx.AsyncClient() as client:
             # Clean up old automated fix branches
@@ -1372,7 +1372,7 @@ async def cleanup():
                 f"https://api.github.com/repos/{repository}/branches",
                 headers=headers
             )
-            
+
             if branches_response.status_code == 200:
                 branches = branches_response.json()
                 for branch in branches:
@@ -1384,7 +1384,7 @@ async def cleanup():
                             headers=headers,
                             params={"head": f"{repository.split('/')[0]}:{branch_name}", "state": "open"}
                         )
-                        
+
                         if prs_response.status_code == 200 and len(prs_response.json()) == 0:
                             # No open PR, safe to delete branch
                             delete_response = await client.delete(
@@ -1393,13 +1393,13 @@ async def cleanup():
                             )
                             if delete_response.status_code == 204:
                                 cleanup_results["branches_cleaned"] += 1
-            
+
             result = {
                 "cleanup_completed": True,
                 "repository": repository,
                 "results": cleanup_results
             }
-            
+
     except Exception as e:
         result = {
             "cleanup_completed": False,
@@ -1407,7 +1407,7 @@ async def cleanup():
             "error": str(e),
             "results": cleanup_results
         }
-    
+
     print(json.dumps(result))
 
 if __name__ == "__main__":

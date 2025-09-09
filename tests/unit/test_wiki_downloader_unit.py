@@ -16,7 +16,6 @@ from unittest.mock import AsyncMock, patch
 import aiohttp
 import pytest
 import pytest_asyncio
-
 from wiki_cache_manager import WikiCacheManager
 from wiki_downloader import DownloadProgress, WikiDownloader
 
@@ -47,16 +46,16 @@ class TestWikiDownloader:
     def test_url_validation(self, downloader):
         """Test URL validation functionality"""
         # Valid URLs
-        assert downloader.validate_url("https://example.com") == True
-        assert downloader.validate_url("http://example.com") == True
-        assert downloader.validate_url("https://sunoaiwiki.com/resources/genres") == True
+        assert downloader.validate_url("https://example.com")
+        assert downloader.validate_url("http://example.com")
+        assert downloader.validate_url("https://sunoaiwiki.com/resources/genres")
 
         # Invalid URLs
-        assert downloader.validate_url("") == False
-        assert downloader.validate_url("not-a-url") == False
-        assert downloader.validate_url("ftp://example.com") == False
-        assert downloader.validate_url("javascript:alert('xss')") == False
-        assert downloader.validate_url(None) == False
+        assert not downloader.validate_url("")
+        assert not downloader.validate_url("not-a-url")
+        assert not downloader.validate_url("ftp://example.com")
+        assert not downloader.validate_url("javascript:alert('xss')")
+        assert not downloader.validate_url(None)
 
     @pytest.mark.asyncio
     async def test_download_page_success(self, downloader, temp_cache_manager):
@@ -76,7 +75,7 @@ class TestWikiDownloader:
             async with downloader:
                 result = await downloader.download_page(test_url)
 
-            assert result.success == True
+            assert result.success
             assert result.url == test_url
             assert result.status_code == 200
             assert result.error_message is None or result.error_message == ""
@@ -103,7 +102,7 @@ class TestWikiDownloader:
             async with downloader:
                 result = await downloader.download_page(test_url)
 
-            assert result.success == False
+            assert not result.success
             assert "404" in result.error_message
 
     @pytest.mark.asyncio
@@ -117,7 +116,7 @@ class TestWikiDownloader:
             async with downloader:
                 result = await downloader.download_page(test_url)
 
-            assert result.success == False
+            assert not result.success
             assert result.status_code == 0
             assert "Connection timeout" in result.error_message
 
@@ -129,7 +128,7 @@ class TestWikiDownloader:
         async with downloader:
             result = await downloader.download_page(invalid_url)
 
-        assert result.success == False
+        assert not result.success
         assert "Invalid URL" in result.error_message
 
     @pytest.mark.asyncio
@@ -139,7 +138,7 @@ class TestWikiDownloader:
 
         # Non-existent file should need refresh
         needs_refresh = await downloader.is_refresh_needed(test_url, 24)
-        assert needs_refresh == True
+        assert needs_refresh
 
         # Create a fresh file
         test_html = "<html><body>Test</body></html>"
@@ -147,7 +146,7 @@ class TestWikiDownloader:
 
         # Fresh file should not need refresh
         needs_refresh = await downloader.is_refresh_needed(test_url, 24)
-        assert needs_refresh == False
+        assert not needs_refresh
 
         # Old file should need refresh (mock old timestamp)
         cached_path = await temp_cache_manager.get_cached_file_path(test_url)
@@ -157,7 +156,7 @@ class TestWikiDownloader:
             Path(cached_path).touch(times=(old_time.timestamp(), old_time.timestamp()))
 
             needs_refresh = await downloader.is_refresh_needed(test_url, 24)
-            assert needs_refresh == True
+            assert needs_refresh
 
     @pytest.mark.asyncio
     async def test_batch_download_success(self, downloader):
@@ -337,7 +336,7 @@ class TestWikiDownloader:
             async with downloader:
                 result = await downloader.download_page(test_url)
 
-            assert result.success == True
+            assert result.success
             assert call_count == 3  # Should have retried twice
 
     @pytest.mark.asyncio
@@ -388,13 +387,13 @@ if __name__ == "__main__":
             downloader = WikiDownloader(cache_manager=cache_manager)
 
             # Test URL validation
-            assert downloader.validate_url("https://example.com") == True
-            assert downloader.validate_url("invalid") == False
+            assert downloader.validate_url("https://example.com")
+            assert not downloader.validate_url("invalid")
             print("✓ URL validation tests passed")
 
             # Test refresh need detection
             needs_refresh = await downloader.is_refresh_needed("https://example.com", 24)
-            assert needs_refresh == True
+            assert needs_refresh
             print("✓ Refresh detection tests passed")
 
             print("Basic WikiDownloader unit tests passed!")

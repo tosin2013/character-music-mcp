@@ -42,18 +42,18 @@ class TestPromptTemplateSystem:
         """Test parsing a complete template file"""
         template_content = """# Single Character Deep Dive Template
 
-**Purpose**: Create comprehensive single character analysis for rich musical development  
-**Best For**: Solo albums, character studies, introspective music  
-**Difficulty**: Beginner to Intermediate  
+**Purpose**: Create comprehensive single character analysis for rich musical development
+**Best For**: Solo albums, character studies, introspective music
+**Difficulty**: Beginner to Intermediate
 
 ## Template Structure
 
 ```
-[CHARACTER_NAME] [CHARACTER_AGE_CONTEXT] in [SETTING_DESCRIPTION]. [OPENING_SITUATION] 
+[CHARACTER_NAME] [CHARACTER_AGE_CONTEXT] in [SETTING_DESCRIPTION]. [OPENING_SITUATION]
 reveals [PRIMARY_PERSONALITY_TRAIT], but [CONTRASTING_ELEMENT] suggests [DEEPER_COMPLEXITY].
 
-[DAILY_ROUTINE_OR_HABIT] [REVEALS_PSYCHOLOGY]. [SPECIFIC_BEHAVIOR_EXAMPLE] shows 
-[CHARACTER_VALUE_OR_FEAR]. When [CHALLENGING_SITUATION], [CHARACTER_NAME] 
+[DAILY_ROUTINE_OR_HABIT] [REVEALS_PSYCHOLOGY]. [SPECIFIC_BEHAVIOR_EXAMPLE] shows
+[CHARACTER_VALUE_OR_FEAR]. When [CHALLENGING_SITUATION], [CHARACTER_NAME]
 [SPECIFIC_REACTION] because [PSYCHOLOGICAL_MOTIVATION].
 ```
 
@@ -67,12 +67,12 @@ reveals [PRIMARY_PERSONALITY_TRAIT], but [CONTRASTING_ELEMENT] suggests [DEEPER_
 ## Example: Filled Template
 
 ```
-Elena, at twenty-eight and working her third job in two years, lived in a converted 
-warehouse apartment in the arts district. Her carefully curated Instagram feed 
-reveals her eye for beauty and composition, but her habit of deleting posts 
+Elena, at twenty-eight and working her third job in two years, lived in a converted
+warehouse apartment in the arts district. Her carefully curated Instagram feed
+reveals her eye for beauty and composition, but her habit of deleting posts
 minutes after publishing suggests a perfectionism that borders on self-sabotage.
 
-Every morning, Elena arranged her coffee cup, notebook, and vintage camera in 
+Every morning, Elena arranged her coffee cup, notebook, and vintage camera in
 perfect alignment before starting her day, a ritual that calmed her anxiety.
 ```
 
@@ -141,9 +141,9 @@ perfect alignment before starting her day, a ritual that calmed her anxiety.
         """Test character content scoring heuristics"""
         # High-quality character content
         good_text = """
-        Elena was a complex character driven by deep fears and desires. Her personality 
-        showed through her daily struggles with anxiety and her motivation to create art. 
-        She had conflicting emotions about her family relationships and dreamed of finding 
+        Elena was a complex character driven by deep fears and desires. Her personality
+        showed through her daily struggles with anxiety and her motivation to create art.
+        She had conflicting emotions about her family relationships and dreamed of finding
         her place in the world.
         """
 
@@ -353,9 +353,9 @@ Elena was introspective.
             ["Good Template", "Bad Template", "Missing Template"]
         )
 
-        assert verification["Good Template"] == True
-        assert verification["Bad Template"] == False
-        assert verification["Missing Template"] == False
+        assert verification["Good Template"]
+        assert not verification["Bad Template"]
+        assert not verification["Missing Template"]
 
     def test_generate_improvement_suggestions(self):
         """Test generation of improvement suggestions"""

@@ -65,11 +65,11 @@ class WikiIntegrationTestRunner:
                            include_stress: bool = False) -> Dict[str, Any]:
         """
         Run all wiki integration tests
-        
+
         Args:
             include_performance: Whether to run performance tests
             include_stress: Whether to run stress tests (may take longer)
-            
+
         Returns:
             Dictionary with test results and metrics
         """
@@ -309,10 +309,10 @@ class WikiIntegrationTestRunner:
     async def run_specific_test_category(self, category: str) -> Dict[str, Any]:
         """
         Run tests from a specific category
-        
+
         Args:
             category: "end_to_end", "performance", or "all"
-            
+
         Returns:
             Test results dictionary
         """

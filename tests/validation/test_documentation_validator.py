@@ -70,7 +70,7 @@ class TestDocumentationValidator:
         # File covering installation and setup
         (getting_started_dir / "setup.md").write_text("""
         # Setup Guide
-        
+
         This covers installation and setup procedures.
         Also includes basic_usage examples.
         """)
@@ -95,18 +95,18 @@ class TestDocumentationValidator:
         high_quality_file = self.docs_path / "high_quality.md"
         high_quality_file.write_text("""
         # High Quality Documentation
-        
+
         This has headers, code examples, and lists.
-        
+
         ```python
         example_code = "here"
         ```
-        
+
         - List item 1
         - List item 2
-        
+
         [Link to something](http://example.com)
-        
+
         This covers character analysis and persona generation topics.
         """)
 
@@ -146,11 +146,11 @@ async def test_mcp_tool(param: str) -> str:
 
 class TestClass:
     """Test class docstring"""
-    
+
     def public_method(self):
         """Public method"""
         pass
-    
+
     def _private_method(self):
         """Private method"""
         pass
@@ -206,11 +206,11 @@ def _private_function():
         # Create documentation that mentions one function
         (self.docs_path / "api.md").write_text("""
         # API Reference
-        
+
         ## documented_function
-        
+
         This function does something important.
-        
+
         Example:
         ```python
         result = documented_function()
@@ -224,9 +224,9 @@ def _private_function():
         documented_mapping = next(m for m in mappings if m.code_element == 'documented_function')
         undocumented_mapping = next(m for m in mappings if m.code_element == 'undocumented_function')
 
-        assert documented_mapping.documented == True
+        assert documented_mapping.documented
         assert documented_mapping.documentation_quality > 0.5
-        assert undocumented_mapping.documented == False
+        assert not undocumented_mapping.documented
 
     def test_identify_documentation_gaps(self):
         """Test identification of documentation gaps"""

@@ -30,9 +30,9 @@ class TestWikiConfig:
     def test_default_config(self):
         """Test default configuration values"""
         config = WikiConfig()
-        assert config.enabled == True
+        assert config.enabled
         assert config.refresh_interval_hours == 24
-        assert config.fallback_to_hardcoded == True
+        assert config.fallback_to_hardcoded
         assert len(config.genre_pages) > 0
         assert len(config.meta_tag_pages) > 0
         assert len(config.tip_pages) > 0
@@ -149,7 +149,7 @@ class TestConfigurationManager:
 
             # Load and verify
             loaded_config = await ConfigurationManager.load_config(str(config_path))
-            assert loaded_config.enabled == False
+            assert not loaded_config.enabled
             assert loaded_config.refresh_interval_hours == 48
 
     @pytest.mark.asyncio
@@ -160,7 +160,7 @@ class TestConfigurationManager:
             config = await ConfigurationManager.load_config(str(non_existent_path))
 
             # Should return default config
-            assert config.enabled == True
+            assert config.enabled
             assert config.refresh_interval_hours == 24
 
 class TestWikiDataManager:
@@ -179,7 +179,7 @@ class TestWikiDataManager:
             await manager.initialize(config)
 
             try:
-                assert manager.initialized == True
+                assert manager.initialized
                 assert manager.storage_path.exists()
 
                 # Check directory structure
@@ -204,7 +204,7 @@ class TestWikiDataManager:
             await manager.initialize(config)
 
             try:
-                assert manager.initialized == True
+                assert manager.initialized
                 assert manager._session is None  # No HTTP session when disabled
 
             finally:
@@ -281,7 +281,7 @@ class TestWikiDataManager:
 
             try:
                 result = await manager.refresh_data()
-                assert result.success == True
+                assert result.success
                 assert result.pages_downloaded == 0
                 assert result.pages_failed == 0
 

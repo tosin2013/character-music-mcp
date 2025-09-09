@@ -529,7 +529,7 @@ class TestMetaTagStrategy:
 
         # Tags should be in logical order
         tag_positions = {tag: command.prompt.find(tag) for tag in found_tags}
-        sorted_tags = sorted(tag_positions.items(), key=lambda x: x[1])
+        sorted(tag_positions.items(), key=lambda x: x[1])
 
         # Intro should come before Outro
         if "[Intro]" in found_tags and "[Outro]" in found_tags:
@@ -592,7 +592,7 @@ class TestMetaTagStrategy:
 
             # Look for instrument-related tags
             instrument_tags = ["[Guitar Solo]", "[Piano]", "[Strings]", "[Synthesizer]", "[Orchestral]"]
-            found_instrument_tags = [tag for tag in instrument_tags if tag.lower().replace('[', '').replace(']', '') in primary_instrument]
+            [tag for tag in instrument_tags if tag.lower().replace('[', '').replace(']', '') in primary_instrument]
 
             # Should reference preferred instruments in some way
             instrument_mentioned = any(instrument.lower() in command.prompt.lower()

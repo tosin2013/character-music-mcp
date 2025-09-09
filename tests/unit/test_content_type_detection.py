@@ -170,11 +170,6 @@ class TestConceptualCharacterCreation:
 
     def test_create_character_from_philosophical_concept(self):
         """Test creating characters from philosophical concepts"""
-        philosophical_content = """
-        The concept of time as a river is flawed. Time is more like an ocean -
-        vast, deep, with currents flowing in all directions. We are not passengers
-        but swimmers in an infinite sea of possibility.
-        """
 
         if hasattr(self.analyzer, 'create_character_from_concepts'):
             concepts = ["time", "ocean", "possibility", "swimming"]
@@ -190,11 +185,6 @@ class TestConceptualCharacterCreation:
 
     def test_create_character_from_abstract_themes(self):
         """Test creating characters from abstract themes"""
-        abstract_content = """
-        The architecture of loneliness is built from silence and empty spaces.
-        Each room represents a different type of solitude - the crowded loneliness
-        of cities, the peaceful solitude of nature.
-        """
 
         if hasattr(self.analyzer, 'create_character_from_concepts'):
             concepts = ["loneliness", "architecture", "solitude", "silence"]

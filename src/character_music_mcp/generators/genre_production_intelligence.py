@@ -646,14 +646,14 @@ def _generate_genre_aligned_description(persona_data: Dict[str, Any], genre_prof
 
     description = f"""
     Musical persona derived from {character_name}: A {genre_name.lower()} artist with {vocal_style} delivery.
-    
-    This artist embodies the {genre_name.lower()} aesthetic through {', '.join(sound_chars[:2]) if sound_chars else 'expressive'} 
-    soundscapes and {genre_profile.vocal_style.emotional_approach} vocal approach. 
-    
-    Production style focuses on {genre_profile.production_techniques.mixing_style} with 
+
+    This artist embodies the {genre_name.lower()} aesthetic through {', '.join(sound_chars[:2]) if sound_chars else 'expressive'}
+    soundscapes and {genre_profile.vocal_style.emotional_approach} vocal approach.
+
+    Production style focuses on {genre_profile.production_techniques.mixing_style} with
     {', '.join(genre_profile.instrumentation[:3]) if genre_profile.instrumentation else 'varied instrumentation'}.
-    
-    Tempo typically ranges from {genre_profile.tempo_range.min_bpm} to {genre_profile.tempo_range.max_bpm} BPM, 
+
+    Tempo typically ranges from {genre_profile.tempo_range.min_bpm} to {genre_profile.tempo_range.max_bpm} BPM,
     creating {genre_profile.tempo_range.get_tempo_description()} energy that matches the character's essence.
     """
 

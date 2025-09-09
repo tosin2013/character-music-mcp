@@ -29,6 +29,7 @@ from server import (
     creative_music_generation,
     generate_artist_personas,
 )
+
 from tests.fixtures.mock_contexts import MockConcurrentContext, MockContext
 from tests.fixtures.test_data import TestDataManager
 
@@ -145,7 +146,7 @@ class TestMCPToolsIntegration:
         await self.mock_context.info("Testing create_suno_commands tool")
 
         # Get test data
-        scenario = self.test_data.get_scenario("sci_fi_adventure")
+        self.test_data.get_scenario("sci_fi_adventure")
         expected_character = self.test_data.get_expected_character("Captain Zara Okafor")
 
         character_data = asdict(expected_character)

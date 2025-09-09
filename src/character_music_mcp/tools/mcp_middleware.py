@@ -8,7 +8,7 @@ when MCP tools try to call each other directly.
 
 The middleware provides:
 - Character analysis services
-- Persona generation services  
+- Persona generation services
 - Content processing services
 - Wiki attribution services
 - Story analysis services
@@ -40,11 +40,11 @@ class MCPMiddleware:
     async def analyze_characters(self, text: str, ctx=None) -> Dict[str, Any]:
         """
         Analyze text for characters using the enhanced character analyzer
-        
+
         Args:
             text: Input narrative text
             ctx: Optional context for logging
-            
+
         Returns:
             Dictionary with characters, themes, and emotional arc
         """
@@ -82,11 +82,11 @@ class MCPMiddleware:
     async def generate_persona(self, character: StandardCharacterProfile, ctx=None) -> ArtistPersona:
         """
         Generate artist persona for a character
-        
+
         Args:
             character: StandardCharacterProfile object
             ctx: Optional context for logging
-            
+
         Returns:
             ArtistPersona object
         """
@@ -113,13 +113,13 @@ class MCPMiddleware:
     ) -> Dict[str, Any]:
         """
         Process track content for story-integrated albums
-        
+
         Args:
             track_concept: Dictionary with track concept details
             character: Character profile
             persona: Artist persona
             ctx: Optional context for logging
-            
+
         Returns:
             Processed track data
         """
@@ -220,12 +220,12 @@ Musical interpretation of {character.name}'s journey at this story moment.
     def extract_story_beats(self, narrative_text: str, character: StandardCharacterProfile, ctx=None) -> List[Dict]:
         """
         Extract story beats from narrative text
-        
+
         Args:
             narrative_text: Full narrative text
             character: Main character to focus on
             ctx: Optional context for logging
-            
+
         Returns:
             List of story beat dictionaries
         """

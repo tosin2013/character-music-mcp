@@ -77,7 +77,7 @@ class WikiCacheManager:
     def __init__(self, cache_root: str = "./data/wiki"):
         """
         Initialize WikiCacheManager
-        
+
         Args:
             cache_root: Root directory for cache storage
         """
@@ -111,10 +111,10 @@ class WikiCacheManager:
     async def get_file_path(self, url: str) -> Optional[str]:
         """
         Get local file path for a URL if it exists and is valid
-        
+
         Args:
             url: URL to look up
-            
+
         Returns:
             Local file path if exists, None otherwise
         """
@@ -147,12 +147,12 @@ class WikiCacheManager:
     async def add_file(self, url: str, local_path: str, download_date: Optional[datetime] = None) -> CacheEntry:
         """
         Add a file to the cache index
-        
+
         Args:
             url: Source URL
             local_path: Local file path
             download_date: When file was downloaded (defaults to now)
-            
+
         Returns:
             CacheEntry for the added file
         """
@@ -186,11 +186,11 @@ class WikiCacheManager:
     async def is_file_fresh(self, url: str, max_age_hours: int) -> bool:
         """
         Check if a cached file is still fresh (within max age)
-        
+
         Args:
             url: URL to check
             max_age_hours: Maximum age in hours
-            
+
         Returns:
             True if file is fresh, False otherwise
         """
@@ -215,10 +215,10 @@ class WikiCacheManager:
     async def get_file_age(self, url: str) -> Optional[timedelta]:
         """
         Get age of a cached file
-        
+
         Args:
             url: URL to check
-            
+
         Returns:
             Age as timedelta, or None if not cached
         """
@@ -234,10 +234,10 @@ class WikiCacheManager:
     async def remove_file(self, url: str) -> bool:
         """
         Remove a file from cache (both index and file)
-        
+
         Args:
             url: URL to remove
-            
+
         Returns:
             True if removed, False if not found
         """
@@ -273,10 +273,10 @@ class WikiCacheManager:
     async def cleanup_old_files(self, max_age_hours: int) -> int:
         """
         Remove files older than specified age
-        
+
         Args:
             max_age_hours: Maximum age in hours
-            
+
         Returns:
             Number of files removed
         """
@@ -306,7 +306,7 @@ class WikiCacheManager:
     async def get_cache_stats(self) -> CacheStats:
         """
         Get cache statistics
-        
+
         Returns:
             CacheStats with current metrics
         """
@@ -339,7 +339,7 @@ class WikiCacheManager:
     async def list_cached_urls(self) -> List[str]:
         """
         Get list of all cached URLs
-        
+
         Returns:
             List of cached URLs
         """
@@ -351,10 +351,10 @@ class WikiCacheManager:
     async def get_cache_entry(self, url: str) -> Optional[CacheEntry]:
         """
         Get cache entry for a URL
-        
+
         Args:
             url: URL to look up
-            
+
         Returns:
             CacheEntry if found, None otherwise
         """
@@ -366,11 +366,11 @@ class WikiCacheManager:
     def get_organized_path(self, url: str, content_type: str = "general") -> str:
         """
         Generate organized local path for a URL
-        
+
         Args:
             url: Source URL
             content_type: Type of content (genres, meta_tags, techniques)
-            
+
         Returns:
             Organized local file path
         """
@@ -493,12 +493,12 @@ class WikiCacheManager:
     async def save_content(self, url: str, content: str, content_type: str = "text/html") -> str:
         """
         Save content to cache and return the local file path
-        
+
         Args:
             url: Source URL
             content: Content to save
             content_type: MIME type of content
-            
+
         Returns:
             Local file path where content was saved
         """
@@ -524,10 +524,10 @@ class WikiCacheManager:
     async def get_cached_file_path(self, url: str) -> Optional[str]:
         """
         Get cached file path for a URL (alias for get_file_path for backward compatibility)
-        
+
         Args:
             url: URL to look up
-            
+
         Returns:
             Local file path if exists, None otherwise
         """

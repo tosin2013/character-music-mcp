@@ -80,8 +80,8 @@ class PerformanceBenchmarkRunner:
         print("🔍 Benchmarking character analysis...")
 
         # Get test scenario
-        scenario = test_data_manager.get_test_scenario("multi_character_complex")
-        ctx = create_mock_context("performance", session_id="benchmark_char_analysis")
+        test_data_manager.get_test_scenario("multi_character_complex")
+        create_mock_context("performance", session_id="benchmark_char_analysis")
 
         execution_times = []
         memory_usages = []
@@ -96,10 +96,6 @@ class PerformanceBenchmarkRunner:
                 await asyncio.sleep(0.1)  # Simulate processing time
 
                 # Mock character analysis result
-                characters = [
-                    {"name": "Character 1", "confidence": 0.95},
-                    {"name": "Character 2", "confidence": 0.87}
-                ]
 
                 execution_time = time.time() - start_time
                 execution_times.append(execution_time)
@@ -137,7 +133,7 @@ class PerformanceBenchmarkRunner:
         """Benchmark artist persona generation performance"""
         print("🎭 Benchmarking persona generation...")
 
-        ctx = create_mock_context("performance", session_id="benchmark_persona_gen")
+        create_mock_context("performance", session_id="benchmark_persona_gen")
 
         execution_times = []
         memory_usages = []
@@ -152,12 +148,6 @@ class PerformanceBenchmarkRunner:
                 await asyncio.sleep(0.05)  # Simulate processing time
 
                 # Mock persona generation result
-                persona = {
-                    "name": "Test Artist",
-                    "genre": "indie-folk",
-                    "vocal_style": "intimate",
-                    "instruments": ["acoustic guitar", "piano"]
-                }
 
                 execution_time = time.time() - start_time
                 execution_times.append(execution_time)
@@ -195,7 +185,7 @@ class PerformanceBenchmarkRunner:
         """Benchmark Suno command generation performance"""
         print("🎵 Benchmarking command generation...")
 
-        ctx = create_mock_context("performance", session_id="benchmark_cmd_gen")
+        create_mock_context("performance", session_id="benchmark_cmd_gen")
 
         execution_times = []
         memory_usages = []
@@ -210,10 +200,6 @@ class PerformanceBenchmarkRunner:
                 await asyncio.sleep(0.03)  # Simulate processing time
 
                 # Mock command generation result
-                commands = [
-                    {"type": "simple", "prompt": "indie folk song about longing"},
-                    {"type": "custom", "lyrics": "Verse 1...", "style": "indie-folk"}
-                ]
 
                 execution_time = time.time() - start_time
                 execution_times.append(execution_time)
@@ -251,8 +237,8 @@ class PerformanceBenchmarkRunner:
         """Benchmark complete workflow performance"""
         print("🔄 Benchmarking complete workflow...")
 
-        scenario = test_data_manager.get_test_scenario("single_character_simple")
-        ctx = create_mock_context("performance", session_id="benchmark_workflow")
+        test_data_manager.get_test_scenario("single_character_simple")
+        create_mock_context("performance", session_id="benchmark_workflow")
 
         execution_times = []
         memory_usages = []
@@ -267,11 +253,6 @@ class PerformanceBenchmarkRunner:
                 await asyncio.sleep(0.2)  # Simulate full workflow processing
 
                 # Mock complete workflow result
-                result = {
-                    "characters": [{"name": "Test Character", "confidence": 0.9}],
-                    "personas": [{"name": "Test Artist", "genre": "folk"}],
-                    "commands": [{"type": "simple", "prompt": "folk song"}]
-                }
 
                 execution_time = time.time() - start_time
                 execution_times.append(execution_time)
@@ -310,7 +291,7 @@ class PerformanceBenchmarkRunner:
         print(f"⚡ Benchmarking {concurrent_count} concurrent requests...")
 
         async def single_request(request_id: int):
-            ctx = create_mock_context("performance", session_id=f"concurrent_{request_id}")
+            create_mock_context("performance", session_id=f"concurrent_{request_id}")
             start_time = time.time()
 
             # Simulate workflow processing
@@ -326,7 +307,7 @@ class PerformanceBenchmarkRunner:
             tasks = [single_request(i) for i in range(concurrent_count)]
             request_times = await asyncio.gather(*tasks)
 
-            total_time = time.time() - start_time
+            time.time() - start_time
             current, peak = tracemalloc.get_traced_memory()
             memory_usage = peak / 1024 / 1024
             tracemalloc.stop()
@@ -365,8 +346,7 @@ class PerformanceBenchmarkRunner:
         print("📚 Benchmarking large text processing...")
 
         # Create large text input (simulate 10k+ words)
-        large_text = "This is a test narrative. " * 2000  # ~10k words
-        ctx = create_mock_context("performance", session_id="benchmark_large_text")
+        create_mock_context("performance", session_id="benchmark_large_text")
 
         execution_times = []
         memory_usages = []

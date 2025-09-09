@@ -217,7 +217,7 @@ class ErrorMonitoringSystem:
                   context: Dict[str, Any] = None) -> None:
         """
         Log an error event
-        
+
         Args:
             operation: Operation that failed
             error: Exception that occurred
@@ -257,7 +257,7 @@ class ErrorMonitoringSystem:
                    context: Dict[str, Any] = None) -> None:
         """
         Log a successful operation
-        
+
         Args:
             operation: Operation that succeeded
             response_time: Response time in seconds

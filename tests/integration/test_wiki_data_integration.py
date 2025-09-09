@@ -24,10 +24,8 @@ async def test_wiki_data_availability():
             from wiki_data_models import WikiConfig
             from wiki_data_system import WikiDataManager
             print("✓ Wiki integration modules are available")
-            WIKI_INTEGRATION_AVAILABLE = True
         except ImportError as e:
             print(f"✗ Wiki integration not available: {e}")
-            WIKI_INTEGRATION_AVAILABLE = False
             return
 
         # Initialize WikiDataManager

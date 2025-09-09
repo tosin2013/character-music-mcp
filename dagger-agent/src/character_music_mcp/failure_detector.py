@@ -197,14 +197,14 @@ class FailureDetector:
     ) -> list[Failure]:
         """
         Detect failures from GitHub workflow jobs data
-        
+
         Args:
             workflow_run_id: GitHub workflow run ID
             jobs_data: Jobs data from GitHub API
             repository: Repository name (owner/repo)
             branch: Branch name
             commit_sha: Commit SHA
-            
+
         Returns:
             List of detected failures
         """
@@ -376,10 +376,10 @@ class FailureDetector:
     async def categorize_failure(self, failure: Failure) -> FailureCategory:
         """
         Categorize a failure based on its logs and error message
-        
+
         Args:
             failure: The failure to categorize
-            
+
         Returns:
             The categorized failure type
         """
@@ -416,12 +416,12 @@ class FailureDetector:
     async def extract_logs(self, job_data: dict[str, Any]) -> str:
         """
         Extract logs from job data (placeholder implementation)
-        
+
         In a real implementation, this would make API calls to fetch actual logs
-        
+
         Args:
             job_data: Job data from GitHub API
-            
+
         Returns:
             Extracted logs as string
         """
@@ -453,10 +453,10 @@ Steps:
     def extract_error_details(self, logs: str) -> tuple[str | None, int | None]:
         """
         Extract file path and line number from error logs
-        
+
         Args:
             logs: The log content to analyze
-            
+
         Returns:
             Tuple of (file_path, line_number) or (None, None) if not found
         """
@@ -498,11 +498,11 @@ Steps:
     def extract_specific_error_message(self, logs: str, category: FailureCategory) -> str:
         """
         Extract specific error message based on failure category
-        
+
         Args:
             logs: The log content to analyze
             category: The failure category
-            
+
         Returns:
             Extracted specific error message
         """

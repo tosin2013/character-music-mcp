@@ -143,11 +143,11 @@ class DeepSeekClient:
     ) -> DeepSeekResponse:
         """
         Analyze a test failure using DeepSeek API
-        
+
         Args:
             failure: The failure to analyze
             code_context: Optional code context for better analysis
-            
+
         Returns:
             DeepSeek API response with analysis
         """
@@ -170,12 +170,12 @@ class DeepSeekClient:
     ) -> DeepSeekResponse:
         """
         Generate a fix for a failure using DeepSeek API
-        
+
         Args:
             failure: The failure to fix
             analysis: Previous analysis of the failure
             code_context: Code context for generating the fix
-            
+
         Returns:
             DeepSeek API response with fix suggestion
         """
@@ -193,11 +193,11 @@ class DeepSeekClient:
     async def validate_code(self, code: str, language: str = "python") -> DeepSeekResponse:
         """
         Validate code syntax and quality using DeepSeek API
-        
+
         Args:
             code: Code to validate
             language: Programming language (default: python)
-            
+
         Returns:
             DeepSeek API response with validation results
         """
@@ -219,12 +219,12 @@ class DeepSeekClient:
     ) -> DeepSeekResponse:
         """
         Make an API call to DeepSeek with retry logic
-        
+
         Args:
             prompt: The prompt to send
             operation: Operation name for logging
             max_retries: Maximum number of retries (uses config default if None)
-            
+
         Returns:
             DeepSeek API response
         """
@@ -562,10 +562,10 @@ Provide a JSON response with:
     def sanitize_code_for_api(self, code: str) -> str:
         """
         Sanitize code before sending to API to remove sensitive information
-        
+
         Args:
             code: Code to sanitize
-            
+
         Returns:
             Sanitized code
         """
@@ -592,10 +592,10 @@ Provide a JSON response with:
     def estimate_tokens(self, text: str) -> int:
         """
         Estimate token count for text (rough approximation)
-        
+
         Args:
             text: Text to estimate tokens for
-            
+
         Returns:
             Estimated token count
         """

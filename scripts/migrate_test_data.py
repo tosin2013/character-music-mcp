@@ -102,7 +102,7 @@ def validate_integration():
         from tests.fixtures.test_data import test_data_manager
         from tests.test_runner import TestRunner
 
-        runner = TestRunner(test_data_manager)
+        TestRunner(test_data_manager)
         validation_results["TestRunner initialization"] = True
         print("✅ TestRunner initializes correctly")
 
@@ -114,7 +114,7 @@ def validate_integration():
     try:
         from tests.fixtures.mock_contexts import create_mock_context
 
-        ctx = create_mock_context("basic", session_id="validation")
+        create_mock_context("basic", session_id="validation")
         validation_results["MockContext creation"] = True
         print("✅ MockContext creates correctly")
 
@@ -164,7 +164,7 @@ This report documents the integration of existing test files with the unified te
 
 ### 2. Framework Integration
 - Updated test_complete_workflow.py to use unified framework
-- Updated test_mcp_workflow.py to use unified framework  
+- Updated test_mcp_workflow.py to use unified framework
 - Updated test_artist_description.py to use unified framework
 - Updated test_new_tools.py to use unified framework
 

@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 class MCPDataManager:
     """
     Centralized data manager for all MCP tools
-    
+
     This class provides a unified interface for data validation, conversion,
     and manipulation across all MCP tools.
     """
@@ -58,14 +58,14 @@ class MCPDataManager:
     def process_character_input(self, data: Any, source_format: str = "auto") -> StandardCharacterProfile:
         """
         Process character input data and return validated StandardCharacterProfile
-        
+
         Args:
             data: Character data in any supported format
             source_format: Source format hint
-            
+
         Returns:
             StandardCharacterProfile instance
-            
+
         Raises:
             ValidationError: If data is invalid
         """
@@ -91,10 +91,10 @@ class MCPDataManager:
     def validate_character_completeness(self, character: StandardCharacterProfile) -> Dict[str, Any]:
         """
         Validate character profile completeness and provide improvement suggestions
-        
+
         Args:
             character: Character profile to validate
-            
+
         Returns:
             Dictionary with completeness analysis
         """
@@ -155,12 +155,12 @@ class MCPDataManager:
                             style_preferences: Dict[str, Any] = None) -> ArtistPersona:
         """
         Create artist persona from character profile
-        
+
         Args:
             character: Source character profile
             genre_hint: Optional genre hint
             style_preferences: Optional style preferences
-            
+
         Returns:
             ArtistPersona instance
         """
@@ -191,11 +191,11 @@ class MCPDataManager:
                                    persona: ArtistPersona) -> Dict[str, Any]:
         """
         Validate consistency between character and persona
-        
+
         Args:
             character: Character profile
             persona: Artist persona
-            
+
         Returns:
             Consistency analysis
         """
@@ -211,12 +211,12 @@ class MCPDataManager:
                            command_type: str = "generate") -> SunoCommandSet:
         """
         Create Suno commands from artist persona with genre-specific production intelligence
-        
+
         Args:
             persona: Artist persona
             command_count: Number of commands to generate
             command_type: Type of commands to generate
-            
+
         Returns:
             SunoCommandSet instance
         """
@@ -338,10 +338,10 @@ class MCPDataManager:
     def analyze_text_for_characters(self, text: str) -> CharacterAnalysisResult:
         """
         Analyze text and extract character information
-        
+
         Args:
             text: Text to analyze
-            
+
         Returns:
             CharacterAnalysisResult
         """
@@ -381,11 +381,11 @@ class MCPDataManager:
     def execute_complete_workflow(self, text: str, genre_hint: str = None) -> Dict[str, Any]:
         """
         Execute complete workflow from text to Suno commands
-        
+
         Args:
             text: Input text for analysis
             genre_hint: Optional genre hint
-            
+
         Returns:
             Complete workflow results
         """
@@ -442,10 +442,10 @@ class MCPDataManager:
     def get_data_summary(self, data: Any) -> Dict[str, Any]:
         """
         Get summary information about any MCP data object
-        
+
         Args:
             data: Data object to summarize
-            
+
         Returns:
             Summary information
         """
@@ -490,11 +490,11 @@ class MCPDataManager:
     def export_data(self, data: Any, format_type: str = "json") -> str:
         """
         Export data in specified format
-        
+
         Args:
             data: Data to export
             format_type: Export format ("json", "yaml", "dict")
-            
+
         Returns:
             Exported data as string
         """

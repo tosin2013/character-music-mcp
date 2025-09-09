@@ -17,7 +17,7 @@ def test_genre_parsing():
         <body>
             <div class="sl-markdown-content">
                 <p>Here's a categorized selection of music genres and styles:</p>
-                
+
                 <h3 id="electronic">Electronic</h3>
                 <ul>
                     <li>Ambient</li>
@@ -28,7 +28,7 @@ def test_genre_parsing():
                     <li>Techno</li>
                     <li>Trance music</li>
                 </ul>
-                
+
                 <h3 id="rock">Rock</h3>
                 <ul>
                     <li>Alternative rock</li>
@@ -37,7 +37,7 @@ def test_genre_parsing():
                     <li>Indie rock</li>
                     <li>Punk rock</li>
                 </ul>
-                
+
                 <h3 id="jazz">Jazz</h3>
                 <ul>
                     <li>Bebop</li>
@@ -46,7 +46,7 @@ def test_genre_parsing():
                     <li>Jazz fusion</li>
                     <li>Smooth jazz</li>
                 </ul>
-                
+
                 <h3 id="regional-music">Regional Music</h3>
                 <ul>
                     <li>Brazilian music (e.g., Samba, Bossa nova)</li>

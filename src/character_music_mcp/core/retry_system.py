@@ -174,16 +174,16 @@ class RetrySystem:
                                policy_name: str = "default") -> Any:
         """
         Execute an operation with retry logic
-        
+
         Args:
             operation: Async function to execute
             operation_id: Unique identifier for the operation
             operation_type: Type of operation being performed
             policy_name: Name of retry policy to use
-            
+
         Returns:
             Result of the operation
-            
+
         Raises:
             Exception: If all retry attempts fail
         """
@@ -372,7 +372,7 @@ class RetrySystem:
                            policy_name: str = "default") -> None:
         """
         Schedule a retry operation for later execution
-        
+
         Args:
             operation: Async function to execute
             operation_id: Unique identifier for the operation

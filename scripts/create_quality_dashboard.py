@@ -34,130 +34,130 @@ class QualityDashboardCreator:
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #f8fafc; color: #334155; line-height: 1.6; 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.6;
         }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .header { 
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); 
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px;
             box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
         }
         .header h1 { font-size: 2.5em; margin-bottom: 10px; font-weight: 700; }
         .header p { font-size: 1.1em; opacity: 0.9; }
-        .refresh-info { 
-            background: rgba(255, 255, 255, 0.1); padding: 10px 15px; 
+        .refresh-info {
+            background: rgba(255, 255, 255, 0.1); padding: 10px 15px;
             border-radius: 8px; margin-top: 15px; font-size: 0.9em;
         }
-        .metrics-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px; margin-bottom: 30px; 
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; margin-bottom: 30px;
         }
-        .metric-card { 
-            background: white; padding: 25px; border-radius: 12px; 
+        .metric-card {
+            background: white; padding: 25px; border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .metric-card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12); 
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
         }
-        .metric-card h3 { 
-            color: #64748b; font-size: 0.85em; text-transform: uppercase; 
+        .metric-card h3 {
+            color: #64748b; font-size: 0.85em; text-transform: uppercase;
             letter-spacing: 1px; margin-bottom: 12px; font-weight: 600;
         }
-        .metric-value { 
-            font-size: 2.8em; font-weight: 800; margin-bottom: 8px; 
+        .metric-value {
+            font-size: 2.8em; font-weight: 800; margin-bottom: 8px;
             display: flex; align-items: center; gap: 10px;
         }
         .metric-value.excellent { color: #059669; }
         .metric-value.good { color: #0891b2; }
         .metric-value.warning { color: #d97706; }
         .metric-value.critical { color: #dc2626; }
-        .metric-trend { 
-            font-size: 0.9em; color: #64748b; display: flex; 
+        .metric-trend {
+            font-size: 0.9em; color: #64748b; display: flex;
             align-items: center; gap: 5px; margin-bottom: 10px;
         }
         .trend-up { color: #059669; }
         .trend-down { color: #dc2626; }
         .trend-stable { color: #64748b; }
         .metric-subtitle { color: #94a3b8; font-size: 0.9em; }
-        .section { 
-            background: white; padding: 30px; border-radius: 12px; 
+        .section {
+            background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 30px;
             border: 1px solid #e2e8f0;
         }
-        .section h2 { 
-            color: #1e293b; margin-bottom: 25px; padding-bottom: 15px; 
+        .section h2 {
+            color: #1e293b; margin-bottom: 25px; padding-bottom: 15px;
             border-bottom: 2px solid #f1f5f9; font-size: 1.5em; font-weight: 600;
         }
-        .chart-container { 
-            position: relative; height: 400px; margin: 20px 0; 
+        .chart-container {
+            position: relative; height: 400px; margin: 20px 0;
             background: #fafbfc; border-radius: 8px; padding: 15px;
         }
-        .alerts-container { 
-            display: grid; gap: 15px; 
+        .alerts-container {
+            display: grid; gap: 15px;
         }
-        .alert { 
+        .alert {
             padding: 15px 20px; border-radius: 8px; border-left: 4px solid;
             display: flex; align-items: center; gap: 12px;
         }
-        .alert.critical { 
-            background: #fef2f2; border-color: #dc2626; color: #991b1b; 
+        .alert.critical {
+            background: #fef2f2; border-color: #dc2626; color: #991b1b;
         }
-        .alert.warning { 
-            background: #fffbeb; border-color: #d97706; color: #92400e; 
+        .alert.warning {
+            background: #fffbeb; border-color: #d97706; color: #92400e;
         }
-        .alert.info { 
-            background: #eff6ff; border-color: #2563eb; color: #1d4ed8; 
+        .alert.info {
+            background: #eff6ff; border-color: #2563eb; color: #1d4ed8;
         }
         .alert-icon { font-size: 1.2em; }
         .alert-content { flex: 1; }
         .alert-time { font-size: 0.85em; opacity: 0.8; }
-        .status-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 20px; 
+        .status-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
-        .status-item { 
+        .status-item {
             padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;
             background: white;
         }
         .status-item h4 { color: #374151; margin-bottom: 10px; font-weight: 600; }
-        .status-badge { 
-            padding: 6px 12px; border-radius: 20px; font-size: 0.8em; 
+        .status-badge {
+            padding: 6px 12px; border-radius: 20px; font-size: 0.8em;
             font-weight: 600; text-transform: uppercase; display: inline-block;
         }
         .status-badge.passing { background: #d1fae5; color: #065f46; }
         .status-badge.failing { background: #fee2e2; color: #991b1b; }
         .status-badge.warning { background: #fef3c7; color: #92400e; }
-        .progress-bar { 
-            width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px; 
+        .progress-bar {
+            width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px;
             overflow: hidden; margin: 10px 0;
         }
-        .progress-fill { 
+        .progress-fill {
             height: 100%; transition: width 0.3s ease; border-radius: 4px;
         }
         .progress-fill.excellent { background: #059669; }
         .progress-fill.good { background: #0891b2; }
         .progress-fill.warning { background: #d97706; }
         .progress-fill.critical { background: #dc2626; }
-        .timestamp { 
-            text-align: center; color: #94a3b8; font-size: 0.9em; 
+        .timestamp {
+            text-align: center; color: #94a3b8; font-size: 0.9em;
             margin-top: 40px; padding-top: 20px; border-top: 1px solid #f1f5f9;
         }
-        .auto-refresh { 
-            position: fixed; top: 20px; right: 20px; background: white; 
+        .auto-refresh {
+            position: fixed; top: 20px; right: 20px; background: white;
             padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             border: 1px solid #e2e8f0; font-size: 0.9em;
         }
-        .refresh-toggle { 
-            margin-left: 10px; padding: 5px 10px; background: #3b82f6; 
+        .refresh-toggle {
+            margin-left: 10px; padding: 5px 10px; background: #3b82f6;
             color: white; border: none; border-radius: 4px; cursor: pointer;
         }
         .refresh-toggle:hover { background: #2563eb; }
         .refresh-toggle.disabled { background: #94a3b8; cursor: not-allowed; }
-        
+
         @media (max-width: 768px) {
             .container { padding: 15px; }
             .metrics-grid { grid-template-columns: 1fr; }
@@ -178,7 +178,7 @@ class QualityDashboardCreator:
             <h1>🎵 Character Music MCP Quality Dashboard</h1>
             <p>Real-time monitoring of test coverage, performance, and code quality</p>
             <div class="refresh-info">
-                <strong>Live Dashboard</strong> • Updates every 5 minutes • 
+                <strong>Live Dashboard</strong> • Updates every 5 minutes •
                 Last updated: {{ timestamp }}
             </div>
         </div>
@@ -198,7 +198,7 @@ class QualityDashboardCreator:
                 </div>
                 <div class="metric-subtitle">{{ metric.subtitle }}</div>
                 <div class="progress-bar">
-                    <div class="progress-fill {{ metric.status_class }}" 
+                    <div class="progress-fill {{ metric.status_class }}"
                          style="width: {{ metric.progress_percent }}%"></div>
                 </div>
             </div>
@@ -261,7 +261,7 @@ class QualityDashboardCreator:
         </div>
 
         <div class="timestamp">
-            Dashboard generated at {{ timestamp }} • 
+            Dashboard generated at {{ timestamp }} •
             <a href="javascript:location.reload()" style="color: #3b82f6;">Refresh Now</a>
         </div>
     </div>
@@ -275,7 +275,7 @@ class QualityDashboardCreator:
             autoRefreshEnabled = !autoRefreshEnabled;
             const status = document.getElementById('refresh-status');
             const button = document.querySelector('.refresh-toggle');
-            
+
             if (autoRefreshEnabled) {
                 status.textContent = 'Auto-refresh: ON';
                 button.textContent = 'Disable';
@@ -299,7 +299,7 @@ class QualityDashboardCreator:
 
         function updateLastRefresh() {
             const now = new Date();
-            document.getElementById('last-update').textContent = 
+            document.getElementById('last-update').textContent =
                 'Last: ' + now.toLocaleTimeString();
         }
 
@@ -394,7 +394,7 @@ class QualityDashboardCreator:
 
         // Start auto-refresh
         startAutoRefresh();
-        
+
         // Update timestamp every minute
         setInterval(updateLastRefresh, 60000);
     </script>

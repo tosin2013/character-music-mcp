@@ -132,12 +132,12 @@ class ErrorRecoveryManager:
                                     operation_context: Dict[str, Any] = None) -> RecoveryResult:
         """
         Handle download failure with appropriate recovery strategy
-        
+
         Args:
             url: URL that failed to download
             error: Exception that occurred
             operation_context: Additional context about the operation
-            
+
         Returns:
             RecoveryResult with recovery data or fallback
         """
@@ -169,13 +169,13 @@ class ErrorRecoveryManager:
                                  source_url: str = "") -> RecoveryResult:
         """
         Handle content parsing failure with fallback strategies
-        
+
         Args:
             content: Content that failed to parse
             error: Exception that occurred
             content_type: Type of content being parsed
             source_url: Source URL of the content
-            
+
         Returns:
             RecoveryResult with recovery data or fallback
         """
@@ -206,11 +206,11 @@ class ErrorRecoveryManager:
     def get_fallback_data(self, data_type: str, quality_threshold: float = 0.3) -> Optional[FallbackData]:
         """
         Get fallback data for a specific data type
-        
+
         Args:
             data_type: Type of data needed ('genres', 'meta_tags', 'techniques')
             quality_threshold: Minimum quality score required
-            
+
         Returns:
             FallbackData if available and meets quality threshold
         """
@@ -232,7 +232,7 @@ class ErrorRecoveryManager:
                            max_retries: int = 3) -> None:
         """
         Schedule a retry operation for later execution
-        
+
         Args:
             operation: Operation identifier
             delay_minutes: Delay before retry in minutes
@@ -251,12 +251,12 @@ class ErrorRecoveryManager:
                                 data_type: str) -> FallbackData:
         """
         Create mixed source data combining wiki and fallback data
-        
+
         Args:
             wiki_data: Data from wiki sources
             fallback_data: Fallback data
             data_type: Type of data being mixed
-            
+
         Returns:
             FallbackData with mixed sources
         """
@@ -346,7 +346,7 @@ class ErrorRecoveryManager:
     def _classify_error(self, error: Exception) -> ErrorType:
         """Classify an error into appropriate error type"""
         error_str = str(error).lower()
-        error_type_name = type(error).__name__.lower()
+        type(error).__name__.lower()
 
         if any(keyword in error_str for keyword in ['network', 'connection', 'timeout', 'dns']):
             return ErrorType.NETWORK_ERROR

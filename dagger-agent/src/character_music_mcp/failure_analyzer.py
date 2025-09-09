@@ -31,7 +31,7 @@ class CodeContextExtractor:
     def __init__(self, repository_path: str = "."):
         """
         Initialize code context extractor
-        
+
         Args:
             repository_path: Path to the repository root
         """
@@ -45,12 +45,12 @@ class CodeContextExtractor:
     ) -> CodeContext | None:
         """
         Extract code context for a failure
-        
+
         Args:
             failure: The failure to extract context for
             context_lines: Number of lines to include around the error
             max_file_size: Maximum file size to read (in characters)
-            
+
         Returns:
             CodeContext if file exists and is readable, None otherwise
         """
@@ -202,7 +202,7 @@ class AnalysisCache:
     def __init__(self, cache_dir: str = ".cache/analysis", ttl_hours: int = 24):
         """
         Initialize analysis cache
-        
+
         Args:
             cache_dir: Directory to store cache files
             ttl_hours: Time to live for cache entries in hours
@@ -370,7 +370,7 @@ class FailureAnalyzer:
     ):
         """
         Initialize the failure analyzer
-        
+
         Args:
             deepseek_config: Configuration for DeepSeek API
             repository_path: Path to the repository root
@@ -401,10 +401,10 @@ class FailureAnalyzer:
     async def analyze_failure(self, failure: Failure) -> Analysis:
         """
         Analyze a test failure using AI-powered analysis
-        
+
         Args:
             failure: The failure to analyze
-            
+
         Returns:
             Analysis result
         """
@@ -584,10 +584,10 @@ class FailureAnalyzer:
     async def get_code_context(self, failure: Failure) -> CodeContext | None:
         """
         Get code context for a failure (public method for external use)
-        
+
         Args:
             failure: The failure to get context for
-            
+
         Returns:
             CodeContext if available, None otherwise
         """
@@ -596,7 +596,7 @@ class FailureAnalyzer:
     async def clear_cache(self) -> int:
         """
         Clear expired cache entries
-        
+
         Returns:
             Number of entries removed
         """
@@ -622,11 +622,11 @@ class FailureAnalyzer:
     ) -> list[Analysis]:
         """
         Analyze multiple failures concurrently
-        
+
         Args:
             failures: List of failures to analyze
             max_concurrent: Maximum number of concurrent analyses
-            
+
         Returns:
             List of analysis results
         """

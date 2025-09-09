@@ -323,7 +323,7 @@ class TestConceptualAlbumGeneration:
 
         # Verify character consistency
         album_info = result.get("album_info", {})
-        protagonist = album_info.get("protagonist", "")
+        album_info.get("protagonist", "")
 
         # All tracks should maintain the nurse perspective
         for track in result["tracks"]:
@@ -347,12 +347,12 @@ class TestContentTypeDetectionEdgeCases:
         """Test detection of mixed content types"""
         mixed_content = """
         Character: Dr. Sarah Chen, a philosopher who works nights as a taxi driver.
-        
+
         Sarah often contemplates the nature of human connection while driving through
         the empty city streets. She believes that every passenger carries a universe
         of stories, and her job is to provide safe passage not just through the city,
         but through the moments of vulnerability that occur in the back seat of a cab.
-        
+
         The existential weight of these encounters shapes her understanding of what
         it means to be truly present for another human being.
         """

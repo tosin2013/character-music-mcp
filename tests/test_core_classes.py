@@ -319,7 +319,7 @@ async def test_integration_workflow():
     assert producer_profile.production_style is not None
 
     # Test that story themes influence production
-    has_theme_influence = any(
+    any(
         theme_word in producer_profile.production_style.lower()
         for theme in story.introspective_themes
         for theme_word in theme.split()[-2:]  # Get last words from themes
