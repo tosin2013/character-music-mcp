@@ -22,7 +22,7 @@ except ImportError as e:
 class TestEnhancedEmotionalAnalyzer:
     """Test class for enhanced_emotional_analyzer module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {

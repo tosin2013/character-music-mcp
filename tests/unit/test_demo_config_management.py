@@ -22,7 +22,7 @@ except ImportError as e:
 class TestDemoConfigManagement:
     """Test class for demo_config_management module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {

@@ -22,7 +22,7 @@ except ImportError as e:
 class TestValidateStandardCharacterProfile:
     """Test class for validate_standard_character_profile module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {

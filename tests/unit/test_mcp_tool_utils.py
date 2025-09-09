@@ -22,7 +22,7 @@ except ImportError as e:
 class TestMcpToolUtils:
     """Test class for mcp_tool_utils module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {

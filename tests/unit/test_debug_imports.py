@@ -22,7 +22,7 @@ except ImportError as e:
 class TestDebugImports:
     """Test class for debug_imports module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {

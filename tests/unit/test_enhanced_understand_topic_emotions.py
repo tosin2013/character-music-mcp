@@ -22,7 +22,7 @@ except ImportError as e:
 class TestEnhancedUnderstandTopicEmotions:
     """Test class for enhanced_understand_topic_emotions module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {

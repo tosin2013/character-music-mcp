@@ -22,7 +22,7 @@ except ImportError as e:
 class TestEnhancedBeatGenerator:
     """Test class for enhanced_beat_generator module"""
     
-    @pytest_asyncio.fixture
+    @pytest.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
         return {
