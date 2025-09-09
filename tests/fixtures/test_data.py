@@ -20,7 +20,7 @@ from server import CharacterProfile, ArtistPersona, SunoCommand
 
 
 @dataclass
-class TestScenario:
+class ScenarioData:
     """Test scenario with expected inputs and outputs"""
     __test__ = False  # Prevent pytest from collecting this class
     name: str
@@ -44,10 +44,10 @@ class TestDataManager:
     # Prevent pytest from treating this as a test class
     __test__ = False
     
-    def _initialize_scenarios(self) -> Dict[str, TestScenario]:
+    def _initialize_scenarios(self) -> Dict[str, ScenarioData]:
         """Initialize test scenarios with different complexity levels"""
         return {
-            "single_character_simple": TestScenario(
+            "single_character_simple": ScenarioData(
                 name="single_character_simple",
                 description="Simple narrative with one clear character",
                 narrative_text="""
@@ -62,7 +62,7 @@ class TestDataManager:
                 complexity_level="simple"
             ),
             
-            "multi_character_medium": TestScenario(
+            "multi_character_medium": ScenarioData(
                 name="multi_character_medium",
                 description="Medium complexity with multiple characters and relationships",
                 narrative_text="""
@@ -84,7 +84,7 @@ class TestDataManager:
                 complexity_level="medium"
             ),
             
-            "concept_album_complex": TestScenario(
+            "concept_album_complex": ScenarioData(
                 name="concept_album_complex",
                 description="Complex philosophical narrative for concept album",
                 narrative_text="""
@@ -107,7 +107,7 @@ class TestDataManager:
                 complexity_level="complex"
             ),
             
-            "minimal_character_edge": TestScenario(
+            "minimal_character_edge": ScenarioData(
                 name="minimal_character_edge",
                 description="Edge case with minimal character information",
                 narrative_text="""
@@ -119,7 +119,7 @@ class TestDataManager:
                 complexity_level="simple"
             ),
             
-            "emotional_intensity_high": TestScenario(
+            "emotional_intensity_high": ScenarioData(
                 name="emotional_intensity_high",
                 description="High emotional intensity for testing emotional framework",
                 narrative_text="""
@@ -143,7 +143,7 @@ class TestDataManager:
                 complexity_level="complex"
             ),
             
-            "sci_fi_adventure": TestScenario(
+            "sci_fi_adventure": ScenarioData(
                 name="sci_fi_adventure",
                 description="Science fiction narrative with adventure elements",
                 narrative_text="""
@@ -167,7 +167,7 @@ class TestDataManager:
                 complexity_level="medium"
             ),
             
-            "romance_contemporary": TestScenario(
+            "romance_contemporary": ScenarioData(
                 name="romance_contemporary",
                 description="Contemporary romance with emotional depth",
                 narrative_text="""
@@ -191,7 +191,7 @@ class TestDataManager:
                 complexity_level="simple"
             ),
             
-            "historical_drama": TestScenario(
+            "historical_drama": ScenarioData(
                 name="historical_drama",
                 description="Historical narrative with period-specific challenges",
                 narrative_text="""
@@ -216,7 +216,7 @@ class TestDataManager:
                 complexity_level="medium"
             ),
             
-            "urban_fantasy": TestScenario(
+            "urban_fantasy": ScenarioData(
                 name="urban_fantasy",
                 description="Urban fantasy with supernatural elements",
                 narrative_text="""
@@ -240,7 +240,7 @@ class TestDataManager:
                 complexity_level="complex"
             ),
             
-            "coming_of_age": TestScenario(
+            "coming_of_age": ScenarioData(
                 name="coming_of_age",
                 description="Coming-of-age story with universal themes",
                 narrative_text="""
@@ -266,7 +266,7 @@ class TestDataManager:
                 complexity_level="medium"
             ),
             
-            "psychological_thriller": TestScenario(
+            "psychological_thriller": ScenarioData(
                 name="psychological_thriller",
                 description="Psychological thriller with unreliable narrator",
                 narrative_text="""
@@ -291,7 +291,7 @@ class TestDataManager:
                 complexity_level="complex"
             ),
             
-            "family_saga": TestScenario(
+            "family_saga": ScenarioData(
                 name="family_saga",
                 description="Multi-generational family story",
                 narrative_text="""
@@ -954,7 +954,7 @@ class TestDataManager:
             return self.expected_commands[character_name]
         raise ValueError(f"Unknown commands for: {character_name}")
     
-    def get_test_scenario(self, scenario_name: str) -> TestScenario:
+    def get_test_scenario(self, scenario_name: str) -> ScenarioData:
         """Get complete test scenario"""
         if scenario_name in self.scenarios:
             return self.scenarios[scenario_name]
@@ -964,7 +964,7 @@ class TestDataManager:
         """List all available test scenarios"""
         return list(self.scenarios.keys())
     
-    def get_scenarios_by_complexity(self, complexity: str) -> List[TestScenario]:
+    def get_scenarios_by_complexity(self, complexity: str) -> List[ScenarioData]:
         """Get scenarios filtered by complexity level"""
         return [scenario for scenario in self.scenarios.values() 
                 if scenario.complexity_level == complexity]
@@ -1243,7 +1243,7 @@ class TestDataManager:
         
         return track_structure
     
-    def get_edge_case_scenarios(self) -> List[TestScenario]:
+    def get_edge_case_scenarios(self) -> List[ScenarioData]:
         """Get scenarios specifically designed for edge case testing"""
         edge_cases = []
         
@@ -1255,7 +1255,7 @@ class TestDataManager:
         
         return edge_cases
     
-    def get_performance_test_scenarios(self) -> List[TestScenario]:
+    def get_performance_test_scenarios(self) -> List[ScenarioData]:
         """Get scenarios suitable for performance testing"""
         performance_scenarios = []
         
@@ -1502,7 +1502,7 @@ class ComprehensiveValidator:
         
         return benchmark_data
     
-    def _estimate_processing_time(self, scenario: TestScenario) -> float:
+    def _estimate_processing_time(self, scenario: ScenarioData) -> float:
         """Estimate processing time based on scenario complexity"""
         base_time = 1.0  # Base processing time in seconds
         

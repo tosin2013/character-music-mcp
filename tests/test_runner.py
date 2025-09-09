@@ -28,7 +28,7 @@ from tests.fixtures.mock_contexts import MockContext, create_mock_context
 
 
 @dataclass
-class TestResult:
+class ResultData:
     """Individual test result"""
     __test__ = False  # Prevent pytest from collecting this class
     test_name: str
@@ -53,7 +53,7 @@ class TestResult:
 
 
 @dataclass
-class TestSuiteResult:
+class SuiteResultData:
     """Test suite result summary"""
     __test__ = False  # Prevent pytest from collecting this class
     suite_name: str
@@ -63,7 +63,7 @@ class TestSuiteResult:
     skipped: int
     errors: int
     total_time: float
-    test_results: List[TestResult] = field(default_factory=list)
+    test_results: List[ResultData] = field(default_factory=list)
     
     @property
     def success_rate(self) -> float:
@@ -84,7 +84,7 @@ class TestSuiteResult:
 
 
 @dataclass
-class TestRunSummary:
+class RunSummaryData:
     """Complete test run summary"""
     __test__ = False  # Prevent pytest from collecting this class
     start_time: datetime
@@ -96,7 +96,7 @@ class TestRunSummary:
     total_skipped: int
     total_errors: int
     total_execution_time: float
-    suite_results: List[TestSuiteResult] = field(default_factory=list)
+    suite_results: List[SuiteResultData] = field(default_factory=list)
     
     @property
     def overall_success_rate(self) -> float:
@@ -118,7 +118,7 @@ class TestRunSummary:
         }
 
 
-class TestRunner:
+class RunnerEngine:
     """Unified test runner for all test suites"""
     __test__ = False  # Prevent pytest from collecting this class
     
@@ -152,7 +152,7 @@ class TestRunner:
         if teardown_func:
             self.teardown_functions[suite_name] = teardown_func
     
-    async def run_single_test(self, test_func: Callable, suite_name: str) -> TestResult:
+    async def run_single_test(self, test_func: Callable, suite_name: str) -> ResultData:
         """Run a single test function and return result"""
         test_name = test_func.__name__
         self.current_test = test_name
@@ -186,7 +186,7 @@ class TestRunner:
             
             execution_time = time.time() - start_time
             
-            return TestResult(
+            return ResultData(
                 test_name=test_name,
                 test_suite=suite_name,
                 status="passed",
@@ -196,7 +196,7 @@ class TestRunner:
             
         except AssertionError as e:
             execution_time = time.time() - start_time
-            return TestResult(
+            return ResultData(
                 test_name=test_name,
                 test_suite=suite_name,
                 status="failed",
@@ -207,7 +207,7 @@ class TestRunner:
             
         except Exception as e:
             execution_time = time.time() - start_time
-            return TestResult(
+            return ResultData(
                 test_name=test_name,
                 test_suite=suite_name,
                 status="error",
@@ -216,7 +216,7 @@ class TestRunner:
                 error_traceback=traceback.format_exc()
             )
     
-    async def run_test_suite(self, suite_name: str) -> TestSuiteResult:
+    async def run_test_suite(self, suite_name: str) -> SuiteResultData:
         """Run a complete test suite"""
         self.current_suite = suite_name
         
@@ -262,7 +262,7 @@ class TestRunner:
         errors = len([r for r in test_results if r.status == "error"])
         skipped = len([r for r in test_results if r.status == "skipped"])
         
-        return TestSuiteResult(
+        return SuiteResultData(
             suite_name=suite_name,
             total_tests=len(test_results),
             passed=passed,
@@ -273,7 +273,7 @@ class TestRunner:
             test_results=test_results
         )
     
-    async def run_all_suites(self, suite_filter: Optional[List[str]] = None) -> TestRunSummary:
+    async def run_all_suites(self, suite_filter: Optional[List[str]] = None) -> RunSummaryData:
         """Run all registered test suites"""
         start_time = datetime.now()
         
@@ -312,7 +312,7 @@ class TestRunner:
         total_skipped = sum(suite.skipped for suite in suite_results)
         total_execution_time = sum(suite.total_time for suite in suite_results)
         
-        summary = TestRunSummary(
+        summary = RunSummaryData(
             start_time=start_time,
             end_time=end_time,
             total_suites=len(suite_results),
@@ -330,7 +330,7 @@ class TestRunner:
         
         return summary
     
-    def _print_test_summary(self, summary: TestRunSummary) -> None:
+    def _print_test_summary(self, summary: RunSummaryData) -> None:
         """Print comprehensive test summary"""
         print("\n" + "=" * 60)
         print("🎯 TEST RUN SUMMARY")
@@ -367,7 +367,7 @@ class TestRunner:
         
         print("=" * 60)
     
-    def save_test_report(self, summary: TestRunSummary, filepath: str) -> None:
+    def save_test_report(self, summary: RunSummaryData, filepath: str) -> None:
         """Save detailed test report to JSON file"""
         report_data = summary.to_dict()
         
@@ -515,7 +515,7 @@ def test_expected_character_validation(ctx: MockContext, data_manager: TestDataM
 async def main():
     """Main test runner execution"""
     # Initialize test runner
-    runner = TestRunner(test_data_manager)
+    runner = RunnerEngine(test_data_manager)
     
     # Register example test suite
     runner.register_test_suite("test_infrastructure", [

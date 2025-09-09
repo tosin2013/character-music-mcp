@@ -11,7 +11,7 @@ from typing import Dict, List, Any
 from pathlib import Path
 
 
-class TestConfig:
+class ConfigData:
     """Test configuration management"""
     __test__ = False  # Prevent pytest from collecting this class
     
@@ -169,7 +169,7 @@ class TestConfig:
 
 
 # Global configuration instance
-test_config = TestConfig()
+test_config = ConfigData()
 
 
 # Utility functions for common configuration checks
@@ -202,7 +202,7 @@ def get_test_scenarios_for_complexity(complexity: str) -> List[str]:
 
 
 # Environment-specific configurations
-class DevelopmentTestConfig(TestConfig):
+class DevelopmentConfigData(ConfigData):
     """Configuration for development environment"""
     __test__ = False  # Prevent pytest from collecting this class
     
@@ -214,7 +214,7 @@ class DevelopmentTestConfig(TestConfig):
         self.PERFORMANCE_THRESHOLDS = {k: v * 2 for k, v in self.PERFORMANCE_THRESHOLDS.items()}  # Relaxed thresholds
 
 
-class CITestConfig(TestConfig):
+class CIConfigData(ConfigData):
     """Configuration for CI/CD environment"""
     __test__ = False  # Prevent pytest from collecting this class
     
@@ -227,7 +227,7 @@ class CITestConfig(TestConfig):
         self.REPORTING["generate_html_report"] = False  # Save CI resources
 
 
-class ProductionTestConfig(TestConfig):
+class ProductionConfigData(ConfigData):
     """Configuration for production-like testing"""
     __test__ = False  # Prevent pytest from collecting this class
     
@@ -239,17 +239,17 @@ class ProductionTestConfig(TestConfig):
         # Strict performance thresholds (use defaults)
 
 
-def get_config_for_environment(env: str = None) -> TestConfig:
+def get_config_for_environment(env: str = None) -> ConfigData:
     """Get configuration for specific environment"""
     if env is None:
         env = os.environ.get("TEST_ENV", "development")
     
     if env == "ci":
-        return CITestConfig()
+        return CIConfigData()
     elif env == "production":
-        return ProductionTestConfig()
+        return ProductionConfigData()
     else:
-        return DevelopmentTestConfig()
+        return DevelopmentConfigData()
 
 
 # Export the appropriate configuration
