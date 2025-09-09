@@ -313,6 +313,8 @@ def create_mock_context(context_type: str = "basic", **kwargs) -> MockContext:
         return MockConcurrentContext(**kwargs)
     elif context_type == "performance":
         return MockPerformanceContext(**kwargs)
+    elif context_type == "smoke_test":
+        return MockContext(session_id="smoke_test_session", **kwargs)
     else:
         raise ValueError(f"Unknown context type: {context_type}")
 

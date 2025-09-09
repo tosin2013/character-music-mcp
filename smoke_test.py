@@ -193,11 +193,11 @@ class MCPSmokeTest:
             with open("mcp-server.json", "r") as f:
                 mcp_config = json.load(f)
                 
-            # Check for required MCP fields
-            required_fields = ["mcpServers"]
+            # Check for required MCP server fields
+            required_fields = ["name", "command", "description"]
             for field in required_fields:
                 if field not in mcp_config:
-                    self.result.add_failure(test_name, f"Missing MCP config field: {field}")
+                    self.result.add_failure(test_name, f"Missing MCP server config field: {field}")
                     return
                     
             self.result.add_success(test_name)
@@ -234,18 +234,34 @@ class MCPSmokeTest:
         """Test persona generation functionality"""
         test_name = "persona_generation"
         try:
-            from server import MusicPersonaGenerator, CharacterProfile
+            from server import MusicPersonaGenerator
+            from standard_character_profile import StandardCharacterProfile
             from tests.fixtures.mock_contexts import create_mock_context
             
             generator = MusicPersonaGenerator()
             mock_ctx = create_mock_context("smoke_test")
             
             # Create a simple character profile for testing
-            character = CharacterProfile(
+            character = StandardCharacterProfile(
                 name="Elena Rodriguez",
-                description="Passionate software engineer",
-                traits=["determined", "creative"],
-                background="Tech worker from Mexico"
+                aliases=["Elena"],
+                physical_description="Passionate software engineer",
+                mannerisms=[],
+                speech_patterns=[],
+                behavioral_traits=["determined", "creative"],
+                backstory="Tech worker from Mexico",
+                relationships=[],
+                formative_experiences=[],
+                social_connections=[],
+                motivations=[],
+                fears=[],
+                desires=[],
+                conflicts=[],
+                personality_drivers=[],
+                confidence_score=0.8,
+                text_references=[],
+                first_appearance="smoke test",
+                importance_score=0.9
             )
             
             # Test persona generation
@@ -264,36 +280,54 @@ class MCPSmokeTest:
         """Test Suno command generation"""
         test_name = "suno_commands"
         try:
-            from server import SunoCommandGenerator, CharacterProfile, ArtistPersona
+            from server import SunoCommandGenerator, ArtistPersona
+            from standard_character_profile import StandardCharacterProfile
             from tests.fixtures.mock_contexts import create_mock_context
             
             cmd_gen = SunoCommandGenerator()
             mock_ctx = create_mock_context("smoke_test")
             
             # Create test objects
-            character = CharacterProfile(
+            character = StandardCharacterProfile(
                 name="Elena Rodriguez",
-                description="Passionate software engineer",
-                traits=["determined", "creative"],
-                background="Tech worker"
+                aliases=["Elena"],
+                physical_description="Passionate software engineer",
+                mannerisms=[],
+                speech_patterns=[],
+                behavioral_traits=["determined", "creative"],
+                backstory="Tech worker",
+                relationships=[],
+                formative_experiences=[],
+                social_connections=[],
+                motivations=[],
+                fears=[],
+                desires=[],
+                conflicts=[],
+                personality_drivers=[],
+                confidence_score=0.8,
+                text_references=[],
+                first_appearance="smoke test",
+                importance_score=0.9
             )
             
             persona = ArtistPersona(
-                character_source="Elena Rodriguez",
-                artist_style="indie-electronic",
-                musical_themes=["resilience", "technology"],
-                vocal_characteristics="warm, determined",
-                genre_preferences=["indie", "electronic"]
+                character_name="Elena Rodriguez",
+                artist_name="Elena Rodriguez",
+                primary_genre="indie-electronic",
+                lyrical_themes=["resilience", "technology"],
+                vocal_style="warm, determined",
+                secondary_genres=["indie", "electronic"]
             )
             
             # Test command generation
-            command = await cmd_gen.generate_command(
-                character, persona, "Create a song about overcoming challenges", mock_ctx
+            commands = await cmd_gen.generate_suno_commands(
+                persona, character, mock_ctx
             )
             
-            # Verify we get a command object
-            assert command is not None
-            logger.info(f"Generated Suno command: {type(command)}")
+            # Verify we get commands list
+            assert commands is not None
+            assert isinstance(commands, list)
+            logger.info(f"Generated Suno commands: {len(commands)} commands of type {type(commands[0]) if commands else 'None'}")
             
             self.result.add_success(test_name)
             

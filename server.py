@@ -2906,6 +2906,30 @@ class CharacterAnalyzer:
         await ctx.info(f"Analysis complete: Found {len(characters)} characters with {len(emotional_states)} emotional states")
         return result
 
+    async def analyze_characters(self, text: str, ctx: Context = None) -> Dict[str, Any]:
+        """Analyze characters in text - compatibility method for smoke test"""
+        if ctx is None:
+            # Create a minimal context for compatibility
+            class MinimalContext:
+                async def info(self, msg): pass
+                async def error(self, msg): pass
+            ctx = MinimalContext()
+        
+        # Use the existing analyze_text method
+        result = await self.analyze_text(text, ctx)
+        
+        # Convert to expected format
+        return {
+            'characters': result.characters,
+            'narrative_themes': result.narrative_themes,
+            'emotional_arc': result.emotional_arc,
+            'analysis_metadata': {
+                'text_length': len(text),
+                'character_count': len(result.characters),
+                'confidence': 0.8
+            }
+        }
+
     async def _extract_characters(self, text: str, ctx: Context) -> List[CharacterProfile]:
         """Extract and analyze characters using three-layer methodology"""
         # Find potential character names with improved patterns
@@ -3753,11 +3777,7 @@ class MusicPersonaGenerator:
                 genre_intelligence = get_genre_intelligence()
                 
                 # Use character traits to determine better genre
-                character_traits = []
-                if character_profile.personality:
-                    character_traits.extend(character_profile.personality[:3])
-                if character_profile.motivations:
-                    character_traits.extend(character_profile.motivations[:2])
+                character_traits = traits[:5]  # Use the traits already passed to this method
                 
                 if character_traits:
                     # This would require implementing trait-to-genre mapping in genre intelligence
