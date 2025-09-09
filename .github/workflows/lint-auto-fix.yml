@@ -69,10 +69,23 @@ jobs:
         ruff check . --fix --unsafe-fixes
         ruff format .
         
-        # Check remaining issues
+        # Check remaining issues and save for Aider
         REMAINING_ISSUES=$(ruff check . --output-format=concise 2>&1 | grep -c "^" || echo "0")
         echo "Fixed $((${{ steps.check_issues.outputs.total_issues }} - $REMAINING_ISSUES)) issues automatically"
         echo "remaining_issues=$REMAINING_ISSUES" >> $GITHUB_ENV
+        
+        # Export remaining errors for Aider processing
+        ruff check . --output-format=json > ruff_remaining_errors.json || true
+        ruff check . --output-format=concise > ruff_remaining_errors.txt || true
+        
+        # Extract unique file paths with errors for targeted Aider processing
+        if [ -s ruff_remaining_errors.txt ]; then
+          awk -F: '{print $1}' ruff_remaining_errors.txt | sort -u > files_with_errors.txt
+          echo "Files with remaining errors:"
+          cat files_with_errors.txt
+        else
+          touch files_with_errors.txt
+        fi
     
     - name: Create Pull Request for Auto-fixes
       if: steps.check_issues.outputs.fixable_issues != '0'
@@ -117,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: ruff-auto-fix
-    if: always()
+    if: always() && needs.ruff-auto-fix.result != 'cancelled'
     container:
       image: quay.io/takinosh/aider-lint-fixer:latest
       options: --user root
@@ -182,26 +195,37 @@ jobs:
         # Set up environment
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         
-        # Run aider-lint-fixer with appropriate options
-        if [ "$FORCE_FIX" = "true" ]; then
-          echo "Running in force mode..."
-          aider-lint-fixer \
-            --linters flake8,pylint \
-            --profile strict \
-            --force \
-            --max-errors 50 \
-            --exclude ".venv/*,venv/*,node_modules/*" \
-            --skip-pre-lint-assessment \
-            . 2>&1 | tee aider_output.log
+        # Check if there are files with remaining errors to process
+        if [ -f "files_with_errors.txt" ] && [ -s "files_with_errors.txt" ]; then
+          echo "Processing files with remaining errors from Ruff:"
+          cat files_with_errors.txt
+          
+          # Run aider-lint-fixer on specific files only
+          if [ "$FORCE_FIX" = "true" ]; then
+            echo "Running in force mode on specific files..."
+            aider-lint-fixer \
+              --linters flake8,pylint \
+              --profile strict \
+              --force \
+              --max-errors 50 \
+              --exclude ".venv/*,venv/*,node_modules/*" \
+              --skip-pre-lint-assessment \
+              $(cat files_with_errors.txt | tr '\n' ' ') 2>&1 | tee aider_output.log
+          else
+            echo "Running in normal mode on specific files..."
+            aider-lint-fixer \
+              --linters flake8,pylint \
+              --profile basic \
+              --max-errors 20 \
+              --exclude ".venv/*,venv/*,node_modules/*" \
+              --skip-pre-lint-assessment \
+              $(cat files_with_errors.txt | tr '\n' ' ') 2>&1 | tee aider_output.log
+          fi
         else
-          echo "Running in normal mode..."
-          aider-lint-fixer \
-            --linters flake8,pylint \
-            --profile basic \
-            --max-errors 5 \
-            --exclude ".venv/*,venv/*,node_modules/*" \
-            --skip-pre-lint-assessment \
-            . 2>&1 | tee aider_output.log
+          echo "No files with remaining errors found. Skipping Aider processing."
+          echo "fixed_count=0" >> $GITHUB_OUTPUT
+          echo "failed_count=0" >> $GITHUB_OUTPUT
+          exit 0
         fi
         
         # Extract statistics from output
