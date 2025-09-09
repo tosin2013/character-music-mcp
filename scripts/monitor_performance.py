@@ -8,10 +8,11 @@ alerts for performance issues in the character music generation system.
 
 import asyncio
 import json
-import sys
 import os
+import sys
 import time
 import tracemalloc
+
 try:
     import psutil
     PSUTIL_AVAILABLE = True
@@ -24,37 +25,37 @@ except ImportError:
                 rss = 100 * 1024 * 1024  # 100MB mock
                 vms = 200 * 1024 * 1024  # 200MB mock
             return MockMemInfo()
-        
+
         def cpu_percent(self):
             return 10.0  # Mock 10% CPU usage
-    
+
     class MockPsutil:
         def Process(self, pid=None):
             return MockProcess()
-        
+
         def virtual_memory(self):
             class MockVMem:
                 total = 8 * 1024 * 1024 * 1024  # 8GB mock
                 available = 4 * 1024 * 1024 * 1024  # 4GB mock
                 percent = 50.0
             return MockVMem()
-        
+
         def cpu_percent(self, interval=None):
             return 15.0  # Mock 15% CPU usage
-    
+
     psutil = MockPsutil()
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
-import statistics
 import argparse
+import statistics
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tests.fixtures.test_data import test_data_manager
 from tests.fixtures.mock_contexts import create_mock_context
+from tests.fixtures.test_data import test_data_manager
 
 
 @dataclass
@@ -66,7 +67,7 @@ class PerformanceMetric:
     unit: str
     context: Dict[str, Any]
     threshold: Optional[float] = None
-    
+
     @property
     def is_within_threshold(self) -> bool:
         return self.threshold is None or self.value <= self.threshold
@@ -87,22 +88,22 @@ class PerformanceAlert:
 
 class PerformanceMonitor:
     """Real-time performance monitoring system"""
-    
+
     def __init__(self, config_file: str = "performance_config.json"):
         self.config_file = Path(config_file)
         self.metrics_file = Path("performance_metrics.json")
         self.alerts_file = Path("performance_alerts.json")
-        
+
         # Load configuration
         self.config = self.load_config()
-        
+
         # Performance data storage
         self.metrics: List[PerformanceMetric] = []
         self.alerts: List[PerformanceAlert] = []
-        
+
         # Load existing metrics
         self.load_metrics()
-        
+
         # Performance thresholds (in seconds unless specified)
         self.thresholds = {
             "character_analysis_time": 5.0,
@@ -114,10 +115,10 @@ class PerformanceMonitor:
             "response_time_p95": 8.0,
             "throughput_requests_per_second": 1.0
         }
-        
+
         # Update thresholds from config
         self.thresholds.update(self.config.get("thresholds", {}))
-    
+
     def load_config(self) -> Dict[str, Any]:
         """Load performance monitoring configuration"""
         default_config = {
@@ -142,7 +143,7 @@ class PerformanceMonitor:
                 "file_alerts": True
             }
         }
-        
+
         if self.config_file.exists():
             try:
                 with open(self.config_file, 'r') as f:
@@ -158,20 +159,20 @@ class PerformanceMonitor:
                 return config
             except Exception as e:
                 print(f"⚠️ Failed to load config, using defaults: {e}")
-        
+
         # Save default config
         with open(self.config_file, 'w') as f:
             json.dump(default_config, f, indent=2)
-        
+
         return default_config
-    
+
     def load_metrics(self) -> None:
         """Load existing performance metrics"""
         if self.metrics_file.exists():
             try:
                 with open(self.metrics_file, 'r') as f:
                     data = json.load(f)
-                
+
                 self.metrics = [
                     PerformanceMetric(
                         name=item["name"],
@@ -183,31 +184,31 @@ class PerformanceMonitor:
                     )
                     for item in data
                 ]
-                
+
                 # Clean old metrics
                 self.clean_old_metrics()
-                
+
             except Exception as e:
                 print(f"⚠️ Failed to load metrics: {e}")
-    
+
     def save_metrics(self) -> None:
         """Save performance metrics to file"""
         data = [asdict(metric) for metric in self.metrics]
-        
+
         with open(self.metrics_file, 'w') as f:
             json.dump(data, f, indent=2)
-    
+
     def clean_old_metrics(self) -> None:
         """Remove metrics older than retention period"""
         retention_days = self.config["monitoring"]["retention_days"]
         cutoff_date = datetime.now() - timedelta(days=retention_days)
-        
+
         self.metrics = [
             metric for metric in self.metrics
             if datetime.fromisoformat(metric.timestamp) > cutoff_date
         ]
-    
-    def record_metric(self, name: str, value: float, unit: str = "seconds", 
+
+    def record_metric(self, name: str, value: float, unit: str = "seconds",
                      context: Optional[Dict[str, Any]] = None) -> None:
         """Record a performance metric"""
         metric = PerformanceMetric(
@@ -218,16 +219,16 @@ class PerformanceMonitor:
             context=context or {},
             threshold=self.thresholds.get(name)
         )
-        
+
         self.metrics.append(metric)
-        
+
         # Check for alerts
         self.check_metric_alerts(metric)
-    
+
     def check_metric_alerts(self, metric: PerformanceMetric) -> None:
         """Check for performance alerts"""
         current_time = datetime.now().isoformat()
-        
+
         # Threshold violation
         if metric.threshold and metric.value > metric.threshold:
             severity = "critical" if metric.value > metric.threshold * 1.5 else "warning"
@@ -241,13 +242,13 @@ class PerformanceMonitor:
                 threshold_value=metric.threshold
             )
             self.alerts.append(alert)
-        
+
         # Regression detection
         recent_metrics = self.get_recent_metrics(metric.name, 10)
         if len(recent_metrics) >= 5:
             baseline = statistics.mean([m.value for m in recent_metrics[:-1]])
             regression_threshold = self.config["monitoring"]["regression_threshold"]
-            
+
             if baseline > 0 and (metric.value - baseline) / baseline > regression_threshold:
                 alert = PerformanceAlert(
                     metric_name=metric.name,
@@ -259,7 +260,7 @@ class PerformanceMonitor:
                     baseline_value=baseline
                 )
                 self.alerts.append(alert)
-        
+
         # Spike detection
         spike_threshold = self.config["monitoring"]["spike_threshold"]
         if len(recent_metrics) >= 3:
@@ -275,33 +276,33 @@ class PerformanceMonitor:
                     baseline_value=recent_avg
                 )
                 self.alerts.append(alert)
-    
+
     def get_recent_metrics(self, metric_name: str, count: int) -> List[PerformanceMetric]:
         """Get recent metrics for a specific metric name"""
         matching_metrics = [m for m in self.metrics if m.name == metric_name]
         return sorted(matching_metrics, key=lambda m: m.timestamp)[-count:]
-    
+
     async def measure_character_analysis(self, iterations: int = 5) -> float:
         """Measure character analysis performance"""
         scenario = test_data_manager.get_test_scenario("single_character_simple")
         ctx = create_mock_context("performance", session_id="perf_char_analysis")
-        
+
         times = []
-        
+
         for i in range(iterations):
             tracemalloc.start()
             start_time = time.time()
-            
+
             try:
                 # Simulate character analysis
                 await asyncio.sleep(0.1)  # Mock processing time
-                
+
                 execution_time = time.time() - start_time
                 times.append(execution_time)
-                
+
                 current, peak = tracemalloc.get_traced_memory()
                 memory_mb = peak / 1024 / 1024
-                
+
                 # Record memory usage
                 self.record_metric(
                     "character_analysis_memory",
@@ -309,12 +310,12 @@ class PerformanceMonitor:
                     "MB",
                     {"iteration": i, "scenario": scenario.name}
                 )
-                
+
             except Exception as e:
                 print(f"⚠️ Character analysis measurement failed: {e}")
             finally:
                 tracemalloc.stop()
-        
+
         avg_time = statistics.mean(times) if times else 0.0
         self.record_metric(
             "character_analysis_time",
@@ -322,28 +323,28 @@ class PerformanceMonitor:
             "seconds",
             {"iterations": iterations, "scenario": scenario.name}
         )
-        
+
         return avg_time
-    
+
     async def measure_persona_generation(self, iterations: int = 5) -> float:
         """Measure persona generation performance"""
         ctx = create_mock_context("performance", session_id="perf_persona_gen")
-        
+
         times = []
-        
+
         for i in range(iterations):
             start_time = time.time()
-            
+
             try:
                 # Simulate persona generation
                 await asyncio.sleep(0.05)  # Mock processing time
-                
+
                 execution_time = time.time() - start_time
                 times.append(execution_time)
-                
+
             except Exception as e:
                 print(f"⚠️ Persona generation measurement failed: {e}")
-        
+
         avg_time = statistics.mean(times) if times else 0.0
         self.record_metric(
             "persona_generation_time",
@@ -351,28 +352,28 @@ class PerformanceMonitor:
             "seconds",
             {"iterations": iterations}
         )
-        
+
         return avg_time
-    
+
     async def measure_command_generation(self, iterations: int = 5) -> float:
         """Measure command generation performance"""
         ctx = create_mock_context("performance", session_id="perf_cmd_gen")
-        
+
         times = []
-        
+
         for i in range(iterations):
             start_time = time.time()
-            
+
             try:
                 # Simulate command generation
                 await asyncio.sleep(0.03)  # Mock processing time
-                
+
                 execution_time = time.time() - start_time
                 times.append(execution_time)
-                
+
             except Exception as e:
                 print(f"⚠️ Command generation measurement failed: {e}")
-        
+
         avg_time = statistics.mean(times) if times else 0.0
         self.record_metric(
             "command_generation_time",
@@ -380,30 +381,30 @@ class PerformanceMonitor:
             "seconds",
             {"iterations": iterations}
         )
-        
+
         return avg_time
-    
+
     async def measure_complete_workflow(self, iterations: int = 3) -> float:
         """Measure complete workflow performance"""
         scenario = test_data_manager.get_test_scenario("single_character_simple")
         ctx = create_mock_context("performance", session_id="perf_workflow")
-        
+
         times = []
-        
+
         for i in range(iterations):
             tracemalloc.start()
             start_time = time.time()
-            
+
             try:
                 # Simulate complete workflow
                 await asyncio.sleep(0.2)  # Mock full workflow processing
-                
+
                 execution_time = time.time() - start_time
                 times.append(execution_time)
-                
+
                 current, peak = tracemalloc.get_traced_memory()
                 memory_mb = peak / 1024 / 1024
-                
+
                 # Record memory usage
                 self.record_metric(
                     "workflow_memory_peak",
@@ -411,12 +412,12 @@ class PerformanceMonitor:
                     "MB",
                     {"iteration": i, "scenario": scenario.name}
                 )
-                
+
             except Exception as e:
                 print(f"⚠️ Workflow measurement failed: {e}")
             finally:
                 tracemalloc.stop()
-        
+
         avg_time = statistics.mean(times) if times else 0.0
         self.record_metric(
             "complete_workflow_time",
@@ -424,46 +425,46 @@ class PerformanceMonitor:
             "seconds",
             {"iterations": iterations, "scenario": scenario.name}
         )
-        
+
         return avg_time
-    
+
     def measure_system_resources(self) -> Dict[str, float]:
         """Measure current system resource usage"""
         try:
             # CPU usage
             cpu_percent = psutil.cpu_percent(interval=1)
             self.record_metric("cpu_usage_percent", cpu_percent, "%")
-            
+
             # Memory usage
             memory = psutil.virtual_memory()
             memory_mb = memory.used / 1024 / 1024
             memory_percent = memory.percent
-            
+
             self.record_metric("system_memory_usage_mb", memory_mb, "MB")
             self.record_metric("system_memory_percent", memory_percent, "%")
-            
+
             # Disk usage
             disk = psutil.disk_usage('.')
             disk_percent = (disk.used / disk.total) * 100
             self.record_metric("disk_usage_percent", disk_percent, "%")
-            
+
             return {
                 "cpu_percent": cpu_percent,
                 "memory_mb": memory_mb,
                 "memory_percent": memory_percent,
                 "disk_percent": disk_percent
             }
-            
+
         except Exception as e:
             print(f"⚠️ System resource measurement failed: {e}")
             return {}
-    
+
     async def run_performance_measurements(self) -> Dict[str, float]:
         """Run all performance measurements"""
         print("📊 Running performance measurements...")
-        
+
         results = {}
-        
+
         # Measure individual components
         measurements = [
             ("character_analysis", self.measure_character_analysis, 5),
@@ -471,7 +472,7 @@ class PerformanceMonitor:
             ("command_generation", self.measure_command_generation, 5),
             ("complete_workflow", self.measure_complete_workflow, 3)
         ]
-        
+
         for name, measure_func, iterations in measurements:
             try:
                 result = await measure_func(iterations)
@@ -480,39 +481,39 @@ class PerformanceMonitor:
             except Exception as e:
                 print(f"  ❌ {name} measurement failed: {e}")
                 results[name] = 0.0
-        
+
         # Measure system resources
         system_resources = self.measure_system_resources()
         results.update(system_resources)
-        
+
         return results
-    
+
     def process_alerts(self) -> None:
         """Process and display performance alerts"""
         if not self.alerts:
             return
-        
+
         print(f"\n🚨 Processing {len(self.alerts)} performance alerts...")
-        
+
         for alert in self.alerts:
             severity_icons = {
                 "critical": "🔴",
                 "warning": "🟡",
                 "info": "🔵"
             }
-            
+
             icon = severity_icons.get(alert.severity, "📢")
             print(f"{icon} {alert.severity.upper()}: {alert.message}")
-        
+
         # Save alerts to file
         if self.config["alerting"]["file_alerts"]:
             alerts_data = [asdict(alert) for alert in self.alerts]
             with open(self.alerts_file, 'w') as f:
                 json.dump(alerts_data, f, indent=2)
-        
+
         # Clear processed alerts
         self.alerts.clear()
-    
+
     def generate_performance_report(self) -> Dict[str, Any]:
         """Generate comprehensive performance report"""
         report = {
@@ -522,22 +523,22 @@ class PerformanceMonitor:
             "trends": {},
             "alerts": len(self.alerts)
         }
-        
+
         # Group metrics by name
         metric_groups = {}
         for metric in self.metrics:
             if metric.name not in metric_groups:
                 metric_groups[metric.name] = []
             metric_groups[metric.name].append(metric)
-        
+
         # Calculate statistics for each metric
         for name, metrics in metric_groups.items():
             if not metrics:
                 continue
-            
+
             values = [m.value for m in metrics]
             recent_values = [m.value for m in metrics[-10:]]  # Last 10 measurements
-            
+
             report["metrics"][name] = {
                 "current": metrics[-1].value if metrics else 0,
                 "average": statistics.mean(values),
@@ -550,15 +551,15 @@ class PerformanceMonitor:
                 "threshold": metrics[-1].threshold,
                 "within_threshold": metrics[-1].is_within_threshold if metrics else True
             }
-            
+
             # Calculate trend
             if len(recent_values) >= 5:
                 first_half = recent_values[:len(recent_values)//2]
                 second_half = recent_values[len(recent_values)//2:]
-                
+
                 first_avg = statistics.mean(first_half)
                 second_avg = statistics.mean(second_half)
-                
+
                 if first_avg > 0:
                     trend_percent = ((second_avg - first_avg) / first_avg) * 100
                     if trend_percent > 5:
@@ -569,99 +570,99 @@ class PerformanceMonitor:
                         trend = "stable"
                 else:
                     trend = "stable"
-                
+
                 report["trends"][name] = {
                     "direction": trend,
                     "change_percent": trend_percent if first_avg > 0 else 0
                 }
-        
+
         # Overall summary
         threshold_violations = sum(
             1 for metrics in metric_groups.values()
             for metric in metrics[-1:]  # Only check latest metric
             if metric.threshold and not metric.is_within_threshold
         )
-        
+
         report["summary"] = {
             "total_metrics": len(metric_groups),
             "threshold_violations": threshold_violations,
             "measurement_count": len(self.metrics),
             "monitoring_period_days": self.config["monitoring"]["retention_days"]
         }
-        
+
         return report
-    
+
     def print_performance_summary(self) -> None:
         """Print performance monitoring summary"""
         print("\n" + "=" * 60)
         print("⚡ PERFORMANCE MONITORING SUMMARY")
         print("=" * 60)
-        
+
         if not self.metrics:
             print("No performance metrics available")
             return
-        
+
         # Group metrics by name and get latest values
         metric_groups = {}
         for metric in self.metrics:
             if metric.name not in metric_groups:
                 metric_groups[metric.name] = []
             metric_groups[metric.name].append(metric)
-        
+
         print("📊 Current Performance Metrics:")
         for name, metrics in sorted(metric_groups.items()):
             if not metrics:
                 continue
-            
+
             latest = metrics[-1]
             status = "✅" if latest.is_within_threshold else "❌"
-            
+
             print(f"  {status} {name}: {latest.value:.3f}{latest.unit}")
             if latest.threshold:
                 print(f"    Threshold: {latest.threshold:.3f}{latest.unit}")
-            
+
             # Show trend if enough data
             if len(metrics) >= 5:
                 recent_avg = statistics.mean([m.value for m in metrics[-5:]])
                 older_avg = statistics.mean([m.value for m in metrics[-10:-5]]) if len(metrics) >= 10 else recent_avg
-                
+
                 if older_avg > 0:
                     trend_percent = ((recent_avg - older_avg) / older_avg) * 100
                     trend_icon = "📈" if trend_percent > 5 else "📉" if trend_percent < -5 else "➡️"
                     print(f"    Trend: {trend_icon} {trend_percent:+.1f}%")
-        
+
         # Alert summary
         if self.alerts:
             print(f"\n🚨 Active Alerts: {len(self.alerts)}")
             for alert in self.alerts[-3:]:  # Show last 3 alerts
                 print(f"  • {alert.severity}: {alert.message}")
-        
+
         print("=" * 60)
-    
+
     async def run_monitoring_cycle(self) -> bool:
         """Run complete performance monitoring cycle"""
         print("⚡ Starting performance monitoring cycle...")
-        
+
         # Run measurements
         results = await self.run_performance_measurements()
-        
+
         # Save metrics
         self.save_metrics()
-        
+
         # Process alerts
         self.process_alerts()
-        
+
         # Generate report
         report = self.generate_performance_report()
         report_file = f"performance_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_file, 'w') as f:
             json.dump(report, f, indent=2)
-        
+
         # Print summary
         self.print_performance_summary()
-        
+
         print(f"📄 Performance report saved: {report_file}")
-        
+
         # Return success if no critical alerts
         critical_alerts = [a for a in self.alerts if a.severity == "critical"]
         return len(critical_alerts) == 0
@@ -678,11 +679,11 @@ async def main():
                        help="Monitoring interval in seconds")
     parser.add_argument("--iterations", type=int, default=5,
                        help="Number of iterations for each measurement")
-    
+
     args = parser.parse_args()
-    
+
     monitor = PerformanceMonitor(args.config)
-    
+
     if args.continuous:
         print(f"🔄 Starting continuous performance monitoring (interval: {args.interval}s)")
         try:
@@ -690,7 +691,7 @@ async def main():
                 success = await monitor.run_monitoring_cycle()
                 if not success:
                     print("⚠️ Performance issues detected!")
-                
+
                 print(f"💤 Sleeping for {args.interval} seconds...")
                 await asyncio.sleep(args.interval)
         except KeyboardInterrupt:

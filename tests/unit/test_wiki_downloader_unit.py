@@ -6,27 +6,24 @@ Tests the WikiDownloader class with mocked HTTP responses to ensure
 proper functionality without network dependencies.
 """
 
+import asyncio
+import shutil
+import tempfile
+from datetime import datetime, timedelta
+from pathlib import Path
+from unittest.mock import AsyncMock, patch
+
+import aiohttp
 import pytest
 import pytest_asyncio
-import asyncio
-import tempfile
-import shutil
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from pathlib import Path
-from datetime import datetime, timedelta
-import aiohttp
 
-from wiki_downloader import (
-    WikiDownloader, 
-    DownloadResult, 
-    BatchDownloadResult, 
-    DownloadProgress
-)
 from wiki_cache_manager import WikiCacheManager
+from wiki_downloader import DownloadProgress, WikiDownloader
+
 
 class TestWikiDownloader:
     """Unit tests for WikiDownloader class"""
-    
+
     @pytest_asyncio.fixture
     async def temp_cache_manager(self):
         """Create a temporary cache manager for testing"""
@@ -36,7 +33,7 @@ class TestWikiDownloader:
         yield cache_manager
         # Cleanup
         shutil.rmtree(temp_dir)
-    
+
     @pytest_asyncio.fixture
     async def downloader(self, temp_cache_manager):
         """Create a WikiDownloader instance for testing"""
@@ -46,122 +43,122 @@ class TestWikiDownloader:
             max_retries=2
         )
         yield downloader
-    
+
     def test_url_validation(self, downloader):
         """Test URL validation functionality"""
         # Valid URLs
         assert downloader.validate_url("https://example.com") == True
         assert downloader.validate_url("http://example.com") == True
         assert downloader.validate_url("https://sunoaiwiki.com/resources/genres") == True
-        
+
         # Invalid URLs
         assert downloader.validate_url("") == False
         assert downloader.validate_url("not-a-url") == False
         assert downloader.validate_url("ftp://example.com") == False
         assert downloader.validate_url("javascript:alert('xss')") == False
         assert downloader.validate_url(None) == False
-    
+
     @pytest.mark.asyncio
     async def test_download_page_success(self, downloader, temp_cache_manager):
         """Test successful page download"""
         test_url = "https://example.com/test"
         test_html = "<html><body><h1>Test Page</h1></body></html>"
-        
+
         # Mock the HTTP response
         mock_response = AsyncMock()
         mock_response.status = 200
         mock_response.text = AsyncMock(return_value=test_html)
         mock_response.headers = {'content-type': 'text/html'}
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.return_value.__aenter__.return_value = mock_response
-            
+
             async with downloader:
                 result = await downloader.download_page(test_url)
-            
+
             assert result.success == True
             assert result.url == test_url
             assert result.status_code == 200
             assert result.error_message is None or result.error_message == ""
             assert result.local_path != ""
-            
+
             # Verify file was cached
             cached_path = await temp_cache_manager.get_cached_file_path(test_url)
             assert cached_path is not None
             assert Path(cached_path).exists()
-    
+
     @pytest.mark.asyncio
     async def test_download_page_http_error(self, downloader):
         """Test download with HTTP error response"""
         test_url = "https://example.com/notfound"
-        
+
         # Mock 404 response
         mock_response = AsyncMock()
         mock_response.status = 404
         mock_response.text = AsyncMock(return_value="Not Found")
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.return_value.__aenter__.return_value = mock_response
-            
+
             async with downloader:
                 result = await downloader.download_page(test_url)
-            
+
             assert result.success == False
             assert "404" in result.error_message
-    
+
     @pytest.mark.asyncio
     async def test_download_page_network_error(self, downloader):
         """Test download with network error"""
         test_url = "https://example.com/timeout"
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.side_effect = aiohttp.ClientError("Connection timeout")
-            
+
             async with downloader:
                 result = await downloader.download_page(test_url)
-            
+
             assert result.success == False
             assert result.status_code == 0
             assert "Connection timeout" in result.error_message
-    
+
     @pytest.mark.asyncio
     async def test_download_page_invalid_url(self, downloader):
         """Test download with invalid URL"""
         invalid_url = "not-a-url"
-        
+
         async with downloader:
             result = await downloader.download_page(invalid_url)
-        
+
         assert result.success == False
         assert "Invalid URL" in result.error_message
-    
+
     @pytest.mark.asyncio
     async def test_is_refresh_needed(self, downloader, temp_cache_manager):
         """Test refresh need detection"""
         test_url = "https://example.com/test"
-        
+
         # Non-existent file should need refresh
         needs_refresh = await downloader.is_refresh_needed(test_url, 24)
         assert needs_refresh == True
-        
+
         # Create a fresh file
         test_html = "<html><body>Test</body></html>"
         await temp_cache_manager.save_content(test_url, test_html, "text/html")
-        
+
         # Fresh file should not need refresh
         needs_refresh = await downloader.is_refresh_needed(test_url, 24)
         assert needs_refresh == False
-        
+
         # Old file should need refresh (mock old timestamp)
         cached_path = await temp_cache_manager.get_cached_file_path(test_url)
         if cached_path:
             # Set file modification time to 2 days ago
             old_time = datetime.now() - timedelta(days=2)
             Path(cached_path).touch(times=(old_time.timestamp(), old_time.timestamp()))
-            
+
             needs_refresh = await downloader.is_refresh_needed(test_url, 24)
             assert needs_refresh == True
-    
+
     @pytest.mark.asyncio
     async def test_batch_download_success(self, downloader):
         """Test successful batch download"""
@@ -170,20 +167,20 @@ class TestWikiDownloader:
             "https://example.com/page2",
             "https://example.com/page3"
         ]
-        
+
         # Mock successful responses
         mock_response = AsyncMock()
         mock_response.status = 200
         mock_response.text = AsyncMock(return_value="<html><body>Test</body></html>")
         mock_response.headers = {'content-type': 'text/html'}
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.return_value.__aenter__.return_value = mock_response
-            
+
             progress_updates = []
             def progress_callback(progress: DownloadProgress):
                 progress_updates.append(progress)
-            
+
             async with downloader:
                 result = await downloader.download_all_configured_pages(
                     test_urls,
@@ -191,19 +188,19 @@ class TestWikiDownloader:
                     max_concurrent=2,
                     progress_callback=progress_callback
                 )
-            
+
             assert result.total_urls == 3
             assert result.successful_downloads == 3
             assert result.failed_downloads == 0
             assert result.skipped_downloads == 0
             assert len(result.results) == 3
-            
+
             # Check progress updates
             assert len(progress_updates) > 0
             final_progress = progress_updates[-1]
             assert final_progress.completed == 3
             assert final_progress.successful == 3
-    
+
     @pytest.mark.asyncio
     async def test_batch_download_mixed_results(self, downloader):
         """Test batch download with mixed success/failure results"""
@@ -212,7 +209,7 @@ class TestWikiDownloader:
             "https://example.com/notfound",
             "invalid-url"
         ]
-        
+
         def mock_get_side_effect(url, **kwargs):
             mock_response = AsyncMock()
             if "success" in str(url):
@@ -224,32 +221,32 @@ class TestWikiDownloader:
                 mock_response.text = AsyncMock(return_value="Not Found")
             else:
                 raise aiohttp.ClientError("Invalid URL")
-            
+
             return mock_response
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.return_value.__aenter__.side_effect = mock_get_side_effect
-            
+
             async with downloader:
                 result = await downloader.download_all_configured_pages(test_urls)
-            
+
             assert result.total_urls == 3
             assert result.successful_downloads == 1
             assert result.failed_downloads == 2
             assert result.skipped_downloads == 0
-    
+
     @pytest.mark.asyncio
     async def test_batch_download_empty_list(self, downloader):
         """Test batch download with empty URL list"""
         async with downloader:
             result = await downloader.download_all_configured_pages([])
-        
+
         assert result.total_urls == 0
         assert result.successful_downloads == 0
         assert result.failed_downloads == 0
         assert result.skipped_downloads == 0
         assert len(result.results) == 0
-    
+
     @pytest.mark.asyncio
     async def test_batch_download_with_skips(self, downloader, temp_cache_manager):
         """Test batch download with some files skipped due to cache"""
@@ -257,69 +254,69 @@ class TestWikiDownloader:
             "https://example.com/fresh",
             "https://example.com/cached"
         ]
-        
+
         # Pre-cache one file
         await temp_cache_manager.save_content(
-            test_urls[1], 
-            "<html>Cached content</html>", 
+            test_urls[1],
+            "<html>Cached content</html>",
             "text/html"
         )
-        
+
         # Mock response for fresh file
         mock_response = AsyncMock()
         mock_response.status = 200
         mock_response.text = AsyncMock(return_value="<html>Fresh content</html>")
         mock_response.headers = {'content-type': 'text/html'}
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.return_value.__aenter__.return_value = mock_response
-            
+
             async with downloader:
                 result = await downloader.download_all_configured_pages(
                     test_urls,
                     max_age_hours=24  # Fresh cache should be skipped
                 )
-            
+
             assert result.total_urls == 2
             assert result.successful_downloads == 1  # Only fresh file downloaded
             assert result.failed_downloads == 0
             assert result.skipped_downloads == 1  # Cached file skipped
-    
+
     @pytest.mark.asyncio
     async def test_get_cached_file_path(self, downloader, temp_cache_manager):
         """Test getting cached file path"""
         test_url = "https://example.com/test"
-        
+
         # No cached file initially
         cached_path = await downloader.get_cached_file_path(test_url)
         assert cached_path is None
-        
+
         # Cache a file
         await temp_cache_manager.save_content(test_url, "<html>Test</html>", "text/html")
-        
+
         # Should now return cached path
         cached_path = await downloader.get_cached_file_path(test_url)
         assert cached_path is not None
         assert Path(cached_path).exists()
-    
+
     @pytest.mark.asyncio
     async def test_context_manager(self, temp_cache_manager):
         """Test WikiDownloader as context manager"""
         downloader = WikiDownloader(cache_manager=temp_cache_manager)
-        
+
         # Test async context manager
         async with downloader:
             assert downloader.session is not None
             assert not downloader.session.closed
-        
+
         # Session should be closed after context
         assert downloader.session.closed
-    
+
     @pytest.mark.asyncio
     async def test_retry_mechanism(self, downloader):
         """Test retry mechanism for failed downloads"""
         test_url = "https://example.com/retry-test"
-        
+
         # Mock to fail first two attempts, succeed on third
         call_count = 0
         def mock_get_side_effect(*args, **kwargs):
@@ -327,56 +324,56 @@ class TestWikiDownloader:
             call_count += 1
             if call_count < 3:
                 raise aiohttp.ClientError("Temporary failure")
-            
+
             mock_response = AsyncMock()
             mock_response.status = 200
             mock_response.text = AsyncMock(return_value="<html>Success after retry</html>")
             mock_response.headers = {'content-type': 'text/html'}
             return mock_response
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.return_value.__aenter__.side_effect = mock_get_side_effect
-            
+
             async with downloader:
                 result = await downloader.download_page(test_url)
-            
+
             assert result.success == True
             assert call_count == 3  # Should have retried twice
-    
+
     @pytest.mark.asyncio
     async def test_concurrent_download_limit(self, downloader):
         """Test concurrent download limiting"""
         test_urls = [f"https://example.com/page{i}" for i in range(10)]
-        
+
         # Track concurrent requests
         active_requests = 0
         max_concurrent = 0
-        
+
         async def mock_get_with_tracking(*args, **kwargs):
             nonlocal active_requests, max_concurrent
             active_requests += 1
             max_concurrent = max(max_concurrent, active_requests)
-            
+
             # Simulate some processing time
             await asyncio.sleep(0.1)
-            
+
             mock_response = AsyncMock()
             mock_response.status = 200
             mock_response.text = AsyncMock(return_value="<html>Test</html>")
             mock_response.headers = {'content-type': 'text/html'}
-            
+
             active_requests -= 1
             return mock_response
-        
+
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.return_value.__aenter__.side_effect = mock_get_with_tracking
-            
+
             async with downloader:
                 result = await downloader.download_all_configured_pages(
                     test_urls,
                     max_concurrent=3
                 )
-            
+
             assert result.successful_downloads == 10
             assert max_concurrent <= 3  # Should not exceed concurrent limit
 
@@ -387,22 +384,22 @@ if __name__ == "__main__":
         try:
             cache_manager = WikiCacheManager(temp_dir)
             await cache_manager.initialize()
-            
+
             downloader = WikiDownloader(cache_manager=cache_manager)
-            
+
             # Test URL validation
             assert downloader.validate_url("https://example.com") == True
             assert downloader.validate_url("invalid") == False
             print("✓ URL validation tests passed")
-            
+
             # Test refresh need detection
             needs_refresh = await downloader.is_refresh_needed("https://example.com", 24)
             assert needs_refresh == True
             print("✓ Refresh detection tests passed")
-            
+
             print("Basic WikiDownloader unit tests passed!")
-            
+
         finally:
             shutil.rmtree(temp_dir)
-    
+
     asyncio.run(run_basic_tests())

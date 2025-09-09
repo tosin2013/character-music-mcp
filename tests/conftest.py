@@ -13,12 +13,12 @@ except ImportError:
     PYTEST_AVAILABLE = False
 
 import asyncio
-import sys
 import os
-from typing import Dict, List, Any, Optional
+import sys
 
 # Add the project root to Python path
 from pathlib import Path
+
 project_root = Path(__file__).parent.parent
 project_root_str = str(project_root.resolve())
 
@@ -37,7 +37,6 @@ if os.environ.get('CI'):
 
 from tests.fixtures.mock_contexts import MockContext, create_mock_context
 from tests.fixtures.test_data import TestDataManager, test_data_manager
-
 
 if PYTEST_AVAILABLE:
     @pytest.fixture

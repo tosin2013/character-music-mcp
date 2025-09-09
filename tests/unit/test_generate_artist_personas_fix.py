@@ -1,4 +1,5 @@
 import pytest
+
 #!/usr/bin/env python3
 """
 Test script to verify the generate_artist_personas tool format fix
@@ -27,7 +28,7 @@ from tests.fixtures.mock_contexts import MockContext
 async def test_standard_character_profile_format():
     """Test that the tool accepts StandardCharacterProfile format correctly"""
     print("Testing StandardCharacterProfile format acceptance...")
-    
+
     # Create a test character using StandardCharacterProfile
     test_character = StandardCharacterProfile(
         name="Test Character",
@@ -50,42 +51,42 @@ async def test_standard_character_profile_format():
         first_appearance="Chapter 1",
         importance_score=0.9
     )
-    
+
     # Create test input in the expected format
     test_input = {
         "characters": [test_character.to_dict()],
         "narrative_themes": ["self-discovery", "artistic growth"],
         "emotional_arc": ["uncertainty", "exploration", "acceptance"]
     }
-    
+
     # Convert to JSON string as expected by the tool
     characters_json = json.dumps(test_input)
-    
+
     # Create mock context
     ctx = MockContext()
-    
+
     try:
         # Call the generate_artist_personas tool
         result = await generate_artist_personas(characters_json, ctx)
-        
+
         # Parse the result
         result_data = json.loads(result)
-        
+
         # Check for errors
         if "error" in result_data:
             print(f"❌ Error in persona generation: {result_data['error']}")
             return False
-        
+
         # Verify the result structure
         if "artist_personas" not in result_data:
             print("❌ Missing 'artist_personas' in result")
             return False
-        
+
         personas = result_data["artist_personas"]
         if not personas:
             print("❌ No personas generated")
             return False
-        
+
         # Verify persona structure
         persona = personas[0]
         required_fields = [
@@ -94,20 +95,20 @@ async def test_standard_character_profile_format():
             "emotional_palette", "artistic_influences", "collaboration_style",
             "character_mapping_confidence", "genre_justification", "persona_description"
         ]
-        
+
         for field in required_fields:
             if field not in persona:
                 print(f"❌ Missing required field '{field}' in persona")
                 return False
-        
+
         print("✅ StandardCharacterProfile format accepted successfully")
         print(f"✅ Generated persona for: {persona['character_name']}")
         print(f"✅ Artist name: {persona['artist_name']}")
         print(f"✅ Primary genre: {persona['primary_genre']}")
         print(f"✅ Confidence: {persona['character_mapping_confidence']}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Exception during persona generation: {str(e)}")
         return False
@@ -117,9 +118,9 @@ async def test_standard_character_profile_format():
 async def test_input_validation():
     """Test input validation with various character profile formats"""
     print("\nTesting input validation with various formats...")
-    
+
     ctx = MockContext()
-    
+
     # Test 1: Invalid JSON
     try:
         result = await generate_artist_personas("invalid json", ctx)
@@ -131,7 +132,7 @@ async def test_input_validation():
     except Exception as e:
         print(f"❌ Unexpected exception with invalid JSON: {e}")
         return False
-    
+
     # Test 2: Missing 'characters' field
     try:
         test_input = {"invalid": "format"}
@@ -144,7 +145,7 @@ async def test_input_validation():
     except Exception as e:
         print(f"❌ Unexpected exception with missing 'characters': {e}")
         return False
-    
+
     # Test 3: Empty characters array
     try:
         test_input = {"characters": []}
@@ -157,14 +158,14 @@ async def test_input_validation():
     except Exception as e:
         print(f"❌ Unexpected exception with empty characters: {e}")
         return False
-    
+
     # Test 4: Character with missing name
     try:
         test_character = {"backstory": "A character without a name"}
         test_input = {"characters": [test_character]}
         result = await generate_artist_personas(json.dumps(test_input), ctx)
         result_data = json.loads(result)
-        
+
         # Should still work but with default name
         if "error" in result_data:
             print("✅ Correctly handled character with missing name")
@@ -179,7 +180,7 @@ async def test_input_validation():
     except Exception as e:
         print(f"❌ Unexpected exception with missing name: {e}")
         return False
-    
+
     # Test 5: Character with minimal valid data
     try:
         test_character = {
@@ -189,21 +190,21 @@ async def test_input_validation():
         test_input = {"characters": [test_character]}
         result = await generate_artist_personas(json.dumps(test_input), ctx)
         result_data = json.loads(result)
-        
+
         if "error" in result_data:
             print(f"❌ Failed with minimal valid character: {result_data['error']}")
             return False
-        
+
         personas = result_data.get("artist_personas", [])
         if not personas:
             print("❌ No personas generated for minimal character")
             return False
-        
+
         print("✅ Correctly handled character with minimal data")
     except Exception as e:
         print(f"❌ Unexpected exception with minimal character: {e}")
         return False
-    
+
     return True
 
 
@@ -211,9 +212,9 @@ async def test_input_validation():
 async def test_legacy_format_compatibility():
     """Test compatibility with legacy character profile formats"""
     print("\nTesting legacy format compatibility...")
-    
+
     ctx = MockContext()
-    
+
     # Test with old format that might have caused 'skin' parameter errors
     legacy_character = {
         "name": "Legacy Character",
@@ -224,32 +225,32 @@ async def test_legacy_format_compatibility():
         "fears": ["failure"],
         "unknown_field": "This should be ignored"
     }
-    
+
     test_input = {"characters": [legacy_character]}
-    
+
     try:
         result = await generate_artist_personas(json.dumps(test_input), ctx)
         result_data = json.loads(result)
-        
+
         if "error" in result_data:
             print(f"❌ Failed with legacy format: {result_data['error']}")
             return False
-        
+
         personas = result_data.get("artist_personas", [])
         if not personas:
             print("❌ No personas generated for legacy character")
             return False
-        
+
         persona = personas[0]
         if persona["character_name"] != "Legacy Character":
             print(f"❌ Wrong character name: {persona['character_name']}")
             return False
-        
+
         print("✅ Successfully handled legacy format with unknown fields")
         print(f"✅ Generated persona: {persona['artist_name']}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Exception with legacy format: {str(e)}")
         return False
@@ -258,16 +259,16 @@ async def test_legacy_format_compatibility():
 async def main():
     """Run all tests"""
     print("🧪 Testing generate_artist_personas tool format fixes\n")
-    
+
     tests = [
         test_standard_character_profile_format,
         test_input_validation,
         test_legacy_format_compatibility
     ]
-    
+
     passed = 0
     total = len(tests)
-    
+
     for test in tests:
         try:
             if await test():
@@ -276,9 +277,9 @@ async def main():
                 print("❌ Test failed")
         except Exception as e:
             print(f"❌ Test failed with exception: {e}")
-    
+
     print(f"\n📊 Test Results: {passed}/{total} tests passed")
-    
+
     if passed == total:
         print("🎉 All tests passed! The generate_artist_personas tool format fix is working correctly.")
         return True

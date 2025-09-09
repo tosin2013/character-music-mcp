@@ -16,14 +16,12 @@ The middleware provides:
 All services are designed to be called from within MCP tools without conflicts.
 """
 
-import json
 import logging
-from typing import Dict, List, Optional, Any
-from dataclasses import asdict
+from typing import Any, Dict, List
 
-from standard_character_profile import StandardCharacterProfile
 from enhanced_character_analyzer import EnhancedCharacterAnalyzer
-from server import MusicPersonaGenerator, ArtistPersona
+from server import ArtistPersona, MusicPersonaGenerator
+from standard_character_profile import StandardCharacterProfile
 
 logger = logging.getLogger(__name__)
 
@@ -32,13 +30,13 @@ class MCPMiddleware:
     Middleware layer for MCP tools to access underlying functionality
     without direct tool-to-tool calls that cause FunctionTool errors
     """
-    
+
     def __init__(self):
         """Initialize middleware with fresh instances of all services"""
         self.character_analyzer = EnhancedCharacterAnalyzer()
         self.persona_generator = MusicPersonaGenerator()
         self.logger = logging.getLogger(__name__)
-    
+
     async def analyze_characters(self, text: str, ctx=None) -> Dict[str, Any]:
         """
         Analyze text for characters using the enhanced character analyzer
@@ -53,10 +51,10 @@ class MCPMiddleware:
         try:
             if ctx:
                 await ctx.info("Middleware: Starting character analysis...")
-            
+
             # Use the character analyzer directly
             result = await self.character_analyzer.analyze_text(text, ctx)
-            
+
             # Convert character dictionaries to StandardCharacterProfile objects
             characters = []
             for char_data in result.get('characters', []):
@@ -67,7 +65,7 @@ class MCPMiddleware:
                     if ctx:
                         await ctx.error(f"Failed to create character profile: {str(e)}")
                     continue
-            
+
             # Return structured result
             return {
                 'characters': characters,
@@ -75,12 +73,12 @@ class MCPMiddleware:
                 'emotional_arc': result.get('emotional_arc', []),
                 'analysis_metadata': result.get('analysis_metadata', {})
             }
-            
+
         except Exception as e:
             if ctx:
                 await ctx.error(f"Character analysis failed: {str(e)}")
             raise
-    
+
     async def generate_persona(self, character: StandardCharacterProfile, ctx=None) -> ArtistPersona:
         """
         Generate artist persona for a character
@@ -95,21 +93,21 @@ class MCPMiddleware:
         try:
             if ctx:
                 await ctx.info(f"Middleware: Generating persona for {character.name}...")
-            
+
             # Use the persona generator directly
             persona = await self.persona_generator.generate_artist_persona(character, ctx)
-            
+
             return persona
-            
+
         except Exception as e:
             if ctx:
                 await ctx.error(f"Persona generation failed: {str(e)}")
             raise
-    
+
     def process_track_content(
-        self, 
-        track_concept: Dict[str, Any], 
-        character: StandardCharacterProfile, 
+        self,
+        track_concept: Dict[str, Any],
+        character: StandardCharacterProfile,
         persona: ArtistPersona,
         ctx=None
     ) -> Dict[str, Any]:
@@ -145,20 +143,20 @@ class MCPMiddleware:
                     "character_authenticity": 0.85  # High authenticity for story-based content
                 }
             }
-            
+
             return track_data
-            
+
         except Exception as e:
             if ctx:
                 logger.error(f"Track content processing failed: {str(e)}")
             raise
-    
+
     def _generate_story_lyrics(self, track_concept: Dict[str, Any], character: StandardCharacterProfile) -> str:
         """Generate lyrics based on story concept and character"""
         story_excerpt = track_concept.get('story_excerpt', f"Story of {character.name}")
         character_state = track_concept.get('character_state', 'emotional journey')
         story_context = track_concept.get('story_context', 'narrative moment')
-        
+
         # Create structured lyrics
         lyrics = f"""[Verse 1]
 {story_excerpt[:100]}...
@@ -184,20 +182,20 @@ Story reaches its point
 [Outro]
 {character_state[:50]}...
 The narrative continues..."""
-        
+
         return lyrics
-    
+
     def _generate_suno_command(
-        self, 
-        track_concept: Dict[str, Any], 
-        character: StandardCharacterProfile, 
+        self,
+        track_concept: Dict[str, Any],
+        character: StandardCharacterProfile,
         persona: ArtistPersona
     ) -> str:
         """Generate Suno AI command for the track"""
-        
+
         emotional_tone = track_concept.get('emotional_tone', 'contemplative')
         narrative_function = track_concept.get('narrative_function', 'story development')
-        
+
         # Adjust style based on narrative position
         if "introduction" in narrative_function.lower():
             style_modifier = "introductory, establishing"
@@ -207,7 +205,7 @@ The narrative continues..."""
             style_modifier = "reflective, concluding"
         else:
             style_modifier = "developing, progressive"
-        
+
         command = f"""[{persona.primary_genre}] [{emotional_tone}] [{style_modifier}]
 
 {track_concept.get('title', 'Untitled Track')} - {narrative_function}
@@ -216,9 +214,9 @@ Musical interpretation of {character.name}'s journey at this story moment.
 {persona.vocal_style} conveying {emotional_tone} emotions.
 
 {self._generate_story_lyrics(track_concept, character)}"""
-        
+
         return command
-    
+
     def extract_story_beats(self, narrative_text: str, character: StandardCharacterProfile, ctx=None) -> List[Dict]:
         """
         Extract story beats from narrative text
@@ -235,21 +233,21 @@ Musical interpretation of {character.name}'s journey at this story moment.
             # Divide text into sections for analysis
             text_length = len(narrative_text)
             section_size = max(text_length // 8, 100)  # At least 100 chars per section
-            
+
             story_beats = []
-            
+
             for i in range(8):
                 start = i * section_size
                 end = start + section_size if i < 7 else text_length
-                
+
                 if start >= text_length:
                     break
-                    
+
                 section = narrative_text[start:end]
-                
+
                 # Find character mentions in this section
                 char_mentions = section.lower().count(character.name.lower())
-                
+
                 if char_mentions > 0 or len(story_beats) == 0:  # Always include first section
                     # Extract key events and emotions
                     beat = {
@@ -262,19 +260,19 @@ Musical interpretation of {character.name}'s journey at this story moment.
                         "conflicts": self._extract_section_conflicts(section)
                     }
                     story_beats.append(beat)
-            
+
             return story_beats
-            
+
         except Exception as e:
             if ctx:
                 logger.error(f"Story beat extraction failed: {str(e)}")
             return []
-    
+
     def _extract_events(self, text: str, character_name: str) -> List[str]:
         """Extract key events from text section"""
         event_indicators = ['happened', 'occurred', 'discovered', 'realized', 'found', 'met', 'left', 'arrived', 'decided', 'fought']
         events = []
-        
+
         sentences = text.split('.')
         for sentence in sentences:
             if character_name.lower() in sentence.lower():
@@ -282,9 +280,9 @@ Musical interpretation of {character.name}'s journey at this story moment.
                     if indicator in sentence.lower():
                         events.append(sentence.strip())
                         break
-        
+
         return events[:3]  # Top 3 events
-    
+
     def _analyze_section_emotion(self, text: str) -> str:
         """Analyze dominant emotion in text section"""
         emotions = {
@@ -295,23 +293,23 @@ Musical interpretation of {character.name}'s journey at this story moment.
             'fearful': ['afraid', 'fear', 'scared', 'terrified', 'anxious'],
             'triumphant': ['victory', 'success', 'achieve', 'win', 'overcome']
         }
-        
+
         text_lower = text.lower()
         emotion_scores = {}
-        
+
         for emotion, keywords in emotions.items():
             score = sum(text_lower.count(keyword) for keyword in keywords)
             if score > 0:
                 emotion_scores[emotion] = score
-        
+
         if emotion_scores:
             return max(emotion_scores, key=emotion_scores.get)
         return 'contemplative'
-    
+
     def _extract_section_relationships(self, text: str, character_name: str) -> List[str]:
         """Extract relationship dynamics in section"""
         relationships = []
-        
+
         # Find other character names near our character
         sentences = text.split('.')
         for sentence in sentences:
@@ -321,23 +319,23 @@ Musical interpretation of {character.name}'s journey at this story moment.
                 for word in words:
                     if word != character_name and len(word) > 2 and word[0].isupper():
                         relationships.append(f"Interaction with {word}")
-        
+
         return list(set(relationships))[:2]
-    
+
     def _extract_section_conflicts(self, text: str) -> List[str]:
         """Extract conflicts and challenges in section"""
         conflict_words = ['but', 'however', 'although', 'despite', 'against', 'struggle', 'challenge', 'difficult']
         conflicts = []
-        
+
         sentences = text.split('.')
         for sentence in sentences:
             for word in conflict_words:
                 if word in sentence.lower():
                     conflicts.append(sentence.strip())
                     break
-        
+
         return conflicts[:2]
-    
+
     def generate_story_based_tracks(
         self,
         story_beats: List[Dict],
@@ -347,17 +345,17 @@ Musical interpretation of {character.name}'s journey at this story moment.
         ctx=None
     ) -> List[Dict]:
         """Generate track concepts based on story progression"""
-        
+
         track_concepts = []
-        
+
         # Distribute tracks across story beats
         beats_per_track = max(1, len(story_beats) // track_count)
-        
+
         for i in range(track_count):
             # Select story beat(s) for this track
             beat_index = min(i * beats_per_track, len(story_beats) - 1)
             beat = story_beats[beat_index] if story_beats else {}
-            
+
             # Determine narrative function based on track position
             if i == 0:
                 narrative_function = "Introduction - Setting the scene"
@@ -367,7 +365,7 @@ Musical interpretation of {character.name}'s journey at this story moment.
                 narrative_function = "Climax - Peak dramatic moment"
             else:
                 narrative_function = f"Development - Story progression {i+1}"
-            
+
             # Create track concept
             track_concept = {
                 'title': f"{character.name}'s Journey - Part {i+1}",
@@ -383,11 +381,11 @@ Musical interpretation of {character.name}'s journey at this story moment.
                 ],
                 'musical_evolution': f"Track {i+1} builds on previous emotional development"
             }
-            
+
             track_concepts.append(track_concept)
-        
+
         return track_concepts
-    
+
     def get_wiki_attribution(self) -> str:
         """Get wiki attribution context (simplified for now)"""
         return "Using fallback data - no wiki sources available"

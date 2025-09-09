@@ -1,15 +1,12 @@
 """CLI entry point for the Dagger Test Repair Agent"""
 
 import asyncio
-import sys
-from typing import Optional
 
 import click
 import dagger
 
 from .config import get_config
-from .logging_config import configure_logging, get_logger
-from .main import DaggerTestRepairAgent
+from .logging_config import configure_logging
 
 
 @click.group()
@@ -33,7 +30,7 @@ def health(ctx: click.Context) -> None:
             agent = client.dagger_test_repair_agent()
             result = await agent.health_check()
             click.echo(result)
-    
+
     asyncio.run(_health_check())
 
 
@@ -50,7 +47,7 @@ def test(ctx: click.Context, source: str, python_version: str, test_command: str
             source_dir = client.host().directory(source)
             result = await agent.run_tests(source_dir, python_version, test_command)
             click.echo(result)
-    
+
     asyncio.run(_run_tests())
 
 
@@ -66,7 +63,7 @@ def quality(ctx: click.Context, source: str, python_version: str) -> None:
             source_dir = client.host().directory(source)
             result = await agent.run_quality_checks(source_dir, python_version)
             click.echo(result)
-    
+
     asyncio.run(_run_quality())
 
 
@@ -83,7 +80,7 @@ def validate(ctx: click.Context, source: str, python_version: str, test_type: st
             source_dir = client.host().directory(source)
             result = await agent.validate_fix(source_dir, python_version, test_type)
             click.echo(result)
-    
+
     asyncio.run(_validate_fix())
 
 
@@ -95,20 +92,20 @@ def process_failure(ctx: click.Context, workflow_run_id: str, repository: str) -
     """Process a GitHub workflow failure"""
     # This command requires GitHub auth, so validate with that requirement
     config = get_config(require_github_auth=True)
-    
+
     async def _process_failure():
         async with await dagger.connect() as client:
             agent = client.dagger_test_repair_agent()
-            
+
             # Convert secrets to Dagger secrets
             github_token = client.set_secret("github_token", config.github_token or "")
             deepseek_key = client.set_secret("deepseek_api_key", config.deepseek_api_key or "")
-            
+
             result = await agent.process_workflow_failure(
                 github_token, deepseek_key, workflow_run_id, repository
             )
             click.echo(result)
-    
+
     asyncio.run(_process_failure())
 
 
@@ -118,13 +115,13 @@ def process_failure(ctx: click.Context, workflow_run_id: str, repository: str) -
 def create_environments(ctx: click.Context, python_versions: str) -> None:
     """Create test environments for multiple Python versions"""
     versions = [v.strip() for v in python_versions.split(",")]
-    
+
     async def _create_environments():
         async with await dagger.connect() as client:
             agent = client.dagger_test_repair_agent()
             containers = await agent.create_test_environment(versions)
             click.echo(f"Created {len(containers)} test environments for Python versions: {', '.join(versions)}")
-    
+
     asyncio.run(_create_environments())
 
 

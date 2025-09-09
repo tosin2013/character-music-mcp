@@ -5,28 +5,24 @@ categorizes different failure types, and extracts error messages for analysis.
 """
 
 import re
-import json
-import logging
-from typing import Dict, List, Optional, Tuple, Any
-from datetime import datetime, UTC
+from typing import Any
+
 import structlog
 
-from .models import (
-    Failure, FailureCategory, create_failure
-)
+from .models import Failure, FailureCategory, create_failure
 
 logger = structlog.get_logger(__name__)
 
 
 class FailureDetector:
     """Detects and categorizes test failures from GitHub workflow logs"""
-    
+
     def __init__(self):
         """Initialize the failure detector with pattern matchers"""
         self.failure_patterns = self._initialize_failure_patterns()
         self.job_type_patterns = self._initialize_job_type_patterns()
-        
-    def _initialize_failure_patterns(self) -> Dict[FailureCategory, List[str]]:
+
+    def _initialize_failure_patterns(self) -> dict[FailureCategory, list[str]]:
         """Initialize regex patterns for different failure types"""
         return {
             FailureCategory.SYNTAX_ERROR: [
@@ -164,8 +160,8 @@ class FailureDetector:
                 r"Response time.*exceeded"
             ]
         }
-    
-    def _initialize_job_type_patterns(self) -> Dict[str, FailureCategory]:
+
+    def _initialize_job_type_patterns(self) -> dict[str, FailureCategory]:
         """Initialize patterns to map job names to failure categories"""
         # Order matters - more specific patterns should come first
         return {
@@ -190,15 +186,15 @@ class FailureDetector:
             r".*coverage.*": FailureCategory.COVERAGE_FAILURE,
             r".*test.*": FailureCategory.UNIT_TEST,  # Default test jobs to unit tests (must be last)
         }
-    
+
     async def detect_failures(
         self,
         workflow_run_id: str,
-        jobs_data: Dict[str, Any],
+        jobs_data: dict[str, Any],
         repository: str,
         branch: str,
         commit_sha: str
-    ) -> List[Failure]:
+    ) -> list[Failure]:
         """
         Detect failures from GitHub workflow jobs data
         
@@ -217,44 +213,44 @@ class FailureDetector:
             workflow_run_id=workflow_run_id,
             repository=repository
         )
-        
+
         failures = []
-        
+
         jobs = jobs_data.get("jobs", [])
         if jobs is None:
             jobs = []
-        
+
         for job in jobs:
             if job.get("conclusion") == "failure":
                 job_failures = await self._analyze_job_failure(
                     job, workflow_run_id, repository, branch, commit_sha
                 )
                 failures.extend(job_failures)
-        
+
         logger.info(
             "Failure detection completed",
             workflow_run_id=workflow_run_id,
             total_failures=len(failures)
         )
-        
+
         return failures
-    
+
     async def _analyze_job_failure(
         self,
-        job: Dict[str, Any],
+        job: dict[str, Any],
         workflow_run_id: str,
         repository: str,
         branch: str,
         commit_sha: str
-    ) -> List[Failure]:
+    ) -> list[Failure]:
         """Analyze a single failed job to extract failures"""
         job_name = job.get("name", "unknown")
         job_id = job.get("id")
-        
+
         logger.info("Analyzing failed job", job_name=job_name, job_id=job_id)
-        
+
         failures = []
-        
+
         # Analyze each failed step
         for step in job.get("steps", []):
             if step.get("conclusion") == "failure":
@@ -262,7 +258,7 @@ class FailureDetector:
                     step, job, workflow_run_id, repository, branch, commit_sha
                 )
                 failures.extend(step_failures)
-        
+
         # If no step-level failures found but job failed, create a job-level failure
         if not failures:
             job_failure = await self._create_job_level_failure(
@@ -270,33 +266,33 @@ class FailureDetector:
             )
             if job_failure:
                 failures.append(job_failure)
-        
+
         return failures
-    
+
     async def _analyze_step_failure(
         self,
-        step: Dict[str, Any],
-        job: Dict[str, Any],
+        step: dict[str, Any],
+        job: dict[str, Any],
         workflow_run_id: str,
         repository: str,
         branch: str,
         commit_sha: str
-    ) -> List[Failure]:
+    ) -> list[Failure]:
         """Analyze a single failed step"""
         step_name = step.get("name", "unknown")
         job_name = job.get("name", "unknown")
-        
+
         # For now, we'll create a placeholder failure since we don't have logs
         # In a real implementation, this would fetch and parse the actual logs
         logs = f"Step '{step_name}' in job '{job_name}' failed"
         error_message = f"Step failure in {step_name}"
-        
+
         # Categorize based on job and step names
         category = self._categorize_failure_by_name(job_name, step_name)
-        
+
         # Extract Python version if available
         python_version = self._extract_python_version(job_name)
-        
+
         failure = create_failure(
             workflow_run_id=workflow_run_id,
             job_name=job_name,
@@ -309,30 +305,30 @@ class FailureDetector:
             category=category,
             python_version=python_version
         )
-        
+
         return [failure]
-    
+
     async def _create_job_level_failure(
         self,
-        job: Dict[str, Any],
+        job: dict[str, Any],
         workflow_run_id: str,
         repository: str,
         branch: str,
         commit_sha: str
-    ) -> Optional[Failure]:
+    ) -> Failure | None:
         """Create a job-level failure when no step-level failures are found"""
         job_name = job.get("name", "unknown")
-        
+
         # Skip if job didn't actually fail
         if job.get("conclusion") != "failure":
             return None
-        
+
         logs = f"Job '{job_name}' failed without specific step failures"
         error_message = f"Job failure: {job_name}"
-        
+
         category = self._categorize_failure_by_name(job_name, "")
         python_version = self._extract_python_version(job_name)
-        
+
         return create_failure(
             workflow_run_id=workflow_run_id,
             job_name=job_name,
@@ -345,19 +341,19 @@ class FailureDetector:
             category=category,
             python_version=python_version
         )
-    
+
     def _categorize_failure_by_name(self, job_name: str, step_name: str) -> FailureCategory:
         """Categorize failure based on job and step names"""
         full_name = f"{job_name} {step_name}".lower()
-        
+
         # Check job type patterns
         for pattern, category in self.job_type_patterns.items():
             if re.search(pattern, full_name, re.IGNORECASE):
                 return category
-        
+
         return FailureCategory.UNKNOWN
-    
-    def _extract_python_version(self, job_name: str) -> Optional[str]:
+
+    def _extract_python_version(self, job_name: str) -> str | None:
         """Extract Python version from job name"""
         # Look for patterns like "python-3.10", "py310", "3.11", etc.
         patterns = [
@@ -365,7 +361,7 @@ class FailureDetector:
             r"py(\d)(\d+)",
             r"(\d+\.\d+)",
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, job_name.lower())
             if match:
@@ -374,9 +370,9 @@ class FailureDetector:
                 elif len(match.groups()) == 2:
                     # Handle py310 format
                     return f"{match.group(1)}.{match.group(2)}"
-        
+
         return None
-    
+
     async def categorize_failure(self, failure: Failure) -> FailureCategory:
         """
         Categorize a failure based on its logs and error message
@@ -390,7 +386,7 @@ class FailureDetector:
         logs = failure.logs.lower()
         error_message = failure.error_message.lower()
         combined_text = f"{logs} {error_message}"
-        
+
         # Check each category's patterns
         for category, patterns in self.failure_patterns.items():
             for pattern in patterns:
@@ -402,22 +398,22 @@ class FailureDetector:
                         matched_pattern=pattern
                     )
                     return category
-        
+
         # If no pattern matches, try to infer from job/step names
         name_category = self._categorize_failure_by_name(failure.job_name, failure.step_name)
         if name_category != FailureCategory.UNKNOWN:
             return name_category
-        
+
         logger.warning(
             "Could not categorize failure",
             failure_id=failure.id,
             job_name=failure.job_name,
             step_name=failure.step_name
         )
-        
+
         return FailureCategory.UNKNOWN
-    
-    async def extract_logs(self, job_data: Dict[str, Any]) -> str:
+
+    async def extract_logs(self, job_data: dict[str, Any]) -> str:
         """
         Extract logs from job data (placeholder implementation)
         
@@ -432,7 +428,7 @@ class FailureDetector:
         job_name = job_data.get("name", "unknown")
         job_id = job_data.get("id", "unknown")
         conclusion = job_data.get("conclusion", "unknown")
-        
+
         # Placeholder log extraction
         logs = f"""
 Job: {job_name}
@@ -443,18 +439,18 @@ Completed: {job_data.get('completed_at', 'unknown')}
 
 Steps:
 """
-        
+
         for step in job_data.get("steps", []):
             step_name = step.get("name", "unknown")
             step_conclusion = step.get("conclusion", "unknown")
             logs += f"  - {step_name}: {step_conclusion}\n"
-            
+
             if step_conclusion == "failure":
                 logs += f"    Error: Step '{step_name}' failed\n"
-        
+
         return logs
-    
-    def extract_error_details(self, logs: str) -> Tuple[Optional[str], Optional[int]]:
+
+    def extract_error_details(self, logs: str) -> tuple[str | None, int | None]:
         """
         Extract file path and line number from error logs
         
@@ -472,13 +468,13 @@ Steps:
             r'in ([^\s]+\.py) line (\d+)',
             r'([^\s]+\.py) at line (\d+)',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 file_path = match.group(1)
                 line_number = int(match.group(2))
-                
+
                 # Clean up file path (remove leading ./ or absolute paths)
                 if file_path.startswith('./'):
                     file_path = file_path[2:]
@@ -494,11 +490,11 @@ Steps:
                             if part.endswith('.py') or part in ['tests', 'src']:
                                 file_path = '/'.join(parts[i:])
                                 break
-                
+
                 return file_path, line_number
-        
+
         return None, None
-    
+
     def extract_specific_error_message(self, logs: str, category: FailureCategory) -> str:
         """
         Extract specific error message based on failure category
@@ -524,7 +520,7 @@ Steps:
             return self._extract_type_error(logs)
         else:
             return self._extract_generic_error(logs)
-    
+
     def _extract_syntax_error(self, logs: str) -> str:
         """Extract syntax error details"""
         patterns = [
@@ -532,14 +528,14 @@ Steps:
             r'IndentationError: (.+)',
             r'TabError: (.+)',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 return match.group(1).strip()
-        
+
         return "Syntax error detected"
-    
+
     def _extract_import_error(self, logs: str) -> str:
         """Extract import error details"""
         patterns = [
@@ -547,14 +543,14 @@ Steps:
             r'ModuleNotFoundError: (.+)',
             r'No module named [\'"]([^\'"]+)[\'"]',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 return match.group(1).strip()
-        
+
         return "Import error detected"
-    
+
     def _extract_assertion_error(self, logs: str) -> str:
         """Extract assertion error details"""
         patterns = [
@@ -562,14 +558,14 @@ Steps:
             r'assert (.+)',
             r'Expected (.+) but got (.+)',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 return match.group(0).strip()
-        
+
         return "Assertion error detected"
-    
+
     def _extract_coverage_error(self, logs: str) -> str:
         """Extract coverage error details"""
         patterns = [
@@ -577,14 +573,14 @@ Steps:
             r'Required test coverage of (\d+)% not reached.*Total coverage: (\d+\.\d+)%',
             r'Coverage check failed.*(\d+\.\d+)%',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 return match.group(0).strip()
-        
+
         return "Coverage threshold not met"
-    
+
     def _extract_linting_error(self, logs: str) -> str:
         """Extract linting error details"""
         patterns = [
@@ -592,14 +588,14 @@ Steps:
             r'ruff.*: (.+)',
             r'(\w+:\d+:\d+: [A-Z]\d{3} .+)',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 return match.group(1).strip()
-        
+
         return "Linting error detected"
-    
+
     def _extract_type_error(self, logs: str) -> str:
         """Extract type checking error details"""
         patterns = [
@@ -607,14 +603,14 @@ Steps:
             r'mypy.*: (.+)',
             r'(Incompatible types .+)',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 return match.group(1).strip()
-        
+
         return "Type checking error detected"
-    
+
     def _extract_generic_error(self, logs: str) -> str:
         """Extract generic error message"""
         # Look for common error patterns
@@ -624,17 +620,17 @@ Steps:
             r'Failed: (.+)',
             r'(\w+Error: .+)',
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, logs)
             if match:
                 return match.group(1).strip()
-        
+
         # If no specific pattern found, return first line that looks like an error
         lines = logs.split('\n')
         for line in lines:
             line = line.strip()
             if any(keyword in line.lower() for keyword in ['error', 'failed', 'exception']):
                 return line
-        
+
         return "Unknown error detected"

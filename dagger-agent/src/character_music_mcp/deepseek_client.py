@@ -7,14 +7,14 @@ to analyze test failures and generate fixes using AI-powered analysis.
 import asyncio
 import json
 import time
-from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
-from datetime import datetime, UTC
-import structlog
+from typing import Any
+
 import httpx
+import structlog
 from httpx import AsyncClient, Response
 
-from .models import FailureCategory, Failure, CodeContext
+from .models import CodeContext, Failure
 
 logger = structlog.get_logger(__name__)
 
@@ -41,36 +41,36 @@ class DeepSeekResponse:
     model: str
     finish_reason: str
     response_time: float
-    raw_response: Dict[str, Any]
+    raw_response: dict[str, Any]
 
 
 class DeepSeekRateLimiter:
     """Rate limiter for DeepSeek API calls"""
-    
+
     def __init__(self, requests_per_minute: int, tokens_per_minute: int):
         self.requests_per_minute = requests_per_minute
         self.tokens_per_minute = tokens_per_minute
-        self.request_times: List[float] = []
-        self.token_usage: List[Tuple[float, int]] = []  # (timestamp, tokens)
+        self.request_times: list[float] = []
+        self.token_usage: list[tuple[float, int]] = []  # (timestamp, tokens)
         self._lock = asyncio.Lock()
-    
+
     async def wait_if_needed(self, estimated_tokens: int = 1000) -> None:
         """Wait if rate limits would be exceeded"""
         async with self._lock:
             now = time.time()
-            
+
             # Clean old entries (older than 1 minute)
             cutoff = now - 60
             self.request_times = [t for t in self.request_times if t > cutoff]
             self.token_usage = [(t, tokens) for t, tokens in self.token_usage if t > cutoff]
-            
+
             # Check request rate limit
             if len(self.request_times) >= self.requests_per_minute:
                 wait_time = 60 - (now - self.request_times[0])
                 if wait_time > 0:
                     logger.info("Rate limit reached, waiting", wait_time=wait_time)
                     await asyncio.sleep(wait_time)
-            
+
             # Check token rate limit
             current_tokens = sum(tokens for _, tokens in self.token_usage)
             if current_tokens + estimated_tokens > self.tokens_per_minute:
@@ -84,10 +84,10 @@ class DeepSeekRateLimiter:
                             logger.info("Token rate limit reached, waiting", wait_time=wait_time)
                             await asyncio.sleep(wait_time)
                         break
-            
+
             # Record this request
             self.request_times.append(now)
-    
+
     def record_usage(self, tokens_used: int) -> None:
         """Record token usage for rate limiting"""
         self.token_usage.append((time.time(), tokens_used))
@@ -110,7 +110,7 @@ class DeepSeekAuthenticationError(DeepSeekAPIError):
 
 class DeepSeekClient:
     """Client for interacting with DeepSeek API"""
-    
+
     def __init__(self, config: DeepSeekConfig):
         """Initialize the DeepSeek client"""
         self.config = config
@@ -118,8 +118,8 @@ class DeepSeekClient:
             config.rate_limit_requests_per_minute,
             config.rate_limit_tokens_per_minute
         )
-        self._client: Optional[AsyncClient] = None
-    
+        self._client: AsyncClient | None = None
+
     async def __aenter__(self):
         """Async context manager entry"""
         self._client = AsyncClient(
@@ -130,16 +130,16 @@ class DeepSeekClient:
             }
         )
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit"""
         if self._client:
             await self._client.aclose()
-    
+
     async def analyze_failure(
         self,
         failure: Failure,
-        code_context: Optional[CodeContext] = None
+        code_context: CodeContext | None = None
     ) -> DeepSeekResponse:
         """
         Analyze a test failure using DeepSeek API
@@ -152,21 +152,21 @@ class DeepSeekClient:
             DeepSeek API response with analysis
         """
         prompt = self._generate_analysis_prompt(failure, code_context)
-        
+
         logger.info(
             "Analyzing failure with DeepSeek",
             failure_id=failure.id,
             category=failure.category.value if hasattr(failure.category, 'value') else failure.category,
             prompt_length=len(prompt)
         )
-        
+
         return await self._make_api_call(prompt, "analyze_failure")
-    
+
     async def generate_fix(
         self,
         failure: Failure,
         analysis: str,
-        code_context: Optional[CodeContext] = None
+        code_context: CodeContext | None = None
     ) -> DeepSeekResponse:
         """
         Generate a fix for a failure using DeepSeek API
@@ -180,16 +180,16 @@ class DeepSeekClient:
             DeepSeek API response with fix suggestion
         """
         prompt = self._generate_fix_prompt(failure, analysis, code_context)
-        
+
         logger.info(
             "Generating fix with DeepSeek",
             failure_id=failure.id,
             category=failure.category.value if hasattr(failure.category, 'value') else failure.category,
             prompt_length=len(prompt)
         )
-        
+
         return await self._make_api_call(prompt, "generate_fix")
-    
+
     async def validate_code(self, code: str, language: str = "python") -> DeepSeekResponse:
         """
         Validate code syntax and quality using DeepSeek API
@@ -202,20 +202,20 @@ class DeepSeekClient:
             DeepSeek API response with validation results
         """
         prompt = self._generate_validation_prompt(code, language)
-        
+
         logger.info(
             "Validating code with DeepSeek",
             language=language,
             code_length=len(code)
         )
-        
+
         return await self._make_api_call(prompt, "validate_code")
-    
+
     async def _make_api_call(
         self,
         prompt: str,
         operation: str,
-        max_retries: Optional[int] = None
+        max_retries: int | None = None
     ) -> DeepSeekResponse:
         """
         Make an API call to DeepSeek with retry logic
@@ -230,15 +230,15 @@ class DeepSeekClient:
         """
         if not self._client:
             raise DeepSeekAPIError("Client not initialized. Use async context manager.")
-        
+
         max_retries = max_retries or self.config.max_retries
         estimated_tokens = len(prompt.split()) * 2  # Rough estimate
-        
+
         for attempt in range(max_retries + 1):
             try:
                 # Wait for rate limiting
                 await self.rate_limiter.wait_if_needed(estimated_tokens)
-                
+
                 # Prepare request
                 payload = {
                     "model": self.config.model,
@@ -256,17 +256,17 @@ class DeepSeekClient:
                     "temperature": self.config.temperature,
                     "stream": False
                 }
-                
+
                 start_time = time.time()
-                
+
                 # Make the API call
                 response = await self._client.post(
                     f"{self.config.base_url}/chat/completions",
                     json=payload
                 )
-                
+
                 response_time = time.time() - start_time
-                
+
                 # Handle response
                 if response.status_code == 200:
                     return self._parse_response(response, response_time, operation)
@@ -300,7 +300,7 @@ class DeepSeekClient:
                         continue
                     else:
                         raise DeepSeekAPIError(error_msg)
-                        
+
             except httpx.TimeoutException:
                 logger.warning(
                     "API call timeout",
@@ -314,7 +314,7 @@ class DeepSeekClient:
                     continue
                 else:
                     raise DeepSeekAPIError(f"API call timed out after {max_retries} retries")
-            
+
             except Exception as e:
                 logger.error(
                     "Unexpected error in API call",
@@ -328,27 +328,27 @@ class DeepSeekClient:
                     continue
                 else:
                     raise DeepSeekAPIError(f"Unexpected error: {str(e)}")
-        
+
         raise DeepSeekAPIError(f"Failed to complete API call after {max_retries} retries")
-    
+
     def _parse_response(self, response: Response, response_time: float, operation: str) -> DeepSeekResponse:
         """Parse DeepSeek API response"""
         try:
             data = response.json()
-            
+
             if "choices" not in data or not data["choices"]:
                 raise DeepSeekAPIError("Invalid response format: no choices")
-            
+
             choice = data["choices"][0]
             content = choice.get("message", {}).get("content", "")
             finish_reason = choice.get("finish_reason", "unknown")
-            
+
             usage = data.get("usage", {})
             tokens_used = usage.get("total_tokens", 0)
-            
+
             # Record token usage for rate limiting
             self.rate_limiter.record_usage(tokens_used)
-            
+
             logger.info(
                 "API call successful",
                 operation=operation,
@@ -356,7 +356,7 @@ class DeepSeekClient:
                 response_time=response_time,
                 finish_reason=finish_reason
             )
-            
+
             return DeepSeekResponse(
                 content=content,
                 tokens_used=tokens_used,
@@ -365,16 +365,16 @@ class DeepSeekClient:
                 response_time=response_time,
                 raw_response=data
             )
-            
+
         except json.JSONDecodeError as e:
             raise DeepSeekAPIError(f"Failed to parse JSON response: {str(e)}")
         except KeyError as e:
             raise DeepSeekAPIError(f"Missing key in response: {str(e)}")
-    
+
     def _generate_analysis_prompt(
         self,
         failure: Failure,
-        code_context: Optional[CodeContext] = None
+        code_context: CodeContext | None = None
     ) -> str:
         """Generate prompt for failure analysis"""
         prompt = f"""
@@ -402,7 +402,7 @@ Analyze the following test failure and provide a detailed analysis:
 {failure.logs}
 ```
 """
-        
+
         if code_context:
             prompt += f"""
 ## Code Context
@@ -413,12 +413,12 @@ Analyze the following test failure and provide a detailed analysis:
 {code_context.content}
 ```
 """
-            
+
             if code_context.surrounding_files:
                 prompt += "\n## Related Files\n"
                 for file_path, content in code_context.surrounding_files.items():
                     prompt += f"\n**{file_path}**:\n```python\n{content[:1000]}...\n```\n"
-        
+
         prompt += """
 ## Analysis Required
 Please provide:
@@ -432,14 +432,14 @@ Please provide:
 
 Please be specific and actionable in your analysis. Focus on Python best practices and testing standards.
 """
-        
+
         return prompt
-    
+
     def _generate_fix_prompt(
         self,
         failure: Failure,
         analysis: str,
-        code_context: Optional[CodeContext] = None
+        code_context: CodeContext | None = None
     ) -> str:
         """Generate prompt for fix generation"""
         prompt = f"""
@@ -457,7 +457,7 @@ Generate a fix for the following test failure based on the analysis provided:
 
 ## Current Code
 """
-        
+
         if code_context:
             prompt += f"""
 **File**: {code_context.file_path}
@@ -467,12 +467,12 @@ Generate a fix for the following test failure based on the analysis provided:
 {code_context.content}
 ```
 """
-            
+
             if code_context.surrounding_files:
                 prompt += "\n## Related Files\n"
                 for file_path, content in code_context.surrounding_files.items():
                     prompt += f"\n**{file_path}**:\n```python\n{content[:500]}...\n```\n"
-        
+
         prompt += """
 ## Fix Requirements
 Please provide a complete fix that includes:
@@ -519,9 +519,9 @@ Please structure your response as JSON:
 
 Focus on minimal, safe changes that directly address the root cause.
 """
-        
+
         return prompt
-    
+
     def _generate_validation_prompt(self, code: str, language: str) -> str:
         """Generate prompt for code validation"""
         return f"""
@@ -558,7 +558,7 @@ Provide a JSON response with:
 }}
 ```
 """
-    
+
     def sanitize_code_for_api(self, code: str) -> str:
         """
         Sanitize code before sending to API to remove sensitive information
@@ -570,7 +570,7 @@ Provide a JSON response with:
             Sanitized code
         """
         import re
-        
+
         # Patterns for sensitive information
         sensitive_patterns = [
             (r'api_key\s*=\s*["\'][^"\']+["\']', 'api_key = "***REDACTED***"'),
@@ -582,13 +582,13 @@ Provide a JSON response with:
             (r'["\'][0-9a-fA-F]{32,}["\']', '"***HEX_REDACTED***"'),  # Hex strings (likely keys)
             (r'https?://[^/]+:[^@]+@', 'https://***REDACTED***@'),  # URLs with credentials
         ]
-        
+
         sanitized = code
         for pattern, replacement in sensitive_patterns:
             sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
-        
+
         return sanitized
-    
+
     def estimate_tokens(self, text: str) -> int:
         """
         Estimate token count for text (rough approximation)

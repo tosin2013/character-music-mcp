@@ -3,12 +3,12 @@ Comprehensive tests for enhanced_cache_manager
 Auto-generated test file to improve coverage
 """
 
+import os
+import sys
+from unittest.mock import AsyncMock, Mock
+
 import pytest
 import pytest_asyncio
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-import sys
-import os
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -21,7 +21,7 @@ except ImportError as e:
 
 class TestEnhancedCacheManager:
     """Test class for enhanced_cache_manager module"""
-    
+
     @pytest_asyncio.fixture
     def mock_dependencies(self):
         """Mock common dependencies"""
@@ -30,28 +30,28 @@ class TestEnhancedCacheManager:
             'config': {'test': True},
             'session': AsyncMock()
         }
-    
+
     def test_module_imports(self):
         """Test that module imports correctly"""
         # This test ensures the module can be imported
         assert True
-    
+
     @pytest.mark.asyncio
     async def test_async_functionality(self, mock_dependencies):
         """Test async functionality if present"""
         # Add async tests here
         assert True
-    
+
     def test_error_handling(self, mock_dependencies):
         """Test error handling scenarios"""
         # Add error handling tests here
         assert True
-    
+
     def test_edge_cases(self, mock_dependencies):
         """Test edge cases and boundary conditions"""
         # Add edge case tests here
         assert True
-    
+
     @pytest.mark.parametrize("input_data,expected", [
         ("test_input", "expected_output"),
         # Add more test cases
@@ -64,13 +64,13 @@ class TestEnhancedCacheManager:
 
 class TestEnhancedCacheManagerIntegration:
     """Integration tests for enhanced_cache_manager"""
-    
+
     @pytest.mark.integration
     def test_integration_scenario(self):
         """Test integration scenarios"""
         # Add integration tests here
         assert True
-    
+
     @pytest.mark.slow
     def test_performance_scenario(self):
         """Test performance scenarios"""

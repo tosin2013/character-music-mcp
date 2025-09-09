@@ -7,23 +7,21 @@ reports for continuous monitoring of code quality and performance.
 """
 
 import json
-import sys
-import os
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
 from jinja2 import Template
-import glob
 
 
 class QualityDashboardGenerator:
     """Generates quality dashboard from CI artifacts"""
-    
+
     def __init__(self, artifacts_dir: str = "."):
         self.artifacts_dir = Path(artifacts_dir)
         self.dashboard_dir = Path("dashboard")
         self.dashboard_dir.mkdir(exist_ok=True)
-        
+
         # Dashboard template
         self.html_template = """
 <!DOCTYPE html>
@@ -246,7 +244,7 @@ class QualityDashboardGenerator:
 </body>
 </html>
         """
-    
+
     def collect_test_results(self) -> Dict[str, Any]:
         """Collect test results from artifacts"""
         test_data = {
@@ -254,15 +252,15 @@ class QualityDashboardGenerator:
             "total_tests": 0,
             "test_suites": []
         }
-        
+
         # Look for test result files
         test_files = list(self.artifacts_dir.glob("**/test_report_*.json"))
-        
+
         for test_file in test_files:
             try:
                 with open(test_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                
+
                 if "suite_results" in data:
                     for suite in data["suite_results"]:
                         test_data["test_suites"].append({
@@ -273,27 +271,27 @@ class QualityDashboardGenerator:
                             "success_rate": suite.get("success_rate", 0.0),
                             "execution_time": suite["total_time"]
                         })
-                
+
                 test_data["overall_success_rate"] = data.get("overall_success_rate", 0.0)
                 test_data["total_tests"] = data.get("total_tests", 0)
-                
+
             except Exception as e:
                 print(f"⚠️ Failed to load test results from {test_file}: {e}")
-        
+
         return test_data
-    
+
     def collect_benchmark_results(self) -> List[Dict[str, Any]]:
         """Collect benchmark results from artifacts"""
         benchmarks = []
-        
+
         # Look for benchmark result files
         benchmark_files = list(self.artifacts_dir.glob("**/benchmark_results.json"))
-        
+
         for benchmark_file in benchmark_files:
             try:
                 with open(benchmark_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                
+
                 if "results" in data:
                     for result in data["results"]:
                         benchmarks.append({
@@ -303,24 +301,24 @@ class QualityDashboardGenerator:
                             "success_rate": result["success_rate"],
                             "threshold_met": result["threshold_met"]
                         })
-                
+
             except Exception as e:
                 print(f"⚠️ Failed to load benchmark results from {benchmark_file}: {e}")
-        
+
         return benchmarks
-    
+
     def collect_validation_results(self) -> List[Dict[str, Any]]:
         """Collect documentation validation results"""
         validations = []
-        
+
         # Look for validation report files
         validation_files = list(self.artifacts_dir.glob("**/validation_report*.json"))
-        
+
         for validation_file in validation_files:
             try:
                 with open(validation_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                
+
                 # Extract validation results
                 if "documentation_validation" in data:
                     validations.append({
@@ -329,7 +327,7 @@ class QualityDashboardGenerator:
                         "score": data["documentation_validation"].get("score", 0.0),
                         "details": data["documentation_validation"].get("summary", "")
                     })
-                
+
                 if "template_validation" in data:
                     validations.append({
                         "type": "templates",
@@ -337,7 +335,7 @@ class QualityDashboardGenerator:
                         "score": data["template_validation"].get("score", 0.0),
                         "details": data["template_validation"].get("summary", "")
                     })
-                
+
                 if "example_validation" in data:
                     validations.append({
                         "type": "examples",
@@ -345,26 +343,26 @@ class QualityDashboardGenerator:
                         "score": data["example_validation"].get("score", 0.0),
                         "details": data["example_validation"].get("summary", "")
                     })
-                
+
             except Exception as e:
                 print(f"⚠️ Failed to load validation results from {validation_file}: {e}")
-        
+
         return validations
-    
+
     def collect_security_results(self) -> List[Dict[str, Any]]:
         """Collect security scan results"""
         security_results = []
-        
+
         # Look for security report files
         security_files = list(self.artifacts_dir.glob("**/*security*.json")) + \
                          list(self.artifacts_dir.glob("**/safety_report.json")) + \
                          list(self.artifacts_dir.glob("**/bandit_report.json"))
-        
+
         for security_file in security_files:
             try:
                 with open(security_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                
+
                 if "safety" in security_file.name.lower():
                     # Safety report format
                     issues = len(data.get("vulnerabilities", []))
@@ -375,13 +373,13 @@ class QualityDashboardGenerator:
                             max_severity = "high"
                         elif "medium" in severities:
                             max_severity = "medium"
-                    
+
                     security_results.append({
                         "tool": "safety",
                         "issues": issues,
                         "max_severity": max_severity
                     })
-                
+
                 elif "bandit" in security_file.name.lower():
                     # Bandit report format
                     issues = len(data.get("results", []))
@@ -392,62 +390,62 @@ class QualityDashboardGenerator:
                             max_severity = "high"
                         elif "MEDIUM" in severities:
                             max_severity = "medium"
-                    
+
                     security_results.append({
                         "tool": "bandit",
                         "issues": issues,
                         "max_severity": max_severity.lower()
                     })
-                
+
             except Exception as e:
                 print(f"⚠️ Failed to load security results from {security_file}: {e}")
-        
+
         return security_results
-    
+
     def calculate_coverage_percentage(self) -> float:
         """Calculate code coverage percentage from artifacts"""
         coverage_files = list(self.artifacts_dir.glob("**/coverage.xml"))
-        
+
         for coverage_file in coverage_files:
             try:
                 # Simple XML parsing for coverage percentage
                 with open(coverage_file, 'r', encoding='utf-8') as f:
                     content = f.read()
-                
+
                 # Look for line-rate attribute in coverage tag
                 import re
                 match = re.search(r'line-rate="([0-9.]+)"', content)
                 if match:
                     return float(match.group(1)) * 100
-                
+
             except Exception as e:
                 print(f"⚠️ Failed to parse coverage from {coverage_file}: {e}")
-        
+
         return 75.0  # Default fallback
-    
+
     def generate_dashboard(self) -> None:
         """Generate complete quality dashboard"""
         print("📊 Generating quality dashboard...")
-        
+
         # Collect all data
         test_data = self.collect_test_results()
         benchmarks = self.collect_benchmark_results()
         validations = self.collect_validation_results()
         security_results = self.collect_security_results()
         coverage_percentage = self.calculate_coverage_percentage()
-        
+
         # Calculate performance score
         performance_score = 0.0
         if benchmarks:
             passed_benchmarks = len([b for b in benchmarks if b["threshold_met"]])
             performance_score = passed_benchmarks / len(benchmarks)
-        
+
         # Calculate documentation score
         documentation_score = 0.0
         if validations:
             passed_validations = len([v for v in validations if v["passed"]])
             documentation_score = passed_validations / len(validations)
-        
+
         # Prepare template data
         template_data = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
@@ -461,18 +459,18 @@ class QualityDashboardGenerator:
             "validation_results": validations,
             "security_results": security_results
         }
-        
+
         # Generate HTML
         template = Template(self.html_template)
         html_content = template.render(**template_data)
-        
+
         # Save dashboard
         dashboard_file = self.dashboard_dir / "index.html"
         with open(dashboard_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        
+
         print(f"✅ Quality dashboard generated: {dashboard_file}")
-        
+
         # Generate summary JSON for API access
         summary_data = {
             "timestamp": template_data["timestamp"],
@@ -490,32 +488,32 @@ class QualityDashboardGenerator:
                 "security_scans": len(template_data["security_results"])
             }
         }
-        
+
         summary_file = self.dashboard_dir / "summary.json"
         with open(summary_file, 'w', encoding='utf-8') as f:
             json.dump(summary_data, f, indent=2)
-        
+
         print(f"📄 Dashboard summary saved: {summary_file}")
 
 
 def main():
     """Main dashboard generation"""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Generate quality dashboard")
     parser.add_argument("--artifacts-dir", "-a", default=".",
                        help="Directory containing CI artifacts")
     parser.add_argument("--output-dir", "-o", default="dashboard",
                        help="Output directory for dashboard")
-    
+
     args = parser.parse_args()
-    
+
     generator = QualityDashboardGenerator(args.artifacts_dir)
     generator.dashboard_dir = Path(args.output_dir)
     generator.dashboard_dir.mkdir(exist_ok=True)
-    
+
     generator.generate_dashboard()
-    
+
     print("🎉 Quality dashboard generation complete!")
 
 

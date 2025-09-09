@@ -6,10 +6,9 @@ Provides consistent mock context objects for testing MCP server functionality
 without requiring actual MCP server initialization.
 """
 
-import asyncio
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -22,7 +21,7 @@ class MockMessage:
 
 class MockContext:
     """Mock MCP context for testing"""
-    
+
     def __init__(self, session_id: str = "test_session"):
         self.session_id = session_id
         self.messages: List[MockMessage] = []
@@ -30,16 +29,16 @@ class MockContext:
         self.warnings: List[MockMessage] = []
         self.info_messages: List[MockMessage] = []
         self.debug_messages: List[MockMessage] = []
-        
+
         # Mock request/response tracking
         self.request_count = 0
         self.response_times: List[float] = []
         self.last_request_time: Optional[datetime] = None
-        
+
         # Mock resource tracking
         self.memory_usage: List[int] = []
         self.processing_times: List[float] = []
-        
+
         # Mock user preferences
         self.user_preferences = {
             "output_format": "detailed",
@@ -47,39 +46,39 @@ class MockContext:
             "max_characters": 5,
             "preferred_genres": ["indie", "alternative"]
         }
-    
+
     async def info(self, message: str) -> None:
         """Mock info logging"""
         mock_msg = MockMessage("INFO", message)
         self.messages.append(mock_msg)
         self.info_messages.append(mock_msg)
-    
+
     async def error(self, message: str) -> None:
         """Mock error logging"""
         mock_msg = MockMessage("ERROR", message)
         self.messages.append(mock_msg)
         self.errors.append(mock_msg)
-    
+
     async def warning(self, message: str) -> None:
         """Mock warning logging"""
         mock_msg = MockMessage("WARNING", message)
         self.messages.append(mock_msg)
         self.warnings.append(mock_msg)
-    
+
     async def debug(self, message: str) -> None:
         """Mock debug logging"""
         mock_msg = MockMessage("DEBUG", message)
         self.messages.append(mock_msg)
         self.debug_messages.append(mock_msg)
-    
+
     def get_messages_by_level(self, level: str) -> List[MockMessage]:
         """Get messages filtered by level"""
         return [msg for msg in self.messages if msg.level == level]
-    
+
     def get_all_messages(self) -> List[str]:
         """Get all messages as strings"""
         return [f"{msg.level}: {msg.message}" for msg in self.messages]
-    
+
     def clear_messages(self) -> None:
         """Clear all logged messages"""
         self.messages.clear()
@@ -87,21 +86,21 @@ class MockContext:
         self.warnings.clear()
         self.info_messages.clear()
         self.debug_messages.clear()
-    
+
     def simulate_request_start(self) -> None:
         """Simulate start of request processing"""
         self.request_count += 1
         self.last_request_time = datetime.now()
-    
+
     def simulate_request_end(self, processing_time: float = 0.5) -> None:
         """Simulate end of request processing"""
         self.response_times.append(processing_time)
         self.processing_times.append(processing_time)
-    
+
     def simulate_memory_usage(self, memory_mb: int) -> None:
         """Simulate memory usage tracking"""
         self.memory_usage.append(memory_mb)
-    
+
     def get_performance_stats(self) -> Dict[str, Any]:
         """Get performance statistics"""
         return {
@@ -114,19 +113,19 @@ class MockContext:
             "error_count": len(self.errors),
             "warning_count": len(self.warnings)
         }
-    
+
     def has_errors(self) -> bool:
         """Check if any errors were logged"""
         return len(self.errors) > 0
-    
+
     def has_warnings(self) -> bool:
         """Check if any warnings were logged"""
         return len(self.warnings) > 0
-    
+
     def get_last_error(self) -> Optional[str]:
         """Get the last error message"""
         return self.errors[-1].message if self.errors else None
-    
+
     def get_last_info(self) -> Optional[str]:
         """Get the last info message"""
         return self.info_messages[-1].message if self.info_messages else None
@@ -134,19 +133,19 @@ class MockContext:
 
 class MockBatchContext(MockContext):
     """Mock context for batch processing tests"""
-    
+
     def __init__(self, batch_size: int = 10, session_id: str = "batch_test_session"):
         super().__init__(session_id)
         self.batch_size = batch_size
         self.batch_results: List[Dict[str, Any]] = []
         self.current_batch = 0
         self.items_processed = 0
-    
+
     async def start_batch(self, batch_id: int) -> None:
         """Start processing a new batch"""
         self.current_batch = batch_id
         await self.info(f"Starting batch {batch_id}")
-    
+
     async def process_batch_item(self, item_id: str, result: Dict[str, Any]) -> None:
         """Process an item in the current batch"""
         self.items_processed += 1
@@ -157,7 +156,7 @@ class MockBatchContext(MockContext):
             "timestamp": datetime.now()
         })
         await self.debug(f"Processed item {item_id} in batch {self.current_batch}")
-    
+
     async def end_batch(self) -> Dict[str, Any]:
         """End current batch and return summary"""
         batch_items = [r for r in self.batch_results if r["batch_id"] == self.current_batch]
@@ -169,7 +168,7 @@ class MockBatchContext(MockContext):
         }
         await self.info(f"Completed batch {self.current_batch}: {summary}")
         return summary
-    
+
     def get_batch_results(self, batch_id: Optional[int] = None) -> List[Dict[str, Any]]:
         """Get results for specific batch or all batches"""
         if batch_id is not None:
@@ -179,39 +178,39 @@ class MockBatchContext(MockContext):
 
 class MockConcurrentContext(MockContext):
     """Mock context for concurrent processing tests"""
-    
+
     def __init__(self, max_concurrent: int = 5, session_id: str = "concurrent_test_session"):
         super().__init__(session_id)
         self.max_concurrent = max_concurrent
         self.active_requests: Dict[str, datetime] = {}
         self.completed_requests: Dict[str, Dict[str, Any]] = {}
         self.concurrent_peak = 0
-    
+
     async def start_concurrent_request(self, request_id: str) -> bool:
         """Start a concurrent request if under limit"""
         if len(self.active_requests) >= self.max_concurrent:
             await self.warning(f"Concurrent limit reached, queuing request {request_id}")
             return False
-        
+
         self.active_requests[request_id] = datetime.now()
         self.concurrent_peak = max(self.concurrent_peak, len(self.active_requests))
         await self.debug(f"Started concurrent request {request_id}")
         return True
-    
+
     async def complete_concurrent_request(self, request_id: str, result: Dict[str, Any]) -> None:
         """Complete a concurrent request"""
         if request_id in self.active_requests:
             start_time = self.active_requests.pop(request_id)
             duration = (datetime.now() - start_time).total_seconds()
-            
+
             self.completed_requests[request_id] = {
                 "result": result,
                 "duration": duration,
                 "completed_at": datetime.now()
             }
-            
+
             await self.debug(f"Completed concurrent request {request_id} in {duration:.2f}s")
-    
+
     def get_concurrent_stats(self) -> Dict[str, Any]:
         """Get concurrent processing statistics"""
         return {
@@ -225,7 +224,7 @@ class MockConcurrentContext(MockContext):
 
 class MockPerformanceContext(MockContext):
     """Mock context for performance testing"""
-    
+
     def __init__(self, session_id: str = "performance_test_session"):
         super().__init__(session_id)
         self.performance_metrics: Dict[str, List[float]] = {
@@ -243,27 +242,27 @@ class MockPerformanceContext(MockContext):
             "personas_per_second": 0,
             "commands_per_second": 0
         }
-    
+
     async def record_performance_metric(self, metric_name: str, value: float) -> None:
         """Record a performance metric"""
         if metric_name not in self.performance_metrics:
             self.performance_metrics[metric_name] = []
-        
+
         self.performance_metrics[metric_name].append(value)
         await self.debug(f"Recorded {metric_name}: {value:.3f}")
-    
+
     async def record_resource_usage(self, resource_name: str, value: int) -> None:
         """Record resource usage"""
         if resource_name not in self.resource_usage:
             self.resource_usage[resource_name] = []
-        
+
         self.resource_usage[resource_name].append(value)
         await self.debug(f"Recorded {resource_name}: {value}")
-    
+
     def get_performance_summary(self) -> Dict[str, Any]:
         """Get comprehensive performance summary"""
         summary = {}
-        
+
         for metric_name, values in self.performance_metrics.items():
             if values:
                 summary[metric_name] = {
@@ -273,7 +272,7 @@ class MockPerformanceContext(MockContext):
                     "max": max(values),
                     "total": sum(values)
                 }
-        
+
         for resource_name, values in self.resource_usage.items():
             if values:
                 summary[f"{resource_name}_stats"] = {
@@ -281,13 +280,13 @@ class MockPerformanceContext(MockContext):
                     "peak": max(values),
                     "samples": len(values)
                 }
-        
+
         return summary
-    
+
     def check_performance_thresholds(self, thresholds: Dict[str, float]) -> Dict[str, bool]:
         """Check if performance metrics meet specified thresholds"""
         results = {}
-        
+
         for metric_name, threshold in thresholds.items():
             if metric_name in self.performance_metrics:
                 values = self.performance_metrics[metric_name]
@@ -298,7 +297,7 @@ class MockPerformanceContext(MockContext):
                     results[metric_name] = True  # No data means threshold met
             else:
                 results[metric_name] = True  # Unknown metric means threshold met
-        
+
         return results
 
 

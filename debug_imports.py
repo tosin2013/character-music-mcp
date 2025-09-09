@@ -2,8 +2,8 @@
 """
 Debug script to test imports in CI environment
 """
-import sys
 import os
+import sys
 from pathlib import Path
 
 print("=== Import Debug Information ===")

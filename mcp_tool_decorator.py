@@ -6,15 +6,14 @@ This module provides decorators that wrap MCP tools with comprehensive error han
 logging, and recovery mechanisms.
 """
 
-import asyncio
+import functools
 import json
 import time
-import functools
-from typing import Dict, Any, Optional, Callable, Union
-from datetime import datetime
+from typing import Any, Callable, Dict, Optional
 
-from mcp_error_handler import get_error_handler, create_format_mismatch_error, ErrorContext
-from mcp_error_recovery import get_recovery_system, RecoveryResult
+from mcp_error_handler import ErrorContext, create_format_mismatch_error, get_error_handler
+from mcp_error_recovery import RecoveryResult, get_recovery_system
+
 
 def mcp_tool_with_error_handling(
     tool_name: str,
@@ -38,7 +37,7 @@ def mcp_tool_with_error_handling(
             recovery_system = get_recovery_system()
             function_name = func.__name__
             start_time = time.time()
-            
+
             # Prepare input data for logging
             input_data = {
                 "args": args,
@@ -46,24 +45,24 @@ def mcp_tool_with_error_handling(
                 "arg_count": len(args),
                 "kwarg_keys": list(kwargs.keys())
             }
-            
+
             # Log tool entry
             error_handler.log_tool_entry(tool_name, function_name, input_data)
-            
+
             try:
                 # Validate input format if specified
                 if expected_input_format and enable_recovery:
                     validation_result = await _validate_input_format(
                         tool_name, function_name, kwargs, expected_input_format
                     )
-                    
+
                     if not validation_result.success:
                         # Attempt format recovery
                         recovery_result = await recovery_system.recover_from_format_error(
                             tool_name, function_name, validation_result.format_error,
                             kwargs, validation_result.error_context
                         )
-                        
+
                         if recovery_result.success:
                             # Use recovered data
                             kwargs.update(recovery_result.recovered_data)
@@ -73,42 +72,42 @@ def mcp_tool_with_error_handling(
                                 tool_name, function_name, validation_result.error_context,
                                 recovery_result.error_message
                             )
-                
+
                 # Execute the original function
                 result = await func(*args, **kwargs)
-                
+
                 # Log successful execution
                 execution_time = time.time() - start_time
                 output_summary = _create_output_summary(result)
                 error_handler.log_tool_success(tool_name, function_name, execution_time, output_summary)
-                
+
                 return result
-                
+
             except Exception as e:
                 execution_time = time.time() - start_time
-                
+
                 # Log the error
                 error_context = error_handler.log_processing_error(
                     tool_name, function_name, e, input_data, "main_execution"
                 )
-                
+
                 if not enable_recovery:
                     return _create_error_response(tool_name, function_name, error_context, str(e))
-                
+
                 # Attempt recovery based on error type
                 recovery_result = await _attempt_error_recovery(
-                    e, tool_name, function_name, func, args, kwargs, 
+                    e, tool_name, function_name, func, args, kwargs,
                     error_context, recovery_system, max_retries
                 )
-                
+
                 if recovery_result.success:
                     # Log recovery success and return recovered data
                     total_time = time.time() - start_time
                     error_handler.log_tool_success(
-                        tool_name, function_name, total_time, 
+                        tool_name, function_name, total_time,
                         f"Recovered: {_create_output_summary(recovery_result.recovered_data)}"
                     )
-                    
+
                     # Return recovered data in proper format
                     if isinstance(recovery_result.recovered_data, dict):
                         if "result" in recovery_result.recovered_data:
@@ -120,26 +119,26 @@ def mcp_tool_with_error_handling(
                 else:
                     # Recovery failed, return error response
                     return _create_error_response(
-                        tool_name, function_name, error_context, 
+                        tool_name, function_name, error_context,
                         recovery_result.error_message or str(e)
                     )
-        
+
         return wrapper
     return decorator
 
 async def _validate_input_format(
-    tool_name: str, 
-    function_name: str, 
-    input_kwargs: Dict[str, Any], 
+    tool_name: str,
+    function_name: str,
+    input_kwargs: Dict[str, Any],
     expected_format: Dict[str, str]
 ) -> 'ValidationResult':
     """Validate input format against expected format"""
-    
+
     for param_name, expected_type in expected_format.items():
         if param_name in input_kwargs:
             actual_value = input_kwargs[param_name]
             actual_type = type(actual_value).__name__
-            
+
             # Check if types match
             if not _types_match(actual_type, expected_type):
                 # Create format mismatch error
@@ -152,26 +151,26 @@ async def _validate_input_format(
                     sample_expected=_get_sample_for_type(expected_type),
                     sample_actual=str(actual_value)[:100]
                 )
-                
+
                 error_context = get_error_handler().log_format_mismatch(
                     tool_name, function_name, format_error, input_kwargs
                 )
-                
+
                 return ValidationResult(
                     success=False,
                     format_error=format_error,
                     error_context=error_context
                 )
-    
+
     return ValidationResult(success=True)
 
 def _types_match(actual_type: str, expected_type: str) -> bool:
     """Check if actual type matches expected type (with some flexibility)"""
-    
+
     # Direct match
     if actual_type == expected_type:
         return True
-    
+
     # Flexible matches
     type_equivalents = {
         "str": ["string", "text"],
@@ -181,7 +180,7 @@ def _types_match(actual_type: str, expected_type: str) -> bool:
         "float": ["number", "decimal"],
         "bool": ["boolean"]
     }
-    
+
     expected_variants = type_equivalents.get(expected_type, [expected_type])
     return actual_type.lower() in [t.lower() for t in expected_variants]
 
@@ -209,9 +208,9 @@ async def _attempt_error_recovery(
     max_retries: int
 ) -> RecoveryResult:
     """Attempt to recover from various types of errors"""
-    
+
     error_type = type(error).__name__
-    
+
     # Character detection errors
     if "character" in str(error).lower() and "not found" in str(error).lower():
         text_param = _find_text_parameter(kwargs)
@@ -219,7 +218,7 @@ async def _attempt_error_recovery(
             return await recovery_system.recover_from_character_detection_failure(
                 tool_name, function_name, text_param, "default_method", kwargs, error_context
             )
-    
+
     # Function callable errors
     elif "not callable" in str(error).lower() or "FunctionTool" in str(error):
         function_param = _find_function_parameter(kwargs)
@@ -227,7 +226,7 @@ async def _attempt_error_recovery(
             return await recovery_system.recover_from_function_callable_error(
                 tool_name, function_name, function_param, kwargs, error_context
             )
-    
+
     # JSON/Format errors
     elif error_type in ["JSONDecodeError", "ValueError", "TypeError"]:
         # Try retry with backoff for transient errors
@@ -235,7 +234,7 @@ async def _attempt_error_recovery(
             return await recovery_system.recover_with_retry(
                 original_function, tool_name, function_name, kwargs, max_retries
             )
-    
+
     # For all other errors, try graceful degradation
     return await recovery_system.provide_graceful_degradation(
         tool_name, function_name, kwargs, error_context, "functional"
@@ -244,21 +243,21 @@ async def _attempt_error_recovery(
 def _find_text_parameter(kwargs: Dict[str, Any]) -> Optional[str]:
     """Find text parameter in kwargs for character detection recovery"""
     text_param_names = ["text", "content", "narrative_text", "topic_text", "concept"]
-    
+
     for param_name in text_param_names:
         if param_name in kwargs and isinstance(kwargs[param_name], str):
             return kwargs[param_name]
-    
+
     return None
 
 def _find_function_parameter(kwargs: Dict[str, Any]) -> Optional[Any]:
     """Find function parameter in kwargs for callable recovery"""
     function_param_names = ["function", "func", "tool", "callable"]
-    
+
     for param_name in function_param_names:
         if param_name in kwargs:
             return kwargs[param_name]
-    
+
     return None
 
 def _create_output_summary(result: Any) -> str:
@@ -286,13 +285,13 @@ def _create_output_summary(result: Any) -> str:
         return f"{type(result).__name__}"
 
 def _create_error_response(
-    tool_name: str, 
-    function_name: str, 
-    error_context: ErrorContext, 
+    tool_name: str,
+    function_name: str,
+    error_context: ErrorContext,
     error_message: str
 ) -> str:
     """Create a standardized error response"""
-    
+
     error_response = {
         "error": True,
         "error_type": error_context.error_type,
@@ -307,7 +306,7 @@ def _create_error_response(
             "contact_support": "If error persists, check the error handling documentation"
         }
     }
-    
+
     # Add specific troubleshooting based on error type
     if error_context.error_type == "FORMAT_MISMATCH":
         error_response["troubleshooting"]["format_help"] = "Check the expected input format in the tool documentation"
@@ -315,7 +314,7 @@ def _create_error_response(
         error_response["troubleshooting"]["character_help"] = "Ensure text contains clear character descriptions or dialogue"
     elif error_context.error_type == "FUNCTION_NOT_CALLABLE":
         error_response["troubleshooting"]["function_help"] = "Check tool registration and function definition"
-    
+
     return json.dumps(error_response, indent=2)
 
 class ValidationResult:

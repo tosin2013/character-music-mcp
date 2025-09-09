@@ -5,18 +5,17 @@ Test Data Manager for Character-Driven Music Generation
 Provides centralized management of test data and fixtures for all test suites.
 """
 
-import pytest
 import json
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Any, Union
-from pathlib import Path
+import os
 
 # Import data models from the main server
 import sys
-import os
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, List, Optional
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from server import CharacterProfile, ArtistPersona, SunoCommand
+from server import ArtistPersona, CharacterProfile, SunoCommand
 
 
 @dataclass
@@ -34,16 +33,16 @@ class TestScenario:
 
 class TestDataManager:
     """Centralized management of test data and fixtures"""
-    
+
     def __init__(self):
         self.scenarios = self._initialize_scenarios()
         self.expected_characters = self._initialize_expected_characters()
         self.expected_personas = self._initialize_expected_personas()
         self.expected_commands = self._initialize_expected_commands()
-    
+
     # Prevent pytest from treating this as a test class
     __test__ = False
-    
+
     def _initialize_scenarios(self) -> Dict[str, TestScenario]:
         """Initialize test scenarios with different complexity levels"""
         return {
@@ -61,7 +60,7 @@ class TestDataManager:
                 expected_genres=["indie", "alternative"],
                 complexity_level="simple"
             ),
-            
+
             "multi_character_medium": TestScenario(
                 name="multi_character_medium",
                 description="Medium complexity with multiple characters and relationships",
@@ -83,7 +82,7 @@ class TestDataManager:
                 expected_genres=["indie", "folk", "alternative"],
                 complexity_level="medium"
             ),
-            
+
             "concept_album_complex": TestScenario(
                 name="concept_album_complex",
                 description="Complex philosophical narrative for concept album",
@@ -106,7 +105,7 @@ class TestDataManager:
                 expected_genres=["progressive rock", "ambient", "post-rock"],
                 complexity_level="complex"
             ),
-            
+
             "minimal_character_edge": TestScenario(
                 name="minimal_character_edge",
                 description="Edge case with minimal character information",
@@ -118,7 +117,7 @@ class TestDataManager:
                 expected_genres=["ambient", "experimental"],
                 complexity_level="simple"
             ),
-            
+
             "emotional_intensity_high": TestScenario(
                 name="emotional_intensity_high",
                 description="High emotional intensity for testing emotional framework",
@@ -142,7 +141,7 @@ class TestDataManager:
                 expected_genres=["blues", "soul", "gospel"],
                 complexity_level="complex"
             ),
-            
+
             "sci_fi_adventure": TestScenario(
                 name="sci_fi_adventure",
                 description="Science fiction narrative with adventure elements",
@@ -166,7 +165,7 @@ class TestDataManager:
                 expected_genres=["electronic", "synthwave", "ambient"],
                 complexity_level="medium"
             ),
-            
+
             "romance_contemporary": TestScenario(
                 name="romance_contemporary",
                 description="Contemporary romance with emotional depth",
@@ -190,7 +189,7 @@ class TestDataManager:
                 expected_genres=["indie pop", "folk", "singer-songwriter"],
                 complexity_level="simple"
             ),
-            
+
             "historical_drama": TestScenario(
                 name="historical_drama",
                 description="Historical narrative with period-specific challenges",
@@ -215,7 +214,7 @@ class TestDataManager:
                 expected_genres=["classical", "orchestral", "chamber music"],
                 complexity_level="medium"
             ),
-            
+
             "urban_fantasy": TestScenario(
                 name="urban_fantasy",
                 description="Urban fantasy with supernatural elements",
@@ -239,7 +238,7 @@ class TestDataManager:
                 expected_genres=["dark electronic", "industrial", "gothic"],
                 complexity_level="complex"
             ),
-            
+
             "coming_of_age": TestScenario(
                 name="coming_of_age",
                 description="Coming-of-age story with universal themes",
@@ -265,7 +264,7 @@ class TestDataManager:
                 expected_genres=["indie rock", "alternative", "lo-fi"],
                 complexity_level="medium"
             ),
-            
+
             "psychological_thriller": TestScenario(
                 name="psychological_thriller",
                 description="Psychological thriller with unreliable narrator",
@@ -290,7 +289,7 @@ class TestDataManager:
                 expected_genres=["dark ambient", "experimental", "minimalist"],
                 complexity_level="complex"
             ),
-            
+
             "family_saga": TestScenario(
                 name="family_saga",
                 description="Multi-generational family story",
@@ -316,7 +315,7 @@ class TestDataManager:
                 complexity_level="medium"
             )
         }
-    
+
     def _initialize_expected_characters(self) -> Dict[str, CharacterProfile]:
         """Initialize expected character profiles for validation"""
         return {
@@ -341,7 +340,7 @@ class TestDataManager:
                 first_appearance="Sarah Chen stood at the edge of the rooftop",
                 importance_score=1.0
             ),
-            
+
             "Elena Rodriguez": CharacterProfile(
                 name="Elena Rodriguez",
                 aliases=["Elena", "El"],
@@ -363,7 +362,7 @@ class TestDataManager:
                 first_appearance="Elena Rodriguez stood in her cramped studio apartment",
                 importance_score=1.0
             ),
-            
+
             "The Philosopher": CharacterProfile(
                 name="The Philosopher",
                 aliases=["Philosopher"],
@@ -385,7 +384,7 @@ class TestDataManager:
                 first_appearance="The Philosopher sat in his study, surrounded by the weight of centuries",
                 importance_score=1.0
             ),
-            
+
             "Marcus": CharacterProfile(
                 name="Marcus",
                 aliases=["Marcus"],
@@ -407,7 +406,7 @@ class TestDataManager:
                 first_appearance="Marcus collapsed to his knees in the hospital corridor",
                 importance_score=1.0
             ),
-            
+
             "Captain Zara Okafor": CharacterProfile(
                 name="Captain Zara Okafor",
                 aliases=["Captain Okafor", "Zara", "Captain"],
@@ -429,7 +428,7 @@ class TestDataManager:
                 first_appearance="Captain Zara Okafor floated in the observation deck of the starship Meridian",
                 importance_score=1.0
             ),
-            
+
             "Maya Patel": CharacterProfile(
                 name="Maya Patel",
                 aliases=["Maya"],
@@ -451,7 +450,7 @@ class TestDataManager:
                 first_appearance="Maya Patel closed her laptop with a sigh",
                 importance_score=1.0
             ),
-            
+
             "Amelia Hartwell": CharacterProfile(
                 name="Amelia Hartwell",
                 aliases=["Amelia", "Miss Hartwell"],
@@ -473,7 +472,7 @@ class TestDataManager:
                 first_appearance="Amelia Hartwell adjusted her corset with practiced efficiency",
                 importance_score=1.0
             ),
-            
+
             "Detective Riley Santos": CharacterProfile(
                 name="Detective Riley Santos",
                 aliases=["Riley", "Detective Santos", "Santos"],
@@ -495,7 +494,7 @@ class TestDataManager:
                 first_appearance="Detective Riley Santos had seen enough crime scenes to last three lifetimes",
                 importance_score=1.0
             ),
-            
+
             "Alex Kim": CharacterProfile(
                 name="Alex Kim",
                 aliases=["Alex"],
@@ -517,7 +516,7 @@ class TestDataManager:
                 first_appearance="Sixteen-year-old Alex Kim stared at the acceptance letter",
                 importance_score=1.0
             ),
-            
+
             "Dr. Catherine Wells": CharacterProfile(
                 name="Dr. Catherine Wells",
                 aliases=["Dr. Wells", "Catherine"],
@@ -539,7 +538,7 @@ class TestDataManager:
                 first_appearance="Dr. Catherine Wells reviewed her patient notes for the third time",
                 importance_score=1.0
             ),
-            
+
             "Rosa Delgado": CharacterProfile(
                 name="Rosa Delgado",
                 aliases=["Rosa", "Abuela"],
@@ -562,7 +561,7 @@ class TestDataManager:
                 importance_score=1.0
             )
         }
-    
+
     def _initialize_expected_personas(self) -> Dict[str, ArtistPersona]:
         """Initialize expected artist personas for validation"""
         return {
@@ -581,7 +580,7 @@ class TestDataManager:
                 genre_justification="Indie's raw authenticity matches her journey from perfection to truth",
                 persona_description="An artist emerging from perfectionist constraints to authentic expression"
             ),
-            
+
             "Elena Rodriguez": ArtistPersona(
                 character_name="Elena Rodriguez",
                 artist_name="Canvas Dreams",
@@ -597,7 +596,7 @@ class TestDataManager:
                 genre_justification="Folk's intimate storytelling suits her introspective artistic journey",
                 persona_description="A fearful artist learning to embrace her creative voice"
             ),
-            
+
             "The Philosopher": ArtistPersona(
                 character_name="The Philosopher",
                 artist_name="Existential Architect",
@@ -613,7 +612,7 @@ class TestDataManager:
                 genre_justification="Progressive rock's complexity mirrors philosophical depth and conceptual thinking",
                 persona_description="A philosophical mind creating meaning through complex musical architecture"
             ),
-            
+
             "Marcus": ArtistPersona(
                 character_name="Marcus",
                 artist_name="Eternal Love",
@@ -629,7 +628,7 @@ class TestDataManager:
                 genre_justification="Blues tradition of transforming pain into beauty matches his grief journey",
                 persona_description="A man transforming devastating loss into eternal love through music"
             ),
-            
+
             "Captain Zara Okafor": ArtistPersona(
                 character_name="Captain Zara Okafor",
                 artist_name="Stellar Command",
@@ -645,7 +644,7 @@ class TestDataManager:
                 genre_justification="Electronic music's futuristic soundscapes match space exploration themes",
                 persona_description="A space commander channeling cosmic adventure through electronic soundscapes"
             ),
-            
+
             "Maya Patel": ArtistPersona(
                 character_name="Maya Patel",
                 artist_name="Coffee Shop Dreams",
@@ -661,7 +660,7 @@ class TestDataManager:
                 genre_justification="Indie pop's warm accessibility matches her hopeful romantic journey",
                 persona_description="A modern romantic finding connection through gentle, hopeful melodies"
             ),
-            
+
             "Amelia Hartwell": ArtistPersona(
                 character_name="Amelia Hartwell",
                 artist_name="Hidden Equations",
@@ -677,7 +676,7 @@ class TestDataManager:
                 genre_justification="Classical music's mathematical precision mirrors her hidden mathematical genius",
                 persona_description="A Victorian genius encoding rebellion and brilliance in classical forms"
             ),
-            
+
             "Detective Riley Santos": ArtistPersona(
                 character_name="Detective Riley Santos",
                 artist_name="Shadow Walker",
@@ -693,7 +692,7 @@ class TestDataManager:
                 genre_justification="Dark electronic's atmospheric tension matches supernatural crime investigation",
                 persona_description="A supernatural detective channeling otherworldly investigations through dark soundscapes"
             ),
-            
+
             "Alex Kim": ArtistPersona(
                 character_name="Alex Kim",
                 artist_name="Cultural Crossroads",
@@ -709,7 +708,7 @@ class TestDataManager:
                 genre_justification="Indie rock's DIY authenticity matches their search for genuine cultural expression",
                 persona_description="A young artist navigating cultural identity through authentic indie expression"
             ),
-            
+
             "Dr. Catherine Wells": ArtistPersona(
                 character_name="Dr. Catherine Wells",
                 artist_name="Fractured Mind",
@@ -725,7 +724,7 @@ class TestDataManager:
                 genre_justification="Dark ambient's disorienting soundscapes mirror psychological fragmentation",
                 persona_description="A fractured psyche exploring the boundaries of sanity through experimental sound"
             ),
-            
+
             "Rosa Delgado": ArtistPersona(
                 character_name="Rosa Delgado",
                 artist_name="Generational Wisdom",
@@ -742,7 +741,7 @@ class TestDataManager:
                 persona_description="A cultural keeper weaving family stories and traditions through timeless folk melodies"
             )
         }
-    
+
     def _initialize_expected_commands(self) -> Dict[str, List[SunoCommand]]:
         """Initialize expected Suno commands for validation"""
         return {
@@ -774,7 +773,7 @@ class TestDataManager:
                     variations=["stripped down", "orchestral build"]
                 )
             ],
-            
+
             "The Philosopher": [
                 SunoCommand(
                     command_type="simple",
@@ -803,7 +802,7 @@ class TestDataManager:
                     variations=["symphonic version", "minimalist arrangement"]
                 )
             ],
-            
+
             "Marcus": [
                 SunoCommand(
                     command_type="simple",
@@ -832,7 +831,7 @@ class TestDataManager:
                     variations=["string arrangement", "harmonica solo"]
                 )
             ],
-            
+
             "Captain Zara Okafor": [
                 SunoCommand(
                     command_type="simple",
@@ -848,7 +847,7 @@ class TestDataManager:
                     variations=["orchestral hybrid", "ambient version", "action sequence"]
                 )
             ],
-            
+
             "Maya Patel": [
                 SunoCommand(
                     command_type="simple",
@@ -864,7 +863,7 @@ class TestDataManager:
                     variations=["acoustic version", "bedroom pop style"]
                 )
             ],
-            
+
             "Amelia Hartwell": [
                 SunoCommand(
                     command_type="simple",
@@ -880,7 +879,7 @@ class TestDataManager:
                     variations=["full orchestra", "string quartet", "solo piano"]
                 )
             ],
-            
+
             "Detective Riley Santos": [
                 SunoCommand(
                     command_type="simple",
@@ -896,7 +895,7 @@ class TestDataManager:
                     variations=["industrial version", "ambient investigation"]
                 )
             ],
-            
+
             "Alex Kim": [
                 SunoCommand(
                     command_type="simple",
@@ -912,7 +911,7 @@ class TestDataManager:
                     variations=["lo-fi version", "full band arrangement"]
                 )
             ],
-            
+
             "Rosa Delgado": [
                 SunoCommand(
                     command_type="simple",
@@ -929,46 +928,46 @@ class TestDataManager:
                 )
             ]
         }
-    
+
     def get_sample_narrative(self, scenario: str) -> str:
         """Get sample narrative text for testing"""
         if scenario in self.scenarios:
             return self.scenarios[scenario].narrative_text
         raise ValueError(f"Unknown scenario: {scenario}")
-    
+
     def get_expected_character(self, character_name: str) -> CharacterProfile:
         """Get expected character profile for validation"""
         if character_name in self.expected_characters:
             return self.expected_characters[character_name]
         raise ValueError(f"Unknown character: {character_name}")
-    
+
     def get_expected_persona(self, character_name: str) -> ArtistPersona:
         """Get expected artist persona for validation"""
         if character_name in self.expected_personas:
             return self.expected_personas[character_name]
         raise ValueError(f"Unknown persona: {character_name}")
-    
+
     def get_expected_commands(self, character_name: str) -> List[SunoCommand]:
         """Get expected Suno commands for validation"""
         if character_name in self.expected_commands:
             return self.expected_commands[character_name]
         raise ValueError(f"Unknown commands for: {character_name}")
-    
+
     def get_test_scenario(self, scenario_name: str) -> TestScenario:
         """Get complete test scenario"""
         if scenario_name in self.scenarios:
             return self.scenarios[scenario_name]
         raise ValueError(f"Unknown scenario: {scenario_name}")
-    
+
     def list_scenarios(self) -> List[str]:
         """List all available test scenarios"""
         return list(self.scenarios.keys())
-    
+
     def get_scenarios_by_complexity(self, complexity: str) -> List[TestScenario]:
         """Get scenarios filtered by complexity level"""
-        return [scenario for scenario in self.scenarios.values() 
+        return [scenario for scenario in self.scenarios.values()
                 if scenario.complexity_level == complexity]
-    
+
     def export_test_data(self, filepath: str) -> None:
         """Export test data to JSON file for external use"""
         data = {
@@ -976,18 +975,18 @@ class TestDataManager:
             "expected_characters": {name: char.to_dict() for name, char in self.expected_characters.items()},
             "expected_personas": {name: persona.to_dict() for name, persona in self.expected_personas.items()},
             "expected_commands": {
-                name: [cmd.to_dict() for cmd in commands] 
+                name: [cmd.to_dict() for cmd in commands]
                 for name, commands in self.expected_commands.items()
             }
         }
-        
+
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-    
+
     def validate_character_against_expected(self, actual: CharacterProfile, expected_name: str) -> Dict[str, Any]:
         """Validate actual character against expected profile"""
         expected = self.get_expected_character(expected_name)
-        
+
         validation_results = {
             "name_match": actual.name == expected.name,
             "confidence_acceptable": actual.confidence_score >= 0.7,
@@ -1001,47 +1000,47 @@ class TestDataManager:
             "theme_alignment": self._check_theme_alignment(actual, expected),
             "completeness_score": self._calculate_completeness(actual)
         }
-        
+
         return validation_results
-    
+
     def _check_theme_alignment(self, actual: CharacterProfile, expected: CharacterProfile) -> float:
         """Check thematic alignment between actual and expected characters"""
         # Simple keyword matching for themes
         expected_themes = set()
         actual_themes = set()
-        
+
         # Extract themes from various fields
         for field in ['motivations', 'fears', 'desires', 'conflicts']:
             expected_themes.update(getattr(expected, field, []))
             actual_themes.update(getattr(actual, field, []))
-        
+
         if not expected_themes:
             return 1.0
-        
+
         # Calculate overlap
         overlap = len(expected_themes.intersection(actual_themes))
         return overlap / len(expected_themes)
-    
+
     def _calculate_completeness(self, character: CharacterProfile) -> float:
         """Calculate completeness score for character profile"""
         required_fields = [
             'name', 'backstory', 'motivations', 'fears', 'desires', 'conflicts',
             'personality_drivers', 'physical_description'
         ]
-        
+
         completed_fields = 0
         for field in required_fields:
             value = getattr(character, field, None)
-            if value and (isinstance(value, str) and value.strip() or 
+            if value and (isinstance(value, str) and value.strip() or
                          isinstance(value, list) and len(value) > 0):
                 completed_fields += 1
-        
+
         return completed_fields / len(required_fields)
-    
+
     def validate_persona_against_expected(self, actual: ArtistPersona, expected_name: str) -> Dict[str, Any]:
         """Validate actual persona against expected persona"""
         expected = self.get_expected_persona(expected_name)
-        
+
         validation_results = {
             "character_name_match": actual.character_name == expected.character_name,
             "genre_alignment": self._check_genre_alignment(actual, expected),
@@ -1055,48 +1054,48 @@ class TestDataManager:
             "persona_completeness": self._calculate_persona_completeness(actual),
             "artistic_coherence": self._check_artistic_coherence(actual)
         }
-        
+
         return validation_results
-    
+
     def _check_genre_alignment(self, actual: ArtistPersona, expected: ArtistPersona) -> float:
         """Check genre alignment between actual and expected personas"""
         # Primary genre match is most important
         primary_match = 1.0 if actual.primary_genre == expected.primary_genre else 0.0
-        
+
         # Secondary genre overlap
         actual_genres = set([actual.primary_genre] + actual.secondary_genres)
         expected_genres = set([expected.primary_genre] + expected.secondary_genres)
-        
+
         if not expected_genres:
             return primary_match
-        
+
         overlap = len(actual_genres.intersection(expected_genres))
         secondary_match = overlap / len(expected_genres)
-        
+
         # Weight primary genre more heavily
         return (primary_match * 0.7) + (secondary_match * 0.3)
-    
+
     def _calculate_persona_completeness(self, persona: ArtistPersona) -> float:
         """Calculate completeness score for artist persona"""
         required_fields = [
             'character_name', 'artist_name', 'primary_genre', 'vocal_style',
             'lyrical_themes', 'emotional_palette', 'persona_description'
         ]
-        
+
         completed_fields = 0
         for field in required_fields:
             value = getattr(persona, field, None)
-            if value and (isinstance(value, str) and value.strip() or 
+            if value and (isinstance(value, str) and value.strip() or
                          isinstance(value, list) and len(value) > 0):
                 completed_fields += 1
-        
+
         return completed_fields / len(required_fields)
-    
+
     def _check_artistic_coherence(self, persona: ArtistPersona) -> float:
         """Check artistic coherence within persona"""
         # Simple coherence check based on genre-style alignment
         coherence_score = 0.0
-        
+
         # Check if vocal style matches genre expectations
         genre_vocal_map = {
             "indie": ["vulnerable", "raw", "intimate"],
@@ -1106,27 +1105,27 @@ class TestDataManager:
             "classical": ["precise", "trained", "formal"],
             "progressive rock": ["complex", "conceptual", "dynamic"]
         }
-        
+
         expected_vocal_styles = genre_vocal_map.get(persona.primary_genre, [])
         if any(style in persona.vocal_style.lower() for style in expected_vocal_styles):
             coherence_score += 0.5
-        
+
         # Check if lyrical themes align with emotional palette
         theme_emotion_alignment = len(set(persona.lyrical_themes).intersection(set(persona.emotional_palette)))
         if theme_emotion_alignment > 0:
             coherence_score += 0.5
-        
+
         return min(coherence_score, 1.0)
-    
+
     def validate_suno_command_against_expected(self, actual: SunoCommand, character_name: str, command_index: int = 0) -> Dict[str, Any]:
         """Validate actual Suno command against expected command"""
         expected_commands = self.get_expected_commands(character_name)
-        
+
         if command_index >= len(expected_commands):
             return {"error": f"No expected command at index {command_index}"}
-        
+
         expected = expected_commands[command_index]
-        
+
         validation_results = {
             "command_type_match": actual.command_type == expected.command_type,
             "character_source_match": actual.character_source == expected.character_source,
@@ -1139,55 +1138,55 @@ class TestDataManager:
             "tag_alignment": self._check_tag_alignment(actual, expected),
             "command_completeness": self._calculate_command_completeness(actual)
         }
-        
+
         return validation_results
-    
+
     def _check_tag_alignment(self, actual: SunoCommand, expected: SunoCommand) -> float:
         """Check tag alignment between actual and expected commands"""
         alignments = []
-        
+
         # Check style tags alignment
         actual_style = set(actual.style_tags)
         expected_style = set(expected.style_tags)
         if expected_style:
             style_alignment = len(actual_style.intersection(expected_style)) / len(expected_style)
             alignments.append(style_alignment)
-        
+
         # Check vocal tags alignment
         actual_vocal = set(actual.vocal_tags)
         expected_vocal = set(expected.vocal_tags)
         if expected_vocal:
             vocal_alignment = len(actual_vocal.intersection(expected_vocal)) / len(expected_vocal)
             alignments.append(vocal_alignment)
-        
+
         return sum(alignments) / len(alignments) if alignments else 1.0
-    
+
     def _calculate_command_completeness(self, command: SunoCommand) -> float:
         """Calculate completeness score for Suno command"""
         required_fields = [
             'command_type', 'prompt', 'style_tags', 'vocal_tags',
             'character_source', 'artist_persona', 'command_rationale'
         ]
-        
+
         completed_fields = 0
         for field in required_fields:
             value = getattr(command, field, None)
-            if value and (isinstance(value, str) and value.strip() or 
+            if value and (isinstance(value, str) and value.strip() or
                          isinstance(value, list) and len(value) > 0):
                 completed_fields += 1
-        
+
         return completed_fields / len(required_fields)
-    
+
     def create_album_test_fixture(self, scenario_name: str, track_count: int = 6) -> Dict[str, Any]:
         """Create a complete album test fixture for validation"""
         scenario = self.get_test_scenario(scenario_name)
         character_name = scenario.expected_primary_character
-        
+
         # Get expected outputs
         expected_character = self.get_expected_character(character_name)
         expected_persona = self.get_expected_persona(character_name)
         expected_commands = self.get_expected_commands(character_name)
-        
+
         # Create album fixture
         album_fixture = {
             "scenario": scenario,
@@ -1209,13 +1208,13 @@ class TestDataManager:
                 "command_effectiveness": 0.8
             }
         }
-        
+
         return album_fixture
-    
+
     def _generate_track_structure(self, base_commands: List[SunoCommand], track_count: int) -> List[Dict[str, Any]]:
         """Generate expected track structure for album"""
         track_structure = []
-        
+
         # Track themes based on narrative arc
         track_themes = [
             "Opening Statement", "Personal Reflection", "Deeper Questions",
@@ -1223,13 +1222,13 @@ class TestDataManager:
             "Bonus Exploration", "Alternative Perspective", "Instrumental Meditation",
             "Collaborative Vision", "Extended Journey", "Ultimate Synthesis"
         ]
-        
+
         for i in range(track_count):
             theme = track_themes[i] if i < len(track_themes) else f"Track {i+1}"
-            
+
             # Use base command as template, modify for track theme
             base_command = base_commands[0] if base_commands else None
-            
+
             track_info = {
                 "track_number": i + 1,
                 "theme": theme,
@@ -1238,36 +1237,36 @@ class TestDataManager:
                 "expected_effectiveness_range": [0.7, 0.95],
                 "thematic_variation": f"Explores {theme.lower()} aspect of character journey"
             }
-            
+
             track_structure.append(track_info)
-        
+
         return track_structure
-    
+
     def get_edge_case_scenarios(self) -> List[TestScenario]:
         """Get scenarios specifically designed for edge case testing"""
         edge_cases = []
-        
+
         for scenario in self.scenarios.values():
-            if (scenario.name == "minimal_character_edge" or 
+            if (scenario.name == "minimal_character_edge" or
                 "edge" in scenario.description.lower() or
                 scenario.expected_character_count == 0):
                 edge_cases.append(scenario)
-        
+
         return edge_cases
-    
+
     def get_performance_test_scenarios(self) -> List[TestScenario]:
         """Get scenarios suitable for performance testing"""
         performance_scenarios = []
-        
+
         for scenario in self.scenarios.values():
             # Long narratives or complex scenarios for performance testing
-            if (len(scenario.narrative_text) > 1000 or 
+            if (len(scenario.narrative_text) > 1000 or
                 scenario.complexity_level == "complex" or
                 scenario.expected_character_count > 2):
                 performance_scenarios.append(scenario)
-        
+
         return performance_scenarios
-    
+
     def create_batch_test_data(self, scenario_names: List[str]) -> Dict[str, Any]:
         """Create batch test data for multiple scenarios"""
         batch_data = {
@@ -1282,12 +1281,12 @@ class TestDataManager:
                 "complexity_distribution": {"simple": 0, "medium": 0, "complex": 0}
             }
         }
-        
+
         for scenario_name in scenario_names:
             if scenario_name in self.scenarios:
                 scenario = self.scenarios[scenario_name]
                 batch_data["scenarios"][scenario_name] = scenario
-                
+
                 # Add expected results
                 character_name = scenario.expected_primary_character
                 batch_data["expected_results"][scenario_name] = {
@@ -1295,13 +1294,13 @@ class TestDataManager:
                     "persona": self.expected_personas.get(character_name),
                     "commands": self.expected_commands.get(character_name, [])
                 }
-                
+
                 # Update summary
                 batch_data["validation_summary"]["total_characters"] += scenario.expected_character_count
                 batch_data["validation_summary"]["total_personas"] += 1
                 batch_data["validation_summary"]["total_commands"] += len(self.expected_commands.get(character_name, []))
                 batch_data["validation_summary"]["complexity_distribution"][scenario.complexity_level] += 1
-        
+
         return batch_data
 
 
@@ -1335,19 +1334,19 @@ class AlbumValidationResult:
 
 class ComprehensiveValidator:
     """Comprehensive validation system for all test fixtures"""
-    
+
     def __init__(self, test_data_manager: TestDataManager):
         self.test_data = test_data_manager
-    
-    def validate_complete_workflow(self, 
+
+    def validate_complete_workflow(self,
                                  scenario_name: str,
                                  actual_character: CharacterProfile,
                                  actual_persona: ArtistPersona,
                                  actual_commands: List[SunoCommand]) -> Dict[str, ValidationResult]:
         """Validate complete workflow output against expected results"""
-        
+
         results = {}
-        
+
         # Validate character
         character_validation = self.test_data.validate_character_against_expected(
             actual_character, actual_character.name
@@ -1358,7 +1357,7 @@ class ComprehensiveValidator:
             score=sum(1 for v in character_validation.values() if v) / len(character_validation),
             details=character_validation
         )
-        
+
         # Validate persona
         persona_validation = self.test_data.validate_persona_against_expected(
             actual_persona, actual_persona.character_name
@@ -1369,7 +1368,7 @@ class ComprehensiveValidator:
             score=sum(1 for v in persona_validation.values() if v) / len(persona_validation),
             details=persona_validation
         )
-        
+
         # Validate commands
         command_results = []
         for i, command in enumerate(actual_commands):
@@ -1382,44 +1381,44 @@ class ComprehensiveValidator:
                 score=sum(1 for k, v in command_validation.items() if k != "error" and v) / max(1, len([k for k in command_validation.keys() if k != "error"])),
                 details=command_validation
             ))
-        
+
         results["commands"] = command_results
-        
+
         return results
-    
+
     def validate_album_creation(self,
                               scenario_name: str,
                               album_tracks: List[Dict[str, Any]]) -> AlbumValidationResult:
         """Validate complete album creation against expected structure"""
-        
+
         album_fixture = self.test_data.create_album_test_fixture(scenario_name, len(album_tracks))
         expected_structure = album_fixture["expected_track_structure"]
         validation_criteria = album_fixture["validation_criteria"]
-        
+
         track_results = []
         thematic_scores = []
         authenticity_scores = []
         genre_scores = []
-        
+
         for i, track in enumerate(album_tracks):
             expected_track = expected_structure[i] if i < len(expected_structure) else expected_structure[0]
-            
+
             # Validate individual track
             track_validation = self._validate_album_track(track, expected_track, album_fixture)
             track_results.append(track_validation)
-            
+
             # Collect scores for album-level metrics
             thematic_scores.append(track_validation.score)
             authenticity_scores.append(track_validation.score)  # Simplified for now
             genre_scores.append(track_validation.score)  # Simplified for now
-        
+
         # Calculate album-level scores
         thematic_consistency = sum(thematic_scores) / len(thematic_scores) if thematic_scores else 0
         character_authenticity = sum(authenticity_scores) / len(authenticity_scores) if authenticity_scores else 0
         genre_coherence = sum(genre_scores) / len(genre_scores) if genre_scores else 0
-        
+
         overall_score = (thematic_consistency + character_authenticity + genre_coherence) / 3
-        
+
         return AlbumValidationResult(
             album_title=album_fixture["album_metadata"]["title"],
             track_count=len(album_tracks),
@@ -1429,46 +1428,46 @@ class ComprehensiveValidator:
             character_authenticity=character_authenticity,
             genre_coherence=genre_coherence
         )
-    
-    def _validate_album_track(self, 
-                            actual_track: Dict[str, Any], 
+
+    def _validate_album_track(self,
+                            actual_track: Dict[str, Any],
                             expected_track: Dict[str, Any],
                             album_fixture: Dict[str, Any]) -> ValidationResult:
         """Validate individual album track"""
-        
+
         validation_details = {}
-        
+
         # Check if track has required fields
         required_fields = ["track_number", "title", "suno_command"]
         for field in required_fields:
             validation_details[f"has_{field}"] = field in actual_track
-        
+
         # Check thematic alignment
         if "theme" in actual_track and "theme" in expected_track:
             validation_details["theme_alignment"] = expected_track["theme"].lower() in actual_track.get("title", "").lower()
-        
+
         # Check command effectiveness if available
         if "suno_command" in actual_track:
             command_data = actual_track["suno_command"]
             if isinstance(command_data, dict) and "estimated_effectiveness" in command_data:
                 effectiveness = command_data["estimated_effectiveness"]
                 validation_details["effectiveness_acceptable"] = effectiveness >= expected_track.get("expected_effectiveness_range", [0.7, 1.0])[0]
-        
+
         # Calculate overall track score
         passed_checks = sum(1 for v in validation_details.values() if v)
         total_checks = len(validation_details)
         score = passed_checks / total_checks if total_checks > 0 else 0
-        
+
         return ValidationResult(
             test_name=f"track_{actual_track.get('track_number', 'unknown')}_validation",
             passed=score >= 0.7,
             score=score,
             details=validation_details
         )
-    
+
     def create_performance_benchmark(self, scenario_names: List[str]) -> Dict[str, Any]:
         """Create performance benchmark data for testing"""
-        
+
         benchmark_data = {
             "benchmark_id": f"perf_benchmark_{len(scenario_names)}_scenarios",
             "scenario_count": len(scenario_names),
@@ -1488,7 +1487,7 @@ class ComprehensiveValidator:
                 "overall_quality": 0.75
             }
         }
-        
+
         for scenario_name in scenario_names:
             if scenario_name in self.test_data.scenarios:
                 scenario = self.test_data.scenarios[scenario_name]
@@ -1499,26 +1498,26 @@ class ComprehensiveValidator:
                     "expected_character_count": scenario.expected_character_count,
                     "expected_processing_time": self._estimate_processing_time(scenario)
                 })
-        
+
         return benchmark_data
-    
+
     def _estimate_processing_time(self, scenario: TestScenario) -> float:
         """Estimate processing time based on scenario complexity"""
         base_time = 1.0  # Base processing time in seconds
-        
+
         # Adjust for narrative length
         length_factor = len(scenario.narrative_text) / 1000  # Per 1000 characters
-        
+
         # Adjust for complexity
         complexity_multiplier = {
             "simple": 1.0,
             "medium": 1.5,
             "complex": 2.0
         }.get(scenario.complexity_level, 1.0)
-        
+
         # Adjust for character count
         character_factor = scenario.expected_character_count * 0.5
-        
+
         estimated_time = base_time + length_factor + character_factor
         return estimated_time * complexity_multiplier
 
@@ -1531,7 +1530,7 @@ comprehensive_validator = ComprehensiveValidator(test_data_manager)
 
 def create_test_suite_data(suite_name: str, scenario_names: List[str]) -> Dict[str, Any]:
     """Create complete test suite data package"""
-    
+
     suite_data = {
         "suite_name": suite_name,
         "created_at": "2024-01-01T00:00:00Z",  # Would be datetime.now() in real implementation
@@ -1552,13 +1551,13 @@ def create_test_suite_data(suite_name: str, scenario_names: List[str]) -> Dict[s
             "character_count_distribution": {}
         }
     }
-    
+
     # Populate scenarios and expected outputs
     for scenario_name in scenario_names:
         if scenario_name in test_data_manager.scenarios:
             scenario = test_data_manager.scenarios[scenario_name]
             suite_data["scenarios"][scenario_name] = asdict(scenario)
-            
+
             # Add expected outputs
             character_name = scenario.expected_primary_character
             suite_data["expected_outputs"][scenario_name] = {
@@ -1566,53 +1565,53 @@ def create_test_suite_data(suite_name: str, scenario_names: List[str]) -> Dict[s
                 "persona": test_data_manager.expected_personas.get(character_name, {}).to_dict() if character_name in test_data_manager.expected_personas else {},
                 "commands": [cmd.to_dict() for cmd in test_data_manager.expected_commands.get(character_name, [])]
             }
-            
+
             # Update metadata
             complexity = scenario.complexity_level
             suite_data["test_metadata"]["complexity_distribution"][complexity] = suite_data["test_metadata"]["complexity_distribution"].get(complexity, 0) + 1
-            
+
             for genre in scenario.expected_genres:
                 suite_data["test_metadata"]["genre_distribution"][genre] = suite_data["test_metadata"]["genre_distribution"].get(genre, 0) + 1
-            
+
             char_count = scenario.expected_character_count
             suite_data["test_metadata"]["character_count_distribution"][str(char_count)] = suite_data["test_metadata"]["character_count_distribution"].get(str(char_count), 0) + 1
-    
+
     return suite_data
 
 
 def export_test_fixtures(output_dir: str = "test_fixtures_export") -> None:
     """Export all test fixtures to files for external use"""
     import os
-    
+
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
-    
+
     # Export main test data
     test_data_manager.export_test_data(os.path.join(output_dir, "test_data.json"))
-    
+
     # Export test suites
     all_scenarios = list(test_data_manager.scenarios.keys())
-    
+
     # Unit test suite
     unit_scenarios = [s for s in all_scenarios if test_data_manager.scenarios[s].complexity_level == "simple"]
     unit_suite = create_test_suite_data("unit_tests", unit_scenarios)
     with open(os.path.join(output_dir, "unit_test_suite.json"), 'w') as f:
         json.dump(unit_suite, f, indent=2)
-    
+
     # Integration test suite
     integration_scenarios = [s for s in all_scenarios if test_data_manager.scenarios[s].complexity_level in ["medium", "complex"]]
     integration_suite = create_test_suite_data("integration_tests", integration_scenarios)
     with open(os.path.join(output_dir, "integration_test_suite.json"), 'w') as f:
         json.dump(integration_suite, f, indent=2)
-    
+
     # Performance test suite
     performance_scenarios = [s for s in all_scenarios if len(test_data_manager.scenarios[s].narrative_text) > 500]
     performance_suite = create_test_suite_data("performance_tests", performance_scenarios)
     with open(os.path.join(output_dir, "performance_test_suite.json"), 'w') as f:
         json.dump(performance_suite, f, indent=2)
-    
+
     print(f"Test fixtures exported to {output_dir}/")
-    print(f"- Main test data: test_data.json")
+    print("- Main test data: test_data.json")
     print(f"- Unit test suite: unit_test_suite.json ({len(unit_scenarios)} scenarios)")
     print(f"- Integration test suite: integration_test_suite.json ({len(integration_scenarios)} scenarios)")
     print(f"- Performance test suite: performance_test_suite.json ({len(performance_scenarios)} scenarios)")
@@ -1623,36 +1622,36 @@ if __name__ == "__main__":
     # Test the comprehensive test data system
     print("🧪 COMPREHENSIVE TEST DATA SYSTEM")
     print("=" * 50)
-    
+
     # Test basic functionality
     print(f"📊 Available scenarios: {len(test_data_manager.scenarios)}")
     print(f"👥 Expected characters: {len(test_data_manager.expected_characters)}")
     print(f"🎭 Expected personas: {len(test_data_manager.expected_personas)}")
     print(f"🎵 Expected command sets: {len(test_data_manager.expected_commands)}")
-    
+
     # Test scenario retrieval
     print(f"\n📖 Sample scenario: {test_data_manager.scenarios['single_character_simple'].name}")
     print(f"   Description: {test_data_manager.scenarios['single_character_simple'].description}")
     print(f"   Complexity: {test_data_manager.scenarios['single_character_simple'].complexity_level}")
-    
+
     # Test validation
     sarah_character = test_data_manager.get_expected_character("Sarah Chen")
     validation_result = test_data_manager.validate_character_against_expected(sarah_character, "Sarah Chen")
     print(f"\n✅ Character validation test: {validation_result}")
-    
+
     # Test album fixture creation
     album_fixture = test_data_manager.create_album_test_fixture("single_character_simple", 4)
     print(f"\n🎵 Album fixture created: {album_fixture['album_metadata']['title']}")
     print(f"   Tracks: {album_fixture['album_metadata']['track_count']}")
-    
+
     # Test batch data creation
     batch_scenarios = ["single_character_simple", "multi_character_medium", "concept_album_complex"]
     batch_data = test_data_manager.create_batch_test_data(batch_scenarios)
     print(f"\n📦 Batch test data: {batch_data['batch_id']}")
     print(f"   Total characters: {batch_data['validation_summary']['total_characters']}")
     print(f"   Complexity distribution: {batch_data['validation_summary']['complexity_distribution']}")
-    
-    print(f"\n🎯 COMPREHENSIVE TEST DATA SYSTEM READY!")
+
+    print("\n🎯 COMPREHENSIVE TEST DATA SYSTEM READY!")
     print("• Realistic narrative scenarios ✅")
     print("• Expected character profiles ✅")
     print("• Expected artist personas ✅")

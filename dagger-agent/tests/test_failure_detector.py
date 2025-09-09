@@ -1,21 +1,20 @@
 """Unit tests for the FailureDetector class"""
 
+
 import pytest
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, patch
 
 from character_music_mcp.failure_detector import FailureDetector
-from character_music_mcp.models import FailureCategory, Failure
+from character_music_mcp.models import Failure, FailureCategory
 
 
 class TestFailureDetector:
     """Test cases for FailureDetector"""
-    
+
     @pytest.fixture
     def detector(self):
         """Create a FailureDetector instance for testing"""
         return FailureDetector()
-    
+
     @pytest.fixture
     def sample_workflow_data(self):
         """Sample workflow data for testing"""
@@ -64,7 +63,7 @@ class TestFailureDetector:
                 }
             ]
         }
-    
+
     @pytest.mark.asyncio
     async def test_detect_failures_basic(self, detector, sample_workflow_data):
         """Test basic failure detection"""
@@ -75,9 +74,9 @@ class TestFailureDetector:
             branch="main",
             commit_sha="abc123"
         )
-        
+
         assert len(failures) == 2  # Two failed jobs
-        
+
         # Check first failure (unit test)
         unit_test_failure = failures[0]
         assert unit_test_failure.workflow_run_id == "123456"
@@ -88,13 +87,13 @@ class TestFailureDetector:
         assert unit_test_failure.branch == "main"
         assert unit_test_failure.commit_sha == "abc123"
         assert unit_test_failure.category == FailureCategory.UNIT_TEST
-        
+
         # Check second failure (quality checks)
         quality_failure = failures[1]
         assert quality_failure.job_name == "quality-checks"
         assert quality_failure.step_name == "Run ruff"
         assert quality_failure.category == FailureCategory.LINTING_ERROR
-    
+
     @pytest.mark.asyncio
     async def test_detect_failures_no_failures(self, detector):
         """Test detection when no failures exist"""
@@ -113,7 +112,7 @@ class TestFailureDetector:
                 }
             ]
         }
-        
+
         failures = await detector.detect_failures(
             workflow_run_id="123456",
             jobs_data=jobs_data,
@@ -121,9 +120,9 @@ class TestFailureDetector:
             branch="main",
             commit_sha="abc123"
         )
-        
+
         assert len(failures) == 0
-    
+
     @pytest.mark.asyncio
     async def test_detect_failures_job_level_failure(self, detector):
         """Test detection of job-level failures without step failures"""
@@ -146,7 +145,7 @@ class TestFailureDetector:
                 }
             ]
         }
-        
+
         failures = await detector.detect_failures(
             workflow_run_id="123456",
             jobs_data=jobs_data,
@@ -154,13 +153,13 @@ class TestFailureDetector:
             branch="main",
             commit_sha="abc123"
         )
-        
+
         assert len(failures) == 1
         failure = failures[0]
         assert failure.job_name == "integration-tests"
         assert failure.step_name == "job-level"
         assert failure.category == FailureCategory.INTEGRATION_TEST
-    
+
     def test_categorize_failure_by_name(self, detector):
         """Test failure categorization by job/step names"""
         test_cases = [
@@ -176,11 +175,11 @@ class TestFailureDetector:
             ("performance-test", "", FailureCategory.PERFORMANCE_FAILURE),
             ("unknown-job", "", FailureCategory.UNKNOWN),
         ]
-        
+
         for job_name, step_name, expected_category in test_cases:
             category = detector._categorize_failure_by_name(job_name, step_name)
             assert category == expected_category, f"Failed for job: {job_name}"
-    
+
     def test_extract_python_version(self, detector):
         """Test Python version extraction from job names"""
         test_cases = [
@@ -194,11 +193,11 @@ class TestFailureDetector:
             ("test-no-version", None),
             ("quality-checks", None),
         ]
-        
+
         for job_name, expected_version in test_cases:
             version = detector._extract_python_version(job_name)
             assert version == expected_version, f"Failed for job: {job_name}"
-    
+
     @pytest.mark.asyncio
     async def test_categorize_failure_by_logs(self, detector):
         """Test failure categorization by log content"""
@@ -215,7 +214,7 @@ class TestFailureDetector:
             ("sphinx error: Documentation build failed", FailureCategory.DOCUMENTATION_ERROR),
             ("Performance test failed", FailureCategory.PERFORMANCE_FAILURE),
         ]
-        
+
         for logs, expected_category in test_cases:
             # Create a mock failure with the test logs
             failure = Failure(
@@ -230,10 +229,10 @@ class TestFailureDetector:
                 commit_sha="abc123",
                 category=FailureCategory.UNKNOWN
             )
-            
+
             category = await detector.categorize_failure(failure)
             assert category == expected_category, f"Failed for logs: {logs}"
-    
+
     def test_extract_error_details(self, detector):
         """Test extraction of file path and line number from logs"""
         test_cases = [
@@ -246,11 +245,11 @@ class TestFailureDetector:
             ('/absolute/path/src/file.py:99: error', ("src/file.py", 99)),
             ('no file info here', (None, None)),
         ]
-        
+
         for logs, expected_result in test_cases:
             result = detector.extract_error_details(logs)
             assert result == expected_result, f"Failed for logs: {logs}"
-    
+
     def test_extract_specific_error_messages(self, detector):
         """Test extraction of specific error messages by category"""
         test_cases = [
@@ -261,11 +260,11 @@ class TestFailureDetector:
             (FailureCategory.LINTING_ERROR, "E501 line too long (82 > 79)", "E501 line too long (82 > 79)"),
             (FailureCategory.TYPE_CHECK_ERROR, "error: Incompatible types [assignment]", "Incompatible types [assignment]"),
         ]
-        
+
         for category, logs, expected_message in test_cases:
             message = detector.extract_specific_error_message(logs, category)
             assert expected_message in message, f"Failed for category: {category.value}"
-    
+
     @pytest.mark.asyncio
     async def test_extract_logs(self, detector):
         """Test log extraction from job data"""
@@ -286,9 +285,9 @@ class TestFailureDetector:
                 }
             ]
         }
-        
+
         logs = await detector.extract_logs(job_data)
-        
+
         assert "Job: test-job" in logs
         assert "Job ID: 12345" in logs
         assert "Conclusion: failure" in logs
@@ -299,11 +298,11 @@ class TestFailureDetector:
 
 class TestFailureDetectorPatterns:
     """Test failure detection patterns"""
-    
+
     @pytest.fixture
     def detector(self):
         return FailureDetector()
-    
+
     def test_syntax_error_patterns(self, detector):
         """Test syntax error pattern matching"""
         patterns = detector.failure_patterns[FailureCategory.SYNTAX_ERROR]
@@ -314,13 +313,13 @@ class TestFailureDetectorPatterns:
             "unexpected EOF while parsing",
             "unmatched ')'",
         ]
-        
+
         for logs in test_logs:
             assert any(
                 __import__('re').search(pattern, logs, __import__('re').IGNORECASE)
                 for pattern in patterns
             ), f"Pattern not matched for: {logs}"
-    
+
     def test_import_error_patterns(self, detector):
         """Test import error pattern matching"""
         patterns = detector.failure_patterns[FailureCategory.IMPORT_ERROR]
@@ -331,13 +330,13 @@ class TestFailureDetectorPatterns:
             "cannot import name 'function' from 'module'",
             "attempted relative import with no known parent package",
         ]
-        
+
         for logs in test_logs:
             assert any(
                 __import__('re').search(pattern, logs, __import__('re').IGNORECASE)
                 for pattern in patterns
             ), f"Pattern not matched for: {logs}"
-    
+
     def test_coverage_failure_patterns(self, detector):
         """Test coverage failure pattern matching"""
         patterns = detector.failure_patterns[FailureCategory.COVERAGE_FAILURE]
@@ -349,13 +348,13 @@ class TestFailureDetectorPatterns:
             "Coverage check failed",
             "FAIL Required test coverage",
         ]
-        
+
         for logs in test_logs:
             assert any(
                 __import__('re').search(pattern, logs, __import__('re').IGNORECASE)
                 for pattern in patterns
             ), f"Pattern not matched for: {logs}"
-    
+
     def test_linting_error_patterns(self, detector):
         """Test linting error pattern matching"""
         patterns = detector.failure_patterns[FailureCategory.LINTING_ERROR]
@@ -370,13 +369,13 @@ class TestFailureDetectorPatterns:
             "B008 Do not perform function calls in argument defaults",
             "RUF001 String contains ambiguous character",
         ]
-        
+
         for logs in test_logs:
             assert any(
                 __import__('re').search(pattern, logs, __import__('re').IGNORECASE)
                 for pattern in patterns
             ), f"Pattern not matched for: {logs}"
-    
+
     def test_type_check_error_patterns(self, detector):
         """Test type checking error pattern matching"""
         patterns = detector.failure_patterns[FailureCategory.TYPE_CHECK_ERROR]
@@ -389,7 +388,7 @@ class TestFailureDetectorPatterns:
             "Incompatible return value type",
             "Need type annotation for variable",
         ]
-        
+
         for logs in test_logs:
             assert any(
                 __import__('re').search(pattern, logs, __import__('re').IGNORECASE)
@@ -399,11 +398,11 @@ class TestFailureDetectorPatterns:
 
 class TestFailureDetectorIntegration:
     """Integration tests for FailureDetector"""
-    
+
     @pytest.fixture
     def detector(self):
         return FailureDetector()
-    
+
     @pytest.mark.asyncio
     async def test_real_workflow_failure_scenario(self, detector):
         """Test with realistic workflow failure data"""
@@ -462,7 +461,7 @@ class TestFailureDetectorIntegration:
                 }
             ]
         }
-        
+
         failures = await detector.detect_failures(
             workflow_run_id="workflow_123",
             jobs_data=workflow_data,
@@ -470,25 +469,25 @@ class TestFailureDetectorIntegration:
             branch="feature/test-fix",
             commit_sha="commit_abc123"
         )
-        
+
         assert len(failures) == 3
-        
+
         # Verify unit test failure
         unit_failure = next(f for f in failures if f.job_name.startswith("test"))
         assert unit_failure.category == FailureCategory.UNIT_TEST
         assert unit_failure.python_version == "3.10"
         assert unit_failure.step_name == "Run unit tests with coverage"
-        
+
         # Verify quality check failure
         quality_failure = next(f for f in failures if f.job_name == "quality-checks")
         assert quality_failure.category == FailureCategory.LINTING_ERROR
         assert quality_failure.step_name == "Run ruff linting"
-        
+
         # Verify security scan failure
         security_failure = next(f for f in failures if f.job_name == "security-scan")
         assert security_failure.category == FailureCategory.SECURITY_SCAN_FAILURE
         assert security_failure.step_name == "Run safety check"
-    
+
     @pytest.mark.asyncio
     async def test_matrix_job_failures(self, detector):
         """Test detection of failures in matrix jobs"""
@@ -514,7 +513,7 @@ class TestFailureDetectorIntegration:
                 }
             ]
         }
-        
+
         failures = await detector.detect_failures(
             workflow_run_id="matrix_test_123",
             jobs_data=workflow_data,
@@ -522,13 +521,13 @@ class TestFailureDetectorIntegration:
             branch="main",
             commit_sha="matrix_commit_456"
         )
-        
+
         assert len(failures) == 1
         failure = failures[0]
         assert failure.python_version == "3.11"
         assert failure.category == FailureCategory.UNIT_TEST
         assert "python-3.11" in failure.job_name
-    
+
     @pytest.mark.asyncio
     async def test_empty_workflow_data(self, detector):
         """Test handling of empty or malformed workflow data"""
@@ -539,7 +538,7 @@ class TestFailureDetectorIntegration:
             {"jobs": [{}]},  # Empty job
             {"jobs": [{"conclusion": "success"}]},  # Job without failure
         ]
-        
+
         for workflow_data in test_cases:
             failures = await detector.detect_failures(
                 workflow_run_id="empty_test",

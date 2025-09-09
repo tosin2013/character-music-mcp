@@ -6,28 +6,29 @@ This test suite validates that the StandardCharacterProfile class handles
 all the format variations and edge cases identified in the diagnostic report.
 """
 
+
 import pytest
-from typing import Dict, Any
+
 from standard_character_profile import (
     StandardCharacterProfile,
     create_character_profile_from_text,
-    validate_character_profile_data
+    validate_character_profile_data,
 )
 
 
 class TestStandardCharacterProfile:
     """Test the StandardCharacterProfile class"""
-    
+
     def test_basic_initialization(self):
         """Test basic character profile creation"""
         profile = StandardCharacterProfile(name="Test Character")
-        
+
         assert profile.name == "Test Character"
         assert profile.aliases == []
         assert profile.physical_description == ""
         assert profile.confidence_score == 1.0
         assert profile.importance_score == 1.0
-    
+
     def test_full_initialization(self):
         """Test character profile with all fields"""
         profile = StandardCharacterProfile(
@@ -51,20 +52,20 @@ class TestStandardCharacterProfile:
             first_appearance="Opening scene",
             importance_score=0.9
         )
-        
+
         assert profile.name == "Sarah Chen"
         assert len(profile.aliases) == 2
         assert len(profile.mannerisms) == 2
         assert len(profile.motivations) == 2
         assert profile.confidence_score == 0.85
         assert profile.importance_score == 0.9
-    
+
     def test_post_init_validation(self):
         """Test that __post_init__ properly validates and normalizes data"""
         # Test empty name handling
         profile = StandardCharacterProfile(name="")
         assert profile.name == "Unknown Character"
-        
+
         # Test score normalization
         profile = StandardCharacterProfile(
             name="Test",
@@ -73,7 +74,7 @@ class TestStandardCharacterProfile:
         )
         assert profile.confidence_score == 1.0
         assert profile.importance_score == 0.0
-        
+
         # Test string cleaning
         profile = StandardCharacterProfile(
             name="  Test Character  ",
@@ -83,7 +84,7 @@ class TestStandardCharacterProfile:
         assert profile.name == "Test Character"
         assert profile.physical_description == "Tall and thin"
         assert profile.backstory == "Complex background"
-        
+
         # Test list cleaning
         profile = StandardCharacterProfile(
             name="Test",
@@ -92,7 +93,7 @@ class TestStandardCharacterProfile:
         )
         assert profile.aliases == ["Valid Alias", "Another"]
         assert profile.mannerisms == ["fidgets"]
-    
+
     def test_from_dict_basic(self):
         """Test creating profile from dictionary"""
         data = {
@@ -101,31 +102,31 @@ class TestStandardCharacterProfile:
             "backstory": "Interesting background",
             "confidence_score": 0.8
         }
-        
+
         profile = StandardCharacterProfile.from_dict(data)
         assert profile.name == "John Doe"
         assert profile.aliases == ["Johnny", "JD"]
         assert profile.backstory == "Interesting background"
         assert profile.confidence_score == 0.8
-    
+
     def test_from_dict_missing_fields(self):
         """Test from_dict handles missing fields gracefully"""
         data = {"name": "Minimal Character"}
-        
+
         profile = StandardCharacterProfile.from_dict(data)
         assert profile.name == "Minimal Character"
         assert profile.aliases == []
         assert profile.backstory == ""
         assert profile.confidence_score == 1.0
-    
+
     def test_from_dict_missing_name(self):
         """Test from_dict handles missing name"""
         data = {"backstory": "Some background"}
-        
+
         profile = StandardCharacterProfile.from_dict(data)
         assert profile.name == "Unknown Character"
         assert profile.backstory == "Some background"
-    
+
     def test_from_dict_type_conversion(self):
         """Test from_dict handles type conversions"""
         data = {
@@ -135,20 +136,20 @@ class TestStandardCharacterProfile:
             "confidence_score": "0.75",  # String instead of float
             "importance_score": None  # None value
         }
-        
+
         profile = StandardCharacterProfile.from_dict(data)
         assert profile.name == "Test Character"
         assert profile.aliases == ["alias1", "alias2", "alias3"]
         assert profile.mannerisms == ["fidgets", "taps foot"]
         assert profile.confidence_score == 0.75
         assert profile.importance_score == 1.0  # Default value
-    
+
     def test_from_dict_invalid_data(self):
         """Test from_dict handles invalid data"""
         # Test non-dict input
         with pytest.raises(ValueError):
             StandardCharacterProfile.from_dict("not a dict")
-        
+
         # Test invalid float conversion
         data = {
             "name": "Test",
@@ -156,7 +157,7 @@ class TestStandardCharacterProfile:
         }
         profile = StandardCharacterProfile.from_dict(data)
         assert profile.confidence_score == 1.0  # Should use default
-    
+
     def test_from_dict_unknown_fields(self):
         """Test from_dict ignores unknown fields"""
         data = {
@@ -165,12 +166,12 @@ class TestStandardCharacterProfile:
             "another_unknown": ["list", "of", "values"],
             "backstory": "Valid field"
         }
-        
+
         profile = StandardCharacterProfile.from_dict(data)
         assert profile.name == "Test Character"
         assert profile.backstory == "Valid field"
         assert not hasattr(profile, "unknown_field")
-    
+
     def test_to_dict(self):
         """Test converting profile to dictionary"""
         profile = StandardCharacterProfile(
@@ -179,14 +180,14 @@ class TestStandardCharacterProfile:
             backstory="Test background",
             confidence_score=0.9
         )
-        
+
         data = profile.to_dict()
         assert isinstance(data, dict)
         assert data["name"] == "Test Character"
         assert data["aliases"] == ["TC"]
         assert data["backstory"] == "Test background"
         assert data["confidence_score"] == 0.9
-        
+
         # Should contain all fields including new conceptual fields
         expected_fields = {
             'name', 'aliases', 'physical_description', 'mannerisms', 'speech_patterns',
@@ -197,7 +198,7 @@ class TestStandardCharacterProfile:
             'processing_notes'
         }
         assert set(data.keys()) == expected_fields
-    
+
     def test_to_legacy_format(self):
         """Test converting to legacy formats"""
         profile = StandardCharacterProfile(
@@ -210,13 +211,13 @@ class TestStandardCharacterProfile:
             motivations=["success"],
             confidence_score=0.8
         )
-        
+
         # Test simple format
         simple = profile.to_legacy_format("simple")
         expected_simple_keys = {"name", "backstory", "conflicts", "fears"}
         assert set(simple.keys()) == expected_simple_keys
         assert simple["name"] == "Test Character"
-        
+
         # Test minimal format
         minimal = profile.to_legacy_format("minimal")
         expected_minimal_keys = {
@@ -224,11 +225,11 @@ class TestStandardCharacterProfile:
             "motivations", "fears", "confidence_score"
         }
         assert set(minimal.keys()) == expected_minimal_keys
-        
+
         # Test full format
         full = profile.to_legacy_format("full")
         assert len(full.keys()) == 22  # All fields including new conceptual fields
-    
+
     def test_from_legacy_format(self):
         """Test creating profile from legacy formats"""
         # Simple legacy format
@@ -238,17 +239,17 @@ class TestStandardCharacterProfile:
             "conflicts": ["old conflict"],
             "fears": ["old fear"]
         }
-        
+
         profile = StandardCharacterProfile.from_legacy_format(simple_data, "simple")
         assert profile.name == "Legacy Character"
         assert profile.backstory == "Old format background"
         assert profile.conflicts == ["old conflict"]
         assert profile.fears == ["old fear"]
-        
+
         # Auto-detect format
         profile_auto = StandardCharacterProfile.from_legacy_format(simple_data, "auto")
         assert profile_auto.name == "Legacy Character"
-    
+
     def test_merge_with(self):
         """Test merging two character profiles"""
         profile1 = StandardCharacterProfile(
@@ -258,7 +259,7 @@ class TestStandardCharacterProfile:
             motivations=["motivation A"],
             confidence_score=0.8
         )
-        
+
         profile2 = StandardCharacterProfile(
             name="Character B",
             aliases=["B"],
@@ -266,42 +267,42 @@ class TestStandardCharacterProfile:
             fears=["fear B"],
             confidence_score=0.6
         )
-        
+
         merged = profile1.merge_with(profile2)
-        
+
         # Should use name from higher confidence profile
         assert merged.name == "Character A"
-        
+
         # Should merge lists
         assert set(merged.aliases) == {"A", "B"}
-        
+
         # Should use longer backstory
         assert merged.backstory == "Longer background B with more details"
-        
+
         # Should combine different fields
         assert merged.motivations == ["motivation A"]
         assert merged.fears == ["fear B"]
-        
+
         # Should use higher confidence score
         assert merged.confidence_score == 0.8
-    
+
     def test_merge_with_invalid_type(self):
         """Test merge_with with invalid input"""
         profile = StandardCharacterProfile(name="Test")
-        
+
         with pytest.raises(ValueError):
             profile.merge_with("not a profile")
-    
+
     def test_is_complete(self):
         """Test completeness checking"""
         # Incomplete profile (just name)
         incomplete = StandardCharacterProfile(name="Test")
         assert not incomplete.is_complete()
-        
+
         # Unknown character is incomplete
         unknown = StandardCharacterProfile(name="Unknown Character")
         assert not unknown.is_complete()
-        
+
         # Complete profile (has info in all layers)
         complete = StandardCharacterProfile(
             name="Complete Character",
@@ -310,7 +311,7 @@ class TestStandardCharacterProfile:
             motivations=["achieve goals"]  # Core layer
         )
         assert complete.is_complete()
-        
+
         # Partially complete (missing core layer)
         partial = StandardCharacterProfile(
             name="Partial Character",
@@ -319,7 +320,7 @@ class TestStandardCharacterProfile:
             # Missing core layer
         )
         assert not partial.is_complete()
-    
+
     def test_get_summary(self):
         """Test summary generation"""
         profile = StandardCharacterProfile(
@@ -330,24 +331,24 @@ class TestStandardCharacterProfile:
             fears=["bugs in code"],
             confidence_score=0.95
         )
-        
+
         summary = profile.get_summary()
         assert "Summary Test" in summary
         assert "ST, Tester" in summary
         assert "test everything" in summary
         assert "bugs in code" in summary
         assert "0.95" in summary
-    
+
     def test_string_representations(self):
         """Test __str__ and __repr__ methods"""
         profile = StandardCharacterProfile(
             name="String Test",
             confidence_score=0.8
         )
-        
+
         str_repr = str(profile)
         assert "String Test" in str_repr
-        
+
         repr_str = repr(profile)
         assert "StandardCharacterProfile" in repr_str
         assert "String Test" in repr_str
@@ -356,33 +357,33 @@ class TestStandardCharacterProfile:
 
 class TestUtilityFunctions:
     """Test utility functions"""
-    
+
     def test_create_character_profile_from_text(self):
         """Test creating profile from text"""
         text = "John Smith is a creative and quiet person who loves art."
-        
+
         profile = create_character_profile_from_text(text)
         assert profile.name == "John Smith"
         assert "creative" in profile.behavioral_traits
         assert profile.confidence_score == 0.7
         assert len(profile.text_references) == 1
-    
+
     def test_create_character_profile_from_text_with_name(self):
         """Test creating profile from text with provided name"""
         text = "A creative person who loves music."
-        
+
         profile = create_character_profile_from_text(text, name="Custom Name")
         assert profile.name == "Custom Name"
         assert "creative" in profile.behavioral_traits
-    
+
     def test_create_character_profile_from_text_no_name_found(self):
         """Test creating profile when no name can be extracted"""
         text = "someone who is very creative and artistic"
-        
+
         profile = create_character_profile_from_text(text)
         assert profile.name == "Character from Text"
         assert "creative" in profile.behavioral_traits
-    
+
     def test_validate_character_profile_data_valid(self):
         """Test validation with valid data"""
         data = {
@@ -390,23 +391,23 @@ class TestUtilityFunctions:
             "aliases": ["VC"],
             "confidence_score": 0.8
         }
-        
+
         issues = validate_character_profile_data(data)
         assert len(issues) == 0
-    
+
     def test_validate_character_profile_data_invalid(self):
         """Test validation with invalid data"""
         # Test non-dict input
         issues = validate_character_profile_data("not a dict")
         assert len(issues) == 1
         assert "Expected dictionary" in issues[0]
-        
+
         # Test missing name
         data = {"backstory": "No name provided"}
         issues = validate_character_profile_data(data)
         assert len(issues) == 1
         assert "Missing required field: 'name'" in issues[0]
-        
+
         # Test wrong types
         data = {
             "name": "Test",
@@ -417,7 +418,7 @@ class TestUtilityFunctions:
         assert len(issues) == 2
         assert any("aliases" in issue for issue in issues)
         assert any("confidence_score" in issue for issue in issues)
-        
+
         # Test score out of range
         data = {
             "name": "Test",
@@ -430,7 +431,7 @@ class TestUtilityFunctions:
 
 class TestBackwardCompatibility:
     """Test backward compatibility with existing formats"""
-    
+
     def test_server_format_compatibility(self):
         """Test compatibility with server.py CharacterProfile format"""
         # This is the format from server.py
@@ -455,15 +456,15 @@ class TestBackwardCompatibility:
             'first_appearance': 'chapter 1',
             'importance_score': 0.8
         }
-        
+
         profile = StandardCharacterProfile.from_dict(server_data)
         assert profile.name == 'Server Character'
         assert profile.confidence_score == 0.9
-        
+
         # Should be able to convert back
         converted = profile.to_dict()
         assert converted['name'] == 'Server Character'
-    
+
     def test_test_core_classes_format_compatibility(self):
         """Test compatibility with tests/test_core_classes.py format"""
         # This format has all the same fields as server.py
@@ -476,11 +477,11 @@ class TestBackwardCompatibility:
             'fears': ['test fears'],
             'confidence_score': 0.7
         }
-        
+
         profile = StandardCharacterProfile.from_dict(test_data)
         assert profile.name == 'Test Character'
         assert profile.is_complete()  # Should have enough info
-    
+
     def test_legacy_simple_format_compatibility(self):
         """Test compatibility with legacy simple format"""
         # This is the format from tests/legacy/test_artist_description.py
@@ -490,13 +491,13 @@ class TestBackwardCompatibility:
             'conflicts': ['legacy conflict'],
             'fears': ['legacy fear']
         }
-        
+
         profile = StandardCharacterProfile.from_dict(legacy_data)
         assert profile.name == 'Legacy Character'
         assert profile.backstory == 'Legacy background'
         assert profile.conflicts == ['legacy conflict']
         assert profile.fears == ['legacy fear']
-        
+
         # Should be able to convert to legacy format
         legacy_format = profile.to_legacy_format('simple')
         assert legacy_format['name'] == 'Legacy Character'
@@ -506,24 +507,24 @@ class TestBackwardCompatibility:
 if __name__ == "__main__":
     # Run basic tests if executed directly
     test_instance = TestStandardCharacterProfile()
-    
+
     print("Running basic StandardCharacterProfile tests...")
-    
+
     try:
         test_instance.test_basic_initialization()
         print("✓ Basic initialization test passed")
-        
+
         test_instance.test_from_dict_basic()
         print("✓ from_dict basic test passed")
-        
+
         test_instance.test_to_dict()
         print("✓ to_dict test passed")
-        
+
         test_instance.test_is_complete()
         print("✓ Completeness check test passed")
-        
+
         print("\nAll basic tests passed! Run with pytest for full test suite.")
-        
+
     except Exception as e:
         print(f"✗ Test failed: {e}")
         raise

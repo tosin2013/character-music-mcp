@@ -2,7 +2,7 @@
 
 import logging
 import sys
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from structlog.types import Processor
@@ -10,14 +10,14 @@ from structlog.types import Processor
 
 def configure_logging(log_level: str = "INFO", log_format: str = "json") -> None:
     """Configure structured logging for the application"""
-    
+
     # Set the logging level
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
         level=getattr(logging, log_level.upper(), logging.INFO),
     )
-    
+
     # Configure processors based on format
     processors: list[Processor] = [
         structlog.stdlib.filter_by_level,
@@ -29,12 +29,12 @@ def configure_logging(log_level: str = "INFO", log_format: str = "json") -> None
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
     ]
-    
+
     if log_format.lower() == "json":
         processors.append(structlog.processors.JSONRenderer())
     else:
         processors.append(structlog.dev.ConsoleRenderer())
-    
+
     structlog.configure(
         processors=processors,
         context_class=dict,
@@ -51,14 +51,14 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
 
 class LoggerMixin:
     """Mixin class to add logging capabilities to other classes"""
-    
+
     @property
     def logger(self) -> structlog.stdlib.BoundLogger:
         """Get a logger instance for this class"""
         return get_logger(self.__class__.__name__)
 
 
-def log_function_call(func_name: str, **kwargs: Any) -> Dict[str, Any]:
+def log_function_call(func_name: str, **kwargs: Any) -> dict[str, Any]:
     """Create a log context for function calls"""
     return {
         "function": func_name,
@@ -66,7 +66,7 @@ def log_function_call(func_name: str, **kwargs: Any) -> Dict[str, Any]:
     }
 
 
-def log_dagger_operation(operation: str, container_image: str, **kwargs: Any) -> Dict[str, Any]:
+def log_dagger_operation(operation: str, container_image: str, **kwargs: Any) -> dict[str, Any]:
     """Create a log context for Dagger operations"""
     return {
         "dagger_operation": operation,
@@ -75,7 +75,7 @@ def log_dagger_operation(operation: str, container_image: str, **kwargs: Any) ->
     }
 
 
-def log_github_event(event_type: str, repository: str, **kwargs: Any) -> Dict[str, Any]:
+def log_github_event(event_type: str, repository: str, **kwargs: Any) -> dict[str, Any]:
     """Create a log context for GitHub events"""
     return {
         "github_event": event_type,
@@ -84,7 +84,7 @@ def log_github_event(event_type: str, repository: str, **kwargs: Any) -> Dict[st
     }
 
 
-def log_api_call(service: str, endpoint: str, status_code: int = None, **kwargs: Any) -> Dict[str, Any]:
+def log_api_call(service: str, endpoint: str, status_code: int = None, **kwargs: Any) -> dict[str, Any]:
     """Create a log context for API calls"""
     context = {
         "api_service": service,

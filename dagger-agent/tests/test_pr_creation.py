@@ -1,9 +1,9 @@
 """Tests for PR creation and management Dagger functions"""
 
-import json
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
+
 import dagger
+import pytest
 
 from character_music_mcp.main import DaggerTestRepairAgent
 
@@ -42,7 +42,7 @@ class TestPRCreationAndManagement:
     def test_pr_creation_script_generation(self, agent):
         """Test that PR creation script is properly generated"""
         script = agent._get_pr_creation_script()
-        
+
         assert "create_pr" in script
         assert "check_existing_pr" in script
         assert "generate_branch_name" in script
@@ -56,7 +56,7 @@ class TestPRCreationAndManagement:
     def test_label_management_script_generation(self, agent):
         """Test that label management script is properly generated"""
         script = agent._get_label_management_script()
-        
+
         assert "manage_labels" in script
         assert "ACTION" in script
         assert "LABELS" in script
@@ -67,7 +67,7 @@ class TestPRCreationAndManagement:
     def test_conflict_detection_script_generation(self, agent):
         """Test that conflict detection script is properly generated"""
         script = agent._get_conflict_detection_script()
-        
+
         assert "check_conflicts" in script
         assert "mergeable" in script
         assert "mergeable_state" in script
@@ -76,7 +76,7 @@ class TestPRCreationAndManagement:
     def test_description_update_script_generation(self, agent):
         """Test that description update script is properly generated"""
         script = agent._get_description_update_script()
-        
+
         assert "update_description" in script
         assert "DESCRIPTION_UPDATE" in script
         assert "APPEND" in script
@@ -85,7 +85,7 @@ class TestPRCreationAndManagement:
     def test_outdated_pr_cleanup_script_generation(self, agent):
         """Test that outdated PR cleanup script is properly generated"""
         script = agent._get_outdated_pr_cleanup_script()
-        
+
         assert "close_outdated_prs" in script
         assert "MAX_AGE_DAYS" in script
         assert "automated-fix" in script
@@ -102,9 +102,9 @@ class TestPRCreationAndManagement:
         mock_container.with_env_variable.return_value = mock_container
         mock_container.with_new_file.return_value = mock_container
         mock_container.stdout.return_value = '{"success": true, "action": "add", "labels": ["automated-fix"]}'
-        
+
         mock_dag.container.return_value = mock_container
-        
+
         result = await agent.manage_pr_labels(
             github_token=mock_github_token,
             repository="test/repo",
@@ -112,7 +112,7 @@ class TestPRCreationAndManagement:
             action="add",
             labels=["automated-fix", "test-repair"]
         )
-        
+
         assert result == '{"success": true, "action": "add", "labels": ["automated-fix"]}'
         mock_container.with_env_variable.assert_any_call("ACTION", "add")
 
@@ -127,15 +127,15 @@ class TestPRCreationAndManagement:
         mock_container.with_env_variable.return_value = mock_container
         mock_container.with_new_file.return_value = mock_container
         mock_container.stdout.return_value = '{"has_conflicts": false, "mergeable": true}'
-        
+
         mock_dag.container.return_value = mock_container
-        
+
         result = await agent.check_pr_conflicts(
             github_token=mock_github_token,
             repository="test/repo",
             pr_number="123"
         )
-        
+
         assert result == '{"has_conflicts": false, "mergeable": true}'
         mock_container.with_env_variable.assert_any_call("PR_NUMBER", "123")
 
@@ -150,9 +150,9 @@ class TestPRCreationAndManagement:
         mock_container.with_env_variable.return_value = mock_container
         mock_container.with_new_file.return_value = mock_container
         mock_container.stdout.return_value = '{"success": true, "append": true}'
-        
+
         mock_dag.container.return_value = mock_container
-        
+
         result = await agent.update_pr_description(
             github_token=mock_github_token,
             repository="test/repo",
@@ -160,7 +160,7 @@ class TestPRCreationAndManagement:
             description_update="Additional validation results",
             append=True
         )
-        
+
         assert result == '{"success": true, "append": true}'
         mock_container.with_env_variable.assert_any_call("APPEND", "true")
 
@@ -175,37 +175,37 @@ class TestPRCreationAndManagement:
         mock_container.with_env_variable.return_value = mock_container
         mock_container.with_new_file.return_value = mock_container
         mock_container.stdout.return_value = '{"success": true, "total_closed": 2}'
-        
+
         mock_dag.container.return_value = mock_container
-        
+
         result = await agent.close_outdated_prs(
             github_token=mock_github_token,
             repository="test/repo",
             max_age_days=7
         )
-        
+
         assert result == '{"success": true, "total_closed": 2}'
         mock_container.with_env_variable.assert_any_call("MAX_AGE_DAYS", "7")
 
     def test_pr_creation_workflow_components(self, agent):
         """Test that PR creation script includes all necessary workflow components"""
         script = agent._get_pr_creation_script()
-        
+
         # Check for GitHub API integration patterns
         assert "https://api.github.com/repos" in script
         assert "Authorization" in script
         assert "application/vnd.github.v3+json" in script
-        
+
         # Check for branch management
         assert "refs/heads/" in script
         assert "default_branch" in script
-        
+
         # Check for PR data generation
         assert "title" in script
         assert "body" in script
         assert "head" in script
         assert "base" in script
-        
+
         # Check for label management
         assert "automated-fix" in script
         assert "test-repair" in script
@@ -214,7 +214,7 @@ class TestPRCreationAndManagement:
     def test_pr_conflict_detection_components(self, agent):
         """Test that conflict detection includes proper GitHub API calls"""
         script = agent._get_conflict_detection_script()
-        
+
         # Check for proper PR status checking
         assert "mergeable" in script
         assert "mergeable_state" in script
@@ -225,12 +225,12 @@ class TestPRCreationAndManagement:
     def test_label_management_actions(self, agent):
         """Test that label management supports all required actions"""
         script = agent._get_label_management_script()
-        
+
         # Check for all supported actions
         assert 'action == "add"' in script
         assert 'action == "remove"' in script
         assert 'action == "replace"' in script
-        
+
         # Check for proper API endpoints
         assert "/labels" in script
         assert "POST" in script or "post" in script
@@ -240,12 +240,12 @@ class TestPRCreationAndManagement:
     def test_pr_description_update_functionality(self, agent):
         """Test that PR description update handles both append and replace modes"""
         script = agent._get_description_update_script()
-        
+
         # Check for append functionality
         assert "append" in script
         assert "current_body" in script
         assert "new_body" in script
-        
+
         # Check for timestamp addition
         assert "Updated:" in script
         assert "datetime" in script
@@ -253,15 +253,15 @@ class TestPRCreationAndManagement:
     def test_outdated_pr_cleanup_logic(self, agent):
         """Test that outdated PR cleanup has proper age filtering"""
         script = agent._get_outdated_pr_cleanup_script()
-        
+
         # Check for age calculation
         assert "timedelta" in script
         assert "cutoff_date" in script
         assert "created_at" in script
-        
+
         # Check for automated fix filtering
         assert "automated-fix" in script
         assert "labels" in script
-        
+
         # Check for proper closure message
         assert "Automatically closed" in script

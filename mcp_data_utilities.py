@@ -7,26 +7,33 @@ and shared models to create a unified interface for all MCP tools.
 """
 
 import logging
-from typing import Dict, List, Optional, Any, Union, Tuple, Type
-from dataclasses import asdict
+from typing import Any, Dict, List
+
+from mcp_data_validation import (
+    MCPDataValidator,
+    ValidationError,
+    ValidationResult,
+    log_validation_issues,
+    require_valid_data,
+)
+from mcp_format_conversion import (
+    FormatConverter,
+)
+from mcp_shared_models import (
+    ArtistPersona,
+    CharacterAnalysisResult,
+    SunoCommand,
+    SunoCommandSet,
+    calculate_data_quality_score,
+    create_analysis_metadata,
+    create_default_artist_persona,
+    create_emotional_profile,
+    create_genre_info,
+    serialize_to_json,
+)
 
 # Import all the components we've created
 from standard_character_profile import StandardCharacterProfile
-from mcp_data_validation import (
-    MCPDataValidator, ValidationResult, ValidationError,
-    validate_character_profile, validate_persona_data, validate_text_input,
-    require_valid_data, log_validation_issues
-)
-from mcp_format_conversion import (
-    FormatConverter, convert_character_profile, convert_persona_data,
-    ensure_standard_character_profile, ensure_valid_persona_data
-)
-from mcp_shared_models import (
-    AnalysisMetadata, GenreInfo, EmotionalProfile, ArtistPersona,
-    SunoCommand, SunoCommandSet, CharacterAnalysisResult,
-    create_analysis_metadata, create_genre_info, create_emotional_profile,
-    create_default_artist_persona, serialize_to_json, calculate_data_quality_score
-)
 
 logger = logging.getLogger(__name__)
 
@@ -38,16 +45,16 @@ class MCPDataManager:
     This class provides a unified interface for data validation, conversion,
     and manipulation across all MCP tools.
     """
-    
+
     def __init__(self):
         self.validator = MCPDataValidator()
         self.converter = FormatConverter()
         self._cache = {}
-    
+
     # ================================================================================================
     # CHARACTER PROFILE OPERATIONS
     # ================================================================================================
-    
+
     def process_character_input(self, data: Any, source_format: str = "auto") -> StandardCharacterProfile:
         """
         Process character input data and return validated StandardCharacterProfile
@@ -67,20 +74,20 @@ class MCPDataManager:
             character_profile, validation_result = self.converter.convert_to_standard_character_profile(
                 data, source_format
             )
-            
+
             # Log any validation issues
             if validation_result.issues:
                 log_validation_issues(validation_result, "character_input_processing")
-            
+
             # Require valid data
             require_valid_data(validation_result)
-            
+
             return character_profile
-            
+
         except Exception as e:
             logger.error(f"Failed to process character input: {e}")
             raise ValidationError(ValidationResult()) from e
-    
+
     def validate_character_completeness(self, character: StandardCharacterProfile) -> Dict[str, Any]:
         """
         Validate character profile completeness and provide improvement suggestions
@@ -98,21 +105,21 @@ class MCPDataManager:
             'suggestions': [],
             'strengths': []
         }
-        
+
         # Calculate quality score
         character_dict = character.to_dict()
         required_fields = ['name', 'backstory', 'motivations', 'fears', 'conflicts']
         completeness_info['quality_score'] = calculate_data_quality_score(character_dict, required_fields)
-        
+
         # Check three-layer completeness
         skin_fields = ['physical_description', 'mannerisms', 'speech_patterns', 'behavioral_traits']
         flesh_fields = ['backstory', 'relationships', 'formative_experiences', 'social_connections']
         core_fields = ['motivations', 'fears', 'desires', 'conflicts', 'personality_drivers']
-        
+
         skin_complete = any(getattr(character, field) for field in skin_fields)
         flesh_complete = any(getattr(character, field) for field in flesh_fields)
         core_complete = any(getattr(character, field) for field in core_fields)
-        
+
         if not skin_complete:
             completeness_info['missing_layers'].append('skin')
             completeness_info['suggestions'].append(
@@ -120,7 +127,7 @@ class MCPDataManager:
             )
         else:
             completeness_info['strengths'].append('Good observable characteristics (skin layer)')
-        
+
         if not flesh_complete:
             completeness_info['missing_layers'].append('flesh')
             completeness_info['suggestions'].append(
@@ -128,7 +135,7 @@ class MCPDataManager:
             )
         else:
             completeness_info['strengths'].append('Good background information (flesh layer)')
-        
+
         if not core_complete:
             completeness_info['missing_layers'].append('core')
             completeness_info['suggestions'].append(
@@ -136,15 +143,15 @@ class MCPDataManager:
             )
         else:
             completeness_info['strengths'].append('Good psychological depth (core layer)')
-        
+
         return completeness_info
-    
+
     # ================================================================================================
     # PERSONA OPERATIONS
     # ================================================================================================
-    
-    def create_artist_persona(self, character: StandardCharacterProfile, 
-                            genre_hint: str = None, 
+
+    def create_artist_persona(self, character: StandardCharacterProfile,
+                            genre_hint: str = None,
                             style_preferences: Dict[str, Any] = None) -> ArtistPersona:
         """
         Create artist persona from character profile
@@ -159,11 +166,11 @@ class MCPDataManager:
         """
         # Start with default persona
         persona = create_default_artist_persona(character)
-        
+
         # Apply genre hint if provided
         if genre_hint:
             persona.genre_info = create_genre_info(genre_hint, confidence=0.8)
-        
+
         # Apply style preferences if provided
         if style_preferences:
             if 'vocal_style' in style_preferences:
@@ -171,16 +178,16 @@ class MCPDataManager:
                 persona.vocal_characteristics = VocalCharacteristics(
                     style=style_preferences['vocal_style']
                 )
-            
+
             if 'lyrical_themes' in style_preferences:
                 persona.lyrical_themes.extend(style_preferences['lyrical_themes'])
-            
+
             if 'musical_influences' in style_preferences:
                 persona.musical_influences = style_preferences['musical_influences']
-        
+
         return persona
-    
-    def validate_persona_consistency(self, character: StandardCharacterProfile, 
+
+    def validate_persona_consistency(self, character: StandardCharacterProfile,
                                    persona: ArtistPersona) -> Dict[str, Any]:
         """
         Validate consistency between character and persona
@@ -194,12 +201,12 @@ class MCPDataManager:
         """
         from mcp_shared_models import validate_character_persona_alignment
         return validate_character_persona_alignment(character, persona)
-    
+
     # ================================================================================================
     # SUNO COMMAND OPERATIONS
     # ================================================================================================
-    
-    def create_suno_commands(self, persona: ArtistPersona, 
+
+    def create_suno_commands(self, persona: ArtistPersona,
                            command_count: int = 3,
                            command_type: str = "generate") -> SunoCommandSet:
         """
@@ -214,7 +221,7 @@ class MCPDataManager:
             SunoCommandSet instance
         """
         commands = []
-        
+
         # Try to use genre intelligence for enhanced commands
         try:
             from genre_production_intelligence import get_genre_intelligence
@@ -223,7 +230,7 @@ class MCPDataManager:
         except ImportError:
             logger.warning("Genre production intelligence not available, using basic command generation")
             use_enhanced = False
-        
+
         # Generate commands based on persona
         for i in range(command_count):
             if use_enhanced and persona.genre_info:
@@ -231,21 +238,21 @@ class MCPDataManager:
                 base_theme = "life"
                 if persona.lyrical_themes and i < len(persona.lyrical_themes):
                     base_theme = persona.lyrical_themes[i]
-                
+
                 base_command = f"Create a song about {base_theme}"
-                
+
                 # Prepare character context
                 character_context = {
                     "emotional_state": persona.emotional_profile.primary_emotion.value if persona.emotional_profile else "contemplative",
                     "character_name": persona.character_name,
                     "lyrical_themes": persona.lyrical_themes
                 }
-                
+
                 # Enhance with genre intelligence
                 enhanced_command = genre_intelligence.enhance_suno_command(
                     base_command, persona.genre_info.primary_genre, character_context
                 )
-                
+
                 # Create enhanced SunoCommand
                 command = SunoCommand(
                     command_text=enhanced_command["command_text"],
@@ -264,54 +271,54 @@ class MCPDataManager:
             else:
                 # Basic command generation (fallback)
                 command_parts = []
-                
+
                 # Add genre information
                 if persona.genre_info:
                     command_parts.append(f"[{persona.genre_info.primary_genre}]")
-                
+
                 # Add vocal characteristics
                 if persona.vocal_characteristics and persona.vocal_characteristics.style:
                     command_parts.append(f"[{persona.vocal_characteristics.style} vocals]")
-                
+
                 # Add emotional context
                 if persona.emotional_profile:
                     command_parts.append(f"[{persona.emotional_profile.primary_emotion.value}]")
-                
+
                 # Add lyrical theme
                 if persona.lyrical_themes and i < len(persona.lyrical_themes):
                     theme = persona.lyrical_themes[i]
                     command_parts.append(f"about {theme}")
-                
+
                 command_text = " ".join(command_parts) if command_parts else f"Generate music for {persona.character_name}"
-                
+
                 # Create tags
                 tags = []
                 if persona.genre_info:
                     tags.append(persona.genre_info.primary_genre)
                     tags.extend(persona.genre_info.sub_genres)
-                
+
                 if persona.lyrical_themes:
                     tags.extend(persona.lyrical_themes[:2])  # Limit to first 2 themes
-                
+
                 command = SunoCommand(
                     command_text=command_text,
                     command_type=command_type,
                     tags=tags,
                     description=f"Command {i+1} for {persona.character_name}"
                 )
-            
+
             commands.append(command)
-        
+
         # Create metadata
         metadata = create_analysis_metadata(
-            "enhanced_suno_command_generator" if use_enhanced else "suno_command_generator", 
+            "enhanced_suno_command_generator" if use_enhanced else "suno_command_generator",
             confidence=persona.confidence_score
         )
-        
+
         generation_notes = [f"Generated {command_count} {'enhanced' if use_enhanced else 'basic'} commands for {persona.character_name}"]
         if use_enhanced and persona.genre_info:
             generation_notes.append(f"Applied {persona.genre_info.primary_genre} genre-specific production intelligence")
-        
+
         return SunoCommandSet(
             commands=commands,
             metadata=metadata,
@@ -320,14 +327,14 @@ class MCPDataManager:
             genre_info=persona.genre_info,
             generation_notes=generation_notes
         )
-    
+
     # Note: Suno command validation is handled by mcp_data_validation.py
     # Use validator.validate_suno_command_data() directly
-    
+
     # ================================================================================================
     # TEXT ANALYSIS OPERATIONS
     # ================================================================================================
-    
+
     def analyze_text_for_characters(self, text: str) -> CharacterAnalysisResult:
         """
         Analyze text and extract character information
@@ -343,22 +350,22 @@ class MCPDataManager:
         if not text_validation.is_valid:
             logger.warning("Text validation issues found")
             log_validation_issues(text_validation, "text_analysis")
-        
+
         # For now, create a basic analysis result
         # In a full implementation, this would use the enhanced character analyzer
         metadata = create_analysis_metadata(
-            "text_analyzer", 
+            "text_analyzer",
             confidence=0.7,
             source_text_length=len(text)
         )
-        
+
         # Create a basic character from text
         from standard_character_profile import create_character_profile_from_text
         character = create_character_profile_from_text(text)
-        
+
         # Create basic emotional profile
         emotional_profile = create_emotional_profile("contemplative", intensity=0.6)
-        
+
         return CharacterAnalysisResult(
             characters=[character],
             narrative_themes=["character development", "personal journey"],
@@ -366,11 +373,11 @@ class MCPDataManager:
             setting_info={"source": "text_analysis"},
             metadata=metadata
         )
-    
+
     # ================================================================================================
     # WORKFLOW OPERATIONS
     # ================================================================================================
-    
+
     def execute_complete_workflow(self, text: str, genre_hint: str = None) -> Dict[str, Any]:
         """
         Execute complete workflow from text to Suno commands
@@ -388,50 +395,50 @@ class MCPDataManager:
             'results': {},
             'errors': []
         }
-        
+
         try:
             # Step 1: Analyze text for characters
             logger.info("Step 1: Analyzing text for characters")
             analysis_result = self.analyze_text_for_characters(text)
             workflow_results['steps_completed'].append('character_analysis')
             workflow_results['results']['character_analysis'] = analysis_result.to_dict()
-            
+
             if not analysis_result.characters:
                 workflow_results['errors'].append("No characters found in text")
                 return workflow_results
-            
+
             # Step 2: Create artist persona
             logger.info("Step 2: Creating artist persona")
             main_character = analysis_result.characters[0]  # Use first character
             persona = self.create_artist_persona(main_character, genre_hint)
             workflow_results['steps_completed'].append('persona_creation')
             workflow_results['results']['artist_persona'] = persona.to_dict()
-            
+
             # Step 3: Generate Suno commands
             logger.info("Step 3: Generating Suno commands")
             command_set = self.create_suno_commands(persona)
             workflow_results['steps_completed'].append('command_generation')
             workflow_results['results']['suno_commands'] = command_set.to_dict()
-            
+
             # Step 4: Validate results
             logger.info("Step 4: Validating results")
             command_validation = self.validate_suno_commands(command_set)
             workflow_results['steps_completed'].append('validation')
             workflow_results['results']['validation'] = command_validation.to_dict()
-            
+
             workflow_results['success'] = True
             logger.info("Complete workflow executed successfully")
-            
+
         except Exception as e:
             logger.error(f"Workflow execution failed: {e}")
             workflow_results['errors'].append(str(e))
-        
+
         return workflow_results
-    
+
     # ================================================================================================
     # UTILITY OPERATIONS
     # ================================================================================================
-    
+
     def get_data_summary(self, data: Any) -> Dict[str, Any]:
         """
         Get summary information about any MCP data object
@@ -449,7 +456,7 @@ class MCPDataManager:
             'completeness': 'unknown',
             'key_fields': []
         }
-        
+
         try:
             if isinstance(data, StandardCharacterProfile):
                 summary['size'] = len(data.to_dict())
@@ -458,28 +465,28 @@ class MCPDataManager:
                 summary['quality_score'] = calculate_data_quality_score(
                     data.to_dict(), summary['key_fields']
                 )
-            
+
             elif isinstance(data, ArtistPersona):
                 summary['size'] = len(data.to_dict())
                 summary['key_fields'] = ['character_name', 'genre_info', 'lyrical_themes']
                 summary['quality_score'] = data.confidence_score
-            
+
             elif isinstance(data, SunoCommandSet):
                 summary['size'] = len(data.commands)
                 summary['key_fields'] = ['commands', 'character_context', 'genre_info']
                 summary['quality_score'] = data.quality_score
-            
+
             elif isinstance(data, dict):
                 summary['size'] = len(data)
                 summary['key_fields'] = list(data.keys())[:5]  # First 5 keys
                 summary['quality_score'] = calculate_data_quality_score(data, summary['key_fields'])
-            
+
         except Exception as e:
             logger.warning(f"Failed to generate summary for {type(data)}: {e}")
             summary['error'] = str(e)
-        
+
         return summary
-    
+
     def export_data(self, data: Any, format_type: str = "json") -> str:
         """
         Export data in specified format
@@ -504,7 +511,7 @@ class MCPDataManager:
         except Exception as e:
             logger.error(f"Failed to export data: {e}")
             return f"Export failed: {e}"
-    
+
     def clear_cache(self) -> None:
         """Clear internal cache"""
         self._cache.clear()
@@ -543,14 +550,14 @@ def quick_persona_creation(character_data: Any, genre: str = None) -> ArtistPers
 def quick_suno_generation(persona_data: Any) -> List[str]:
     """Quick Suno command generation"""
     manager = get_data_manager()
-    
+
     if isinstance(persona_data, ArtistPersona):
         persona = persona_data
     else:
         # Try to convert to persona
         character = manager.process_character_input(persona_data)
         persona = manager.create_artist_persona(character)
-    
+
     command_set = manager.create_suno_commands(persona)
     return [cmd.command_text for cmd in command_set.commands]
 
@@ -564,20 +571,20 @@ def get_workflow_summary(workflow_results: Dict[str, Any]) -> str:
     if not workflow_results.get('success', False):
         errors = workflow_results.get('errors', [])
         return f"Workflow failed. Errors: {'; '.join(errors)}"
-    
+
     steps = workflow_results.get('steps_completed', [])
     results = workflow_results.get('results', {})
-    
+
     summary_parts = [f"Workflow completed successfully ({len(steps)} steps)"]
-    
+
     if 'character_analysis' in results:
         char_count = len(results['character_analysis'].get('characters', []))
         summary_parts.append(f"Found {char_count} character(s)")
-    
+
     if 'suno_commands' in results:
         cmd_count = len(results['suno_commands'].get('commands', []))
         summary_parts.append(f"Generated {cmd_count} Suno command(s)")
-    
+
     return ". ".join(summary_parts)
 
 

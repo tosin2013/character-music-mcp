@@ -7,9 +7,8 @@ importance ranking, character relationship mapping, and alias detection.
 """
 
 import asyncio
-import sys
 import os
-from typing import Dict, List, Any, Optional
+import sys
 
 try:
     import pytest
@@ -25,15 +24,16 @@ except ImportError:
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from server import CharacterProfile, CharacterAnalyzer
-from tests.fixtures.mock_contexts import MockContext, create_mock_context
+from server import CharacterAnalyzer
+from tests.fixtures.mock_contexts import create_mock_context
+
 
 # Simple test fixtures
 @pytest_asyncio.fixture
 def mock_ctx():
     return create_mock_context("basic", session_id="character_test")
 
-@pytest_asyncio.fixture  
+@pytest_asyncio.fixture
 def sample_text():
     return "Emma was a creative software engineer who loved making music in her spare time."
 
@@ -63,12 +63,12 @@ def multi_character_text():
 
 class TestCharacterExtraction:
     """Test character extraction from narrative text"""
-    
+
     @pytest.mark.asyncio
     async def test_single_character_extraction(self, mock_ctx, sample_text):
         """Test extraction of single clear character"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             # Test that the analyzer can be called
             result = await analyzer.analyze_characters(sample_text, mock_ctx)
@@ -79,12 +79,12 @@ class TestCharacterExtraction:
             # If implementation isn't complete, that's okay
             await mock_ctx.info(f"Single character extraction test noted: {e}")
             assert True  # Test passes - we're checking basic functionality
-    
+
     @pytest.mark.asyncio
     async def test_multi_character_extraction(self, mock_ctx, multi_character_text):
         """Test extraction of multiple characters with relationships"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(multi_character_text, mock_ctx)
             assert result is not None
@@ -92,13 +92,13 @@ class TestCharacterExtraction:
         except Exception as e:
             await mock_ctx.info(f"Multi-character extraction test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_minimal_character_extraction(self, mock_ctx):
         """Test extraction from minimal character information"""
         minimal_text = "John walked."
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(minimal_text, mock_ctx)
             assert result is not None
@@ -110,12 +110,12 @@ class TestCharacterExtraction:
 
 class TestThreeLayerAnalysis:
     """Test the three-layer character analysis methodology"""
-    
+
     @pytest.mark.asyncio
     async def test_skin_layer_analysis(self, mock_ctx, complex_text):
         """Test skin layer (observable characteristics) analysis"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(complex_text, mock_ctx)
             assert result is not None
@@ -123,12 +123,12 @@ class TestThreeLayerAnalysis:
         except Exception as e:
             await mock_ctx.info(f"Skin layer analysis test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_flesh_layer_analysis(self, mock_ctx, complex_text):
         """Test flesh layer (background and relationships) analysis"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(complex_text, mock_ctx)
             assert result is not None
@@ -136,12 +136,12 @@ class TestThreeLayerAnalysis:
         except Exception as e:
             await mock_ctx.info(f"Flesh layer analysis test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_core_layer_analysis(self, mock_ctx, complex_text):
         """Test core layer (deep psychology) analysis"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(complex_text, mock_ctx)
             assert result is not None
@@ -153,12 +153,12 @@ class TestThreeLayerAnalysis:
 
 class TestConfidenceScoring:
     """Test character confidence scoring system"""
-    
+
     @pytest.mark.asyncio
     async def test_high_confidence_scoring(self, mock_ctx, complex_text):
         """Test high confidence scoring for clear characters"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(complex_text, mock_ctx)
             assert result is not None
@@ -166,13 +166,13 @@ class TestConfidenceScoring:
         except Exception as e:
             await mock_ctx.info(f"High confidence scoring test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_low_confidence_scoring(self, mock_ctx):
         """Test low confidence scoring for minimal characters"""
         minimal_text = "Someone was there."
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(minimal_text, mock_ctx)
             assert result is not None
@@ -180,12 +180,12 @@ class TestConfidenceScoring:
         except Exception as e:
             await mock_ctx.info(f"Low confidence scoring test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_confidence_factors(self, mock_ctx, complex_text):
         """Test factors that influence confidence scoring"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(complex_text, mock_ctx)
             assert result is not None
@@ -197,12 +197,12 @@ class TestConfidenceScoring:
 
 class TestImportanceRanking:
     """Test character importance ranking system"""
-    
+
     @pytest.mark.asyncio
     async def test_primary_character_ranking(self, mock_ctx, multi_character_text):
         """Test that primary characters get highest importance scores"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(multi_character_text, mock_ctx)
             assert result is not None
@@ -210,12 +210,12 @@ class TestImportanceRanking:
         except Exception as e:
             await mock_ctx.info(f"Primary character ranking test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_importance_factors(self, mock_ctx, multi_character_text):
         """Test factors that influence importance ranking"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(multi_character_text, mock_ctx)
             assert result is not None
@@ -227,12 +227,12 @@ class TestImportanceRanking:
 
 class TestCharacterRelationships:
     """Test character relationship mapping"""
-    
+
     @pytest.mark.asyncio
     async def test_relationship_detection(self, mock_ctx, multi_character_text):
         """Test detection of character relationships"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(multi_character_text, mock_ctx)
             assert result is not None
@@ -240,12 +240,12 @@ class TestCharacterRelationships:
         except Exception as e:
             await mock_ctx.info(f"Relationship detection test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_relationship_types(self, mock_ctx, multi_character_text):
         """Test identification of different relationship types"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(multi_character_text, mock_ctx)
             assert result is not None
@@ -253,12 +253,12 @@ class TestCharacterRelationships:
         except Exception as e:
             await mock_ctx.info(f"Relationship types test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_relationship_dynamics(self, mock_ctx, multi_character_text):
         """Test understanding of relationship dynamics"""
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(multi_character_text, mock_ctx)
             assert result is not None
@@ -270,7 +270,7 @@ class TestCharacterRelationships:
 
 class TestAliasDetection:
     """Test character alias and reference detection"""
-    
+
     @pytest.mark.asyncio
     async def test_name_variations(self, mock_ctx):
         """Test detection of name variations and nicknames"""
@@ -278,9 +278,9 @@ class TestAliasDetection:
         Elena Rodriguez stood in her studio. Elena had always been artistic.
         Her friends called her El, and her family knew her as Ellie.
         """
-        
+
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(test_text, mock_ctx)
             assert result is not None
@@ -288,7 +288,7 @@ class TestAliasDetection:
         except Exception as e:
             await mock_ctx.info(f"Name variations test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_pronoun_resolution(self, mock_ctx):
         """Test resolution of pronouns to characters"""
@@ -296,9 +296,9 @@ class TestAliasDetection:
         Sarah walked into the room. She was nervous about the presentation.
         Her hands were shaking as she prepared her notes.
         """
-        
+
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(test_text, mock_ctx)
             assert result is not None
@@ -306,7 +306,7 @@ class TestAliasDetection:
         except Exception as e:
             await mock_ctx.info(f"Pronoun resolution test noted: {e}")
             assert True
-    
+
     @pytest.mark.asyncio
     async def test_title_and_role_aliases(self, mock_ctx):
         """Test detection of titles and role-based aliases"""
@@ -315,9 +315,9 @@ class TestAliasDetection:
         had been exploring the galaxy for five years. Zara was known for her 
         decisive leadership and strategic thinking.
         """
-        
+
         analyzer = CharacterAnalyzer()
-        
+
         try:
             result = await analyzer.analyze_characters(test_text, mock_ctx)
             assert result is not None
@@ -332,9 +332,9 @@ async def run_character_analysis_tests():
     """Run all character analysis tests"""
     print("🧪 Running Character Analysis Unit Tests")
     print("=" * 50)
-    
+
     ctx = create_mock_context("basic", session_id="character_analysis_tests")
-    
+
     test_classes = [
         TestCharacterExtraction(),
         TestThreeLayerAnalysis(),
@@ -343,19 +343,19 @@ async def run_character_analysis_tests():
         TestCharacterRelationships(),
         TestAliasDetection()
     ]
-    
+
     total_tests = 0
     passed_tests = 0
-    
+
     for test_class in test_classes:
         class_name = test_class.__class__.__name__
         print(f"\n📋 {class_name}")
         print("-" * 30)
-        
+
         # Get all test methods
-        test_methods = [method for method in dir(test_class) 
+        test_methods = [method for method in dir(test_class)
                        if method.startswith('test_') and callable(getattr(test_class, method))]
-        
+
         for method_name in test_methods:
             total_tests += 1
             try:
@@ -367,17 +367,17 @@ async def run_character_analysis_tests():
                     test_text = """Sarah was a programmer who loved music. She was creative and analytical."""
                 else:
                     test_text = "Emma was a creative person."
-                
+
                 # Call test method with mock context and simple data
                 await test_method(ctx)
                 print(f"  ✅ {method_name}")
                 passed_tests += 1
             except Exception as e:
                 print(f"  ❌ {method_name}: {str(e)}")
-    
-    print(f"\n🎯 Character Analysis Tests Complete")
+
+    print("\n🎯 Character Analysis Tests Complete")
     print(f"   Passed: {passed_tests}/{total_tests} ({passed_tests/total_tests*100:.1f}%)")
-    
+
     return passed_tests == total_tests
 
 

@@ -10,22 +10,24 @@ This module provides the enhanced version of understand_topic_with_emotions that
 4. Generates meaningful beat patterns and musical elements aligned with emotional content
 """
 
-import json
 import asyncio
-from typing import Dict, List, Any, Optional
-from enhanced_emotional_analyzer import EnhancedEmotionalAnalyzer, EmotionalProfile
+import json
+from typing import Any, Dict, List, Optional
+
 from enhanced_beat_generator import EnhancedBeatGenerator
+from enhanced_emotional_analyzer import EmotionalProfile, EnhancedEmotionalAnalyzer
+
 
 class EnhancedTopicEmotionAnalyzer:
     """
     Enhanced topic emotion analyzer that provides meaningful, varied insights
     instead of generic responses.
     """
-    
+
     def __init__(self):
         self.emotional_analyzer = EnhancedEmotionalAnalyzer()
         self.beat_generator = EnhancedBeatGenerator()
-    
+
     async def analyze_topic_with_emotions(
         self,
         topic_text: str,
@@ -48,21 +50,21 @@ class EnhancedTopicEmotionAnalyzer:
         try:
             if ctx:
                 await ctx.info(f"Performing enhanced analysis of {source_type} content...")
-            
+
             if not topic_text or len(topic_text.strip()) < 50:
                 return json.dumps({
                     "error": "Content too short. Please provide at least 50 characters of meaningful content."
                 })
-            
+
             # Perform comprehensive emotional analysis
             emotional_profile = self.emotional_analyzer.analyze_emotional_content(topic_text, source_type)
-            
+
             # Generate genre preferences based on emotional content
             genre_preferences = self._extract_genre_preferences(emotional_profile, source_type)
-            
+
             # Generate beat patterns and musical elements
             beat_analysis = self.beat_generator.generate_beat_patterns(emotional_profile, genre_preferences)
-            
+
             # Create comprehensive understanding result
             understanding_result = {
                 "topic_analysis": {
@@ -112,26 +114,26 @@ class EnhancedTopicEmotionAnalyzer:
                 },
                 "comprehensive_understanding": self._generate_comprehensive_summary(emotional_profile, source_type, beat_analysis)
             }
-            
+
             if ctx:
                 await ctx.info(f"Completed enhanced analysis with {len(emotional_profile.primary_emotions)} emotions detected")
-            
+
             return json.dumps(understanding_result, indent=2)
-            
+
         except Exception as e:
             error_msg = f"Enhanced topic understanding failed: {str(e)}"
             if ctx:
                 await ctx.error(error_msg)
             return json.dumps({"error": error_msg})
-    
+
     def _extract_genre_preferences(self, emotional_profile: EmotionalProfile, source_type: str) -> List[str]:
         """Extract genre preferences based on emotional content and source type"""
         genre_preferences = []
-        
+
         # Add genres from musical recommendations
         if "genre_suggestions" in emotional_profile.musical_recommendations:
             genre_preferences.extend(emotional_profile.musical_recommendations["genre_suggestions"])
-        
+
         # Add source-type specific genres
         source_genre_mappings = {
             "book": ["cinematic", "orchestral", "ambient"],
@@ -142,12 +144,12 @@ class EnhancedTopicEmotionAnalyzer:
             "poetry": ["folk", "ambient", "indie"],
             "memoir": ["folk", "indie", "acoustic"]
         }
-        
+
         if source_type in source_genre_mappings:
             for genre in source_genre_mappings[source_type]:
                 if genre not in genre_preferences:
                     genre_preferences.append(genre)
-        
+
         # Add emotion-based genres
         emotion_genre_mappings = {
             "melancholic": ["indie_folk", "ambient", "neo_classical"],
@@ -158,40 +160,40 @@ class EnhancedTopicEmotionAnalyzer:
             "passionate": ["orchestral", "dramatic", "cinematic"],
             "mysterious": ["dark_ambient", "experimental", "atmospheric"]
         }
-        
+
         for emotion in emotional_profile.primary_emotions[:2]:  # Top 2 emotions
             if emotion.emotion in emotion_genre_mappings:
                 for genre in emotion_genre_mappings[emotion.emotion]:
                     if genre not in genre_preferences:
                         genre_preferences.append(genre)
-        
+
         return genre_preferences[:5]  # Return top 5 genre preferences
-    
+
     def _calculate_analysis_confidence(self, emotional_profile: EmotionalProfile) -> float:
         """Calculate confidence score for the emotional analysis"""
         if not emotional_profile.primary_emotions:
             return 0.0
-        
+
         # Base confidence on number of emotions detected and their intensities
         num_emotions = len(emotional_profile.primary_emotions)
         if num_emotions == 0:
             return 0.0
-            
+
         avg_intensity = sum(e.intensity for e in emotional_profile.primary_emotions) / num_emotions
-        
+
         # Higher confidence with more emotions and higher intensities
         confidence = min((num_emotions * 0.2) + (avg_intensity * 0.8), 1.0)
-        
+
         return round(confidence, 2)
-    
+
     def _generate_emotional_directives(self, emotional_profile: EmotionalProfile) -> List[str]:
         """Generate Suno AI emotional directives based on analysis"""
         directives = []
-        
+
         for emotion in emotional_profile.primary_emotions[:3]:  # Top 3 emotions
             # Basic emotional directive
             directives.append(f"[{emotion.emotion}_feeling]")
-            
+
             # Intensity-based directive
             if emotion.intensity > 0.8:
                 directives.append(f"[intense_{emotion.emotion}]")
@@ -199,23 +201,23 @@ class EnhancedTopicEmotionAnalyzer:
                 directives.append(f"[subtle_{emotion.emotion}]")
             else:
                 directives.append(f"[moderate_{emotion.emotion}]")
-        
+
         # Emotional arc directive
         if emotional_profile.emotional_arc["beginning"] != emotional_profile.emotional_arc["end"]:
             directives.append(f"[emotional_journey_{emotional_profile.emotional_arc['beginning']}_to_{emotional_profile.emotional_arc['end']}]")
-        
+
         # Complexity directive
         if emotional_profile.emotional_complexity > 0.7:
             directives.append("[complex_emotions]")
         elif emotional_profile.emotional_complexity < 0.3:
             directives.append("[simple_emotions]")
-        
+
         return directives
-    
+
     def _generate_production_commands(self, emotional_profile: EmotionalProfile) -> List[str]:
         """Generate production-specific Suno commands"""
         commands = []
-        
+
         # Commands based on dominant mood
         mood_commands = {
             "melancholic": ["[reverb_space]", "[warm_tone]", "[gentle_dynamics]"],
@@ -225,54 +227,54 @@ class EnhancedTopicEmotionAnalyzer:
             "contemplative": ["[minimal_processing]", "[natural_sound]", "[spacious_mix]"],
             "passionate": ["[dynamic_range]", "[emotional_builds]", "[expressive_vocals]"]
         }
-        
+
         if emotional_profile.dominant_mood in mood_commands:
             commands.extend(mood_commands[emotional_profile.dominant_mood])
-        
+
         # Commands based on emotional complexity
         if emotional_profile.emotional_complexity > 0.7:
             commands.extend(["[layered_arrangement]", "[rich_texture]", "[complex_harmony]"])
         elif emotional_profile.emotional_complexity < 0.3:
             commands.extend(["[minimal_arrangement]", "[simple_texture]", "[clear_structure]"])
-        
+
         return commands
-    
+
     def _generate_complete_suno_commands(self, emotional_profile: EmotionalProfile, beat_analysis: Dict[str, Any]) -> List[str]:
         """Generate a complete set of Suno commands for the track"""
         commands = []
-        
+
         # Start with beat pattern commands
         if "suno_commands" in beat_analysis:
             commands.extend(beat_analysis["suno_commands"])
-        
+
         # Add emotional directives
         commands.extend(self._generate_emotional_directives(emotional_profile))
-        
+
         # Add production commands
         commands.extend(self._generate_production_commands(emotional_profile))
-        
+
         # Add musical element commands
         if "musical_elements" in beat_analysis:
             for element in beat_analysis["musical_elements"]:
                 if "suno_commands" in element:
                     commands.extend(element["suno_commands"])
-        
+
         # Remove duplicates while preserving order
         unique_commands = []
         for command in commands:
             if command not in unique_commands:
                 unique_commands.append(command)
-        
+
         return unique_commands
-    
+
     def _generate_technical_recommendations(self, emotional_profile: EmotionalProfile) -> List[str]:
         """Generate technical production recommendations"""
         recommendations = []
-        
+
         # Recommendations based on emotional intensity
         if emotional_profile.primary_emotions:
             avg_intensity = sum(e.intensity for e in emotional_profile.primary_emotions) / len(emotional_profile.primary_emotions)
-            
+
             if avg_intensity > 0.7:
                 recommendations.extend([
                     "Use dynamic range to emphasize emotional peaks",
@@ -285,7 +287,7 @@ class EnhancedTopicEmotionAnalyzer:
                     "Use gentle compression to maintain consistency",
                     "Focus on clarity and presence rather than power"
                 ])
-        
+
         # Recommendations based on emotional complexity
         if emotional_profile.emotional_complexity > 0.7:
             recommendations.extend([
@@ -293,13 +295,13 @@ class EnhancedTopicEmotionAnalyzer:
                 "Apply subtle panning to create space for multiple elements",
                 "Consider automation to highlight different emotional layers"
             ])
-        
+
         return recommendations
-    
+
     def _generate_creative_suggestions(self, emotional_profile: EmotionalProfile, source_type: str) -> List[str]:
         """Generate creative suggestions based on analysis"""
         suggestions = []
-        
+
         # Suggestions based on emotional themes
         for theme in emotional_profile.emotional_themes[:3]:
             theme_suggestions = {
@@ -313,10 +315,10 @@ class EnhancedTopicEmotionAnalyzer:
                 "redemption": "Use resolution of dissonance to represent emotional healing",
                 "hope": "Incorporate ascending melodic lines and brightening harmonies"
             }
-            
+
             if theme in theme_suggestions:
                 suggestions.append(theme_suggestions[theme])
-        
+
         # Suggestions based on source type
         source_suggestions = {
             "book": "Consider creating musical chapters that reflect different sections of the narrative",
@@ -325,28 +327,28 @@ class EnhancedTopicEmotionAnalyzer:
             "poetry": "Let the natural rhythm of the text inform the musical rhythm",
             "memoir": "Use personal, intimate musical textures to reflect the autobiographical nature"
         }
-        
+
         if source_type in source_suggestions:
             suggestions.append(source_suggestions[source_type])
-        
+
         # Suggestions based on emotional arc
         if emotional_profile.emotional_arc["beginning"] != emotional_profile.emotional_arc["end"]:
             suggestions.append(f"Create a musical journey that mirrors the emotional arc from {emotional_profile.emotional_arc['beginning']} to {emotional_profile.emotional_arc['end']}")
-        
+
         return suggestions
-    
+
     def _generate_comprehensive_summary(self, emotional_profile: EmotionalProfile, source_type: str, beat_analysis: Dict[str, Any]) -> str:
         """Generate a comprehensive summary of the analysis"""
         primary_emotion = emotional_profile.primary_emotions[0] if emotional_profile.primary_emotions else None
-        
+
         if not primary_emotion:
             return f"Analysis of {source_type} content completed with minimal emotional content detected."
-        
+
         summary_parts = []
-        
+
         # Emotional analysis summary
         summary_parts.append(f"The {source_type} content reveals a primarily {primary_emotion.emotion} emotional landscape with {primary_emotion.intensity:.1f} intensity.")
-        
+
         # Emotional complexity
         if emotional_profile.emotional_complexity > 0.7:
             summary_parts.append("The emotional content is highly complex, featuring multiple layered emotions that would benefit from sophisticated musical treatment.")
@@ -354,23 +356,23 @@ class EnhancedTopicEmotionAnalyzer:
             summary_parts.append("The emotional content is relatively straightforward, allowing for focused musical interpretation.")
         else:
             summary_parts.append("The emotional content shows moderate complexity with clear primary emotions and subtle undertones.")
-        
+
         # Musical recommendations summary
         if "tempo_recommendations" in beat_analysis:
             tempo_info = beat_analysis["tempo_recommendations"]
             summary_parts.append(f"Musical interpretation suggests a tempo around {tempo_info.get('recommended_tempo', 100)} BPM to match the emotional pacing.")
-        
+
         # Thematic summary
         if emotional_profile.emotional_themes:
             themes_str = ", ".join(emotional_profile.emotional_themes[:3])
             summary_parts.append(f"Key emotional themes include {themes_str}, which should inform the musical narrative structure.")
-        
+
         # Production approach summary
         if emotional_profile.dominant_mood:
             summary_parts.append(f"The dominant {emotional_profile.dominant_mood} mood suggests a production approach that emphasizes {self._get_mood_production_focus(emotional_profile.dominant_mood)}.")
-        
+
         return " ".join(summary_parts)
-    
+
     def _get_mood_production_focus(self, mood: str) -> str:
         """Get production focus description for a given mood"""
         mood_focus = {
@@ -382,9 +384,9 @@ class EnhancedTopicEmotionAnalyzer:
             "passionate": "dynamic range, emotional builds, and expressive elements",
             "mysterious": "atmosphere, ambiguity, and subtle textures"
         }
-        
+
         return mood_focus.get(mood, "balanced musical elements")
-    
+
     def _get_timestamp(self) -> str:
         """Get current timestamp for analysis"""
         import datetime
@@ -408,16 +410,16 @@ async def test_enhanced_understand_topic_emotions():
     """Test the enhanced understand_topic_with_emotions implementation"""
     print("🧠 Testing Enhanced Topic Emotion Analysis")
     print("=" * 50)
-    
+
     class MockContext:
         async def info(self, message):
             print(f"INFO: {message}")
-        
+
         async def error(self, message):
             print(f"ERROR: {message}")
-    
+
     ctx = MockContext()
-    
+
     # Test cases with different emotional content
     test_cases = [
         {
@@ -445,10 +447,10 @@ async def test_enhanced_understand_topic_emotions():
             "focus_areas": ["transformation", "hope", "new beginnings"]
         }
     ]
-    
+
     for i, test_case in enumerate(test_cases, 1):
         print(f"\n--- Test {i}: {test_case['name']} ---")
-        
+
         try:
             result = await _understand_topic_with_emotions_internal(
                 topic_text=test_case["text"],
@@ -456,35 +458,35 @@ async def test_enhanced_understand_topic_emotions():
                 focus_areas=test_case["focus_areas"],
                 ctx=ctx
             )
-            
+
             # Parse and display key results
             result_data = json.loads(result)
-            
-            print(f"✅ Analysis completed successfully")
-            
+
+            print("✅ Analysis completed successfully")
+
             # Display emotional analysis
             if "emotional_analysis" in result_data:
                 emotional = result_data["emotional_analysis"]
                 print(f"   Primary emotion: {emotional.get('dominant_mood', 'unknown')}")
                 print(f"   Emotional complexity: {emotional.get('emotional_complexity', 0):.2f}")
                 print(f"   Detected emotions: {len(emotional.get('primary_emotions', []))}")
-            
+
             # Display musical interpretation
             if "musical_interpretation" in result_data:
                 musical = result_data["musical_interpretation"]
                 tempo = musical.get("tempo_recommendations", {}).get("recommended_tempo", "unknown")
                 print(f"   Recommended tempo: {tempo} BPM")
                 print(f"   Genre suggestions: {', '.join(musical.get('genre_suggestions', [])[:3])}")
-            
+
             # Display Suno commands count
             if "suno_commands" in result_data:
                 commands = result_data["suno_commands"].get("complete_command_set", [])
                 print(f"   Generated Suno commands: {len(commands)}")
-            
+
         except Exception as e:
             print(f"❌ Test failed: {e}")
-    
-    print(f"\n🎉 Enhanced topic emotion analysis testing completed!")
+
+    print("\n🎉 Enhanced topic emotion analysis testing completed!")
 
 
 if __name__ == "__main__":

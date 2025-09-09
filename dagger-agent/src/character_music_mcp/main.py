@@ -4,17 +4,11 @@ An automated system that monitors GitHub Actions workflows, detects test failure
 analyzes them using AI, generates fixes, and creates pull requests.
 """
 
-import asyncio
 import json
-import logging
-import os
-from typing import Dict, List, Optional, Any
 
 import dagger
-from dagger import dag, function, object_type
 import structlog
-import httpx
-
+from dagger import dag, function, object_type
 
 # Configure structured logging
 structlog.configure(
@@ -56,7 +50,7 @@ class DaggerTestRepairAgent:
     ) -> dagger.Container:
         """Validate Python environment setup for testing"""
         logger.info("Validating Python environment", python_version=python_version)
-        
+
         return (
             dag.container()
             .from_(f"python:{python_version}")
@@ -80,7 +74,7 @@ class DaggerTestRepairAgent:
             python_version=python_version,
             test_command=test_command
         )
-        
+
         container = (
             dag.container()
             .from_(f"python:{python_version}")
@@ -91,7 +85,7 @@ class DaggerTestRepairAgent:
             .with_exec(["bash", "-c", "source .venv/bin/activate && uv pip install -e .[test]"])
             .with_exec(["bash", "-c", f"source .venv/bin/activate && {test_command}"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -102,7 +96,7 @@ class DaggerTestRepairAgent:
     ) -> str:
         """Run quality checks (ruff, mypy) in a containerized environment"""
         logger.info("Running quality checks", python_version=python_version)
-        
+
         container = (
             dag.container()
             .from_(f"python:{python_version}")
@@ -114,7 +108,7 @@ class DaggerTestRepairAgent:
             .with_exec(["bash", "-c", "source .venv/bin/activate && uv pip install ruff mypy"])
             .with_exec(["bash", "-c", "source .venv/bin/activate && ruff check ."])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -130,7 +124,7 @@ class DaggerTestRepairAgent:
             python_version=python_version,
             test_type=test_type
         )
-        
+
         # Map test types to commands
         test_commands = {
             "unit": "pytest tests/unit/ -v --cov=. --cov-fail-under=80",
@@ -138,9 +132,9 @@ class DaggerTestRepairAgent:
             "quality": "ruff check .",
             "all": "pytest tests/ -v --cov=. --cov-fail-under=80"
         }
-        
+
         test_command = test_commands.get(test_type, test_commands["unit"])
-        
+
         container = (
             dag.container()
             .from_(f"python:{python_version}")
@@ -150,13 +144,13 @@ class DaggerTestRepairAgent:
             .with_exec(["uv", "venv", "--python", python_version])
             .with_exec(["bash", "-c", "source .venv/bin/activate && uv pip install -e .[test]"])
         )
-        
+
         # Add quality tools if needed
         if test_type == "quality":
             container = container.with_exec(["bash", "-c", "source .venv/bin/activate && uv pip install ruff mypy"])
-        
+
         container = container.with_exec(["bash", "-c", f"source .venv/bin/activate && {test_command}"])
-        
+
         return await container.stdout()
 
     @function
@@ -172,7 +166,7 @@ class DaggerTestRepairAgent:
             workflow_run_id=workflow_run_id,
             repository=repository
         )
-        
+
         # Create a container with GitHub CLI and Python for API interactions
         container = (
             dag.container()
@@ -189,7 +183,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/detect_failures.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -198,7 +192,7 @@ class DaggerTestRepairAgent:
         github_token: dagger.Secret,
         repository: str,
         workflow_run_id: str,
-        job_name: Optional[str] = None
+        job_name: str | None = None
     ) -> str:
         """Fetch logs from a GitHub workflow run"""
         logger.info(
@@ -207,7 +201,7 @@ class DaggerTestRepairAgent:
             repository=repository,
             job_name=job_name
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -224,7 +218,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/fetch_logs.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -246,7 +240,7 @@ class DaggerTestRepairAgent:
             python_version=python_version,
             failure_type=failure_type
         )
-        
+
         container = (
             dag.container()
             .from_(f"python:{python_version}-slim")
@@ -267,7 +261,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/analyze_fix.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -283,7 +277,7 @@ class DaggerTestRepairAgent:
             "Creating fix pull request",
             repository=repository
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -301,7 +295,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/create_pr.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -318,7 +312,7 @@ class DaggerTestRepairAgent:
             repository=repository,
             python_version=python_version
         )
-        
+
         container = (
             dag.container()
             .from_(f"python:{python_version}")
@@ -337,7 +331,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["bash", "-c", "source .venv/bin/activate && python /validate_fixes.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -356,7 +350,7 @@ class DaggerTestRepairAgent:
             workflow_run_id=workflow_run_id,
             repository=repository
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -373,7 +367,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/generate_report.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -383,7 +377,7 @@ class DaggerTestRepairAgent:
         repository: str,
         pr_number: str,
         action: str,
-        labels: List[str]
+        labels: list[str]
     ) -> str:
         """Manage labels on a pull request (add, remove, or replace)"""
         logger.info(
@@ -393,7 +387,7 @@ class DaggerTestRepairAgent:
             action=action,
             labels=labels
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -409,7 +403,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/manage_labels.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -425,7 +419,7 @@ class DaggerTestRepairAgent:
             repository=repository,
             pr_number=pr_number
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -439,7 +433,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/check_conflicts.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -458,7 +452,7 @@ class DaggerTestRepairAgent:
             pr_number=pr_number,
             append=append
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -474,7 +468,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/update_description.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -490,7 +484,7 @@ class DaggerTestRepairAgent:
             repository=repository,
             max_age_days=max_age_days
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -504,7 +498,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/close_outdated_prs.py"])
         )
-        
+
         return await container.stdout()
 
     @function
@@ -518,7 +512,7 @@ class DaggerTestRepairAgent:
             "Cleaning up agent resources",
             repository=repository
         )
-        
+
         container = (
             dag.container()
             .from_("python:3.10-slim")
@@ -531,7 +525,7 @@ class DaggerTestRepairAgent:
             )
             .with_exec(["python", "/cleanup.py"])
         )
-        
+
         return await container.stdout()
 
     def _get_failure_detection_script(self) -> str:
@@ -1423,14 +1417,14 @@ if __name__ == "__main__":
     @function
     async def create_test_environment(
         self,
-        python_versions: List[str] = None
-    ) -> List[dagger.Container]:
+        python_versions: list[str] = None
+    ) -> list[dagger.Container]:
         """Create test environments for multiple Python versions"""
         if python_versions is None:
             python_versions = ["3.10", "3.11", "3.12"]
-        
+
         logger.info("Creating test environments", python_versions=python_versions)
-        
+
         containers = []
         for version in python_versions:
             container = (
@@ -1440,5 +1434,5 @@ if __name__ == "__main__":
                 .with_exec(["uv", "--version"])
             )
             containers.append(container)
-        
+
         return containers

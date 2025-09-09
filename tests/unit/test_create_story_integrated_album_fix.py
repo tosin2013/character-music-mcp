@@ -1,4 +1,5 @@
 import pytest
+
 #!/usr/bin/env python3
 """
 Test create_story_integrated_album Fix
@@ -9,7 +10,6 @@ using the middleware to avoid MCP tool conflicts.
 
 import asyncio
 import json
-import sys
 import logging
 
 # Configure logging
@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 
 class MockContext:
     """Mock context for testing"""
-    async def info(self, msg): 
+    async def info(self, msg):
         print(f'INFO: {msg}')
-    
-    async def error(self, msg): 
+
+    async def error(self, msg):
         print(f'ERROR: {msg}')
 
 async def create_story_integrated_album_fixed(
@@ -40,33 +40,33 @@ async def create_story_integrated_album_fixed(
     """
     try:
         await ctx.info("Starting story-integrated album creation...")
-        
+
         # Validate inputs
         if track_count < 3 or track_count > 12:
             return json.dumps({"error": "Track count must be between 3 and 12"})
-        
+
         if not narrative_text or len(narrative_text.strip()) < 100:
             return json.dumps({"error": "Narrative text too short. Please provide substantial story content."})
-        
+
         # Import middleware
         from mcp_middleware import middleware
-        
+
         # Step 1: Analyze the narrative to extract characters and story elements
         await ctx.info("Step 1: Analyzing narrative structure...")
-        
+
         analysis_result = await middleware.analyze_characters(narrative_text, ctx)
-        
+
         characters = analysis_result['characters']
         if not characters:
             return json.dumps({"error": "No characters found in narrative. Please provide character-driven content."})
-        
+
         # Create text_analysis object for compatibility
         text_analysis = type('obj', (object,), {
             'characters': characters,
             'narrative_themes': analysis_result.get('narrative_themes', []),
             'emotional_arc': analysis_result.get('emotional_arc', [])
         })()
-        
+
         # Select character perspective
         if character_name:
             selected_character = next((char for char in text_analysis.characters if char.name.lower() == character_name.lower()), None)
@@ -76,41 +76,41 @@ async def create_story_integrated_album_fixed(
             # Auto-select protagonist (highest importance score)
             selected_character = text_analysis.characters[0]
             await ctx.info(f"Auto-selected protagonist: {selected_character.name}")
-        
+
         character_profile = selected_character
-        
+
         # Step 2: Extract story beats and narrative arc
         await ctx.info("Step 2: Extracting story beats and narrative arc...")
         story_beats = middleware.extract_story_beats(narrative_text, character_profile, ctx)
-        
+
         # Step 3: Generate artist persona for the character
         await ctx.info("Step 3: Generating character's musical persona...")
         artist_persona = await middleware.generate_persona(character_profile, ctx)
-        
+
         # Step 4: Map story beats to track concepts
         await ctx.info("Step 4: Mapping story progression to album tracks...")
         track_concepts = middleware.generate_story_based_tracks(
-            story_beats, 
-            character_profile, 
+            story_beats,
+            character_profile,
             artist_persona,
             track_count,
             ctx
         )
-        
+
         # Step 5: Create tracks that follow the story
         album_tracks = []
-        
+
         for i, track_concept in enumerate(track_concepts):
             await ctx.info(f"Creating track {i+1}/{track_count}: {track_concept['title']}")
-            
+
             # Process track content using middleware
             track_result_data = middleware.process_track_content(
-                track_concept, 
-                character_profile, 
-                artist_persona, 
+                track_concept,
+                character_profile,
+                artist_persona,
                 ctx
             )
-            
+
             track_data = {
                 "track_number": i + 1,
                 "title": track_concept['title'],
@@ -126,13 +126,13 @@ async def create_story_integrated_album_fixed(
                 "production_context": track_result_data['character_story']['creative_process'],
                 "effectiveness_score": track_result_data['effectiveness_metrics']['character_authenticity']
             }
-            
+
             album_tracks.append(track_data)
-        
+
         # Derive album concept if not provided
         if not album_concept:
             album_concept = f"{character_profile.name}'s Journey: A Musical Narrative"
-        
+
         # Create album response with story integration metrics
         album_response = {
             "album_status": "story_integrated",
@@ -170,11 +170,11 @@ async def create_story_integrated_album_fixed(
             "album_summary": f"Created {track_count}-track story-integrated album following {character_profile.name}'s journey through key narrative moments",
             "wiki_attribution": middleware.get_wiki_attribution()
         }
-        
+
         await ctx.info(f"Story-integrated album complete: {track_count} narrative-driven tracks")
-        
+
         return json.dumps(album_response, indent=2)
-        
+
     except Exception as e:
         await ctx.error(f"Story-integrated album creation failed: {str(e)}")
         return json.dumps({"error": f"Story album creation failed: {str(e)}"})
@@ -182,7 +182,7 @@ async def create_story_integrated_album_fixed(
 @pytest.mark.asyncio
 async def test_create_story_integrated_album():
     """Test the fixed create_story_integrated_album function"""
-    
+
     # Test narrative with clear characters
     narrative = '''
     Sarah Chen stood at the edge of the rooftop, tears streaming down her face. 
@@ -224,12 +224,12 @@ async def test_create_story_integrated_album():
     
     "Always," Marcus replied without hesitation. "We'll figure this out together."
     '''
-    
+
     ctx = MockContext()
-    
+
     print("=== Testing create_story_integrated_album Fix ===")
     print(f"Narrative length: {len(narrative)} characters")
-    
+
     try:
         # Test the fixed function
         result = await create_story_integrated_album_fixed(
@@ -240,9 +240,9 @@ async def test_create_story_integrated_album():
             require_story_arc=True,
             ctx=ctx
         )
-        
+
         result_data = json.loads(result)
-        
+
         if 'error' in result_data:
             print(f"❌ FAILED: {result_data['error']}")
             return False
@@ -253,16 +253,16 @@ async def test_create_story_integrated_album():
             print(f"Genre: {result_data['album_info']['musical_genre']}")
             print(f"Track count: {result_data['album_info']['total_tracks']}")
             print(f"Average effectiveness: {result_data['album_effectiveness']['average_score']:.2f}")
-            
+
             print("\nTracks:")
             for track in result_data['tracks']:
                 print(f"  {track['track_number']}. {track['title']}")
                 print(f"     Emotional tone: {track['emotional_arc_position']}")
                 print(f"     Narrative function: {track['narrative_function']}")
                 print(f"     Effectiveness: {track['effectiveness_score']:.2f}")
-            
+
             return True
-            
+
     except Exception as e:
         print(f"❌ EXCEPTION: {str(e)}")
         import traceback
@@ -272,7 +272,7 @@ async def test_create_story_integrated_album():
 @pytest.mark.asyncio
 async def test_character_name_specification():
     """Test specifying a specific character name"""
-    
+
     narrative = '''
     Elena Rodriguez stood in her cramped studio apartment, paintbrush trembling 
     in her hand as she stared at the blank canvas. At twenty-eight, she had already 
@@ -294,11 +294,11 @@ async def test_character_name_specification():
     Elena picked up her brush and dipped it in paint. Tonight, she would create 
     something beautiful. Tonight, she would remember who she really was.
     '''
-    
+
     ctx = MockContext()
-    
+
     print("\n=== Testing Character Name Specification ===")
-    
+
     try:
         # Test with specific character name
         result = await create_story_integrated_album_fixed(
@@ -309,9 +309,9 @@ async def test_character_name_specification():
             require_story_arc=True,
             ctx=ctx
         )
-        
+
         result_data = json.loads(result)
-        
+
         if 'error' in result_data:
             print(f"❌ FAILED: {result_data['error']}")
             return False
@@ -319,7 +319,7 @@ async def test_character_name_specification():
             print("✅ SUCCESS: Album created with specified character!")
             print(f"Protagonist: {result_data['album_info']['protagonist']}")
             print(f"Album concept: {result_data['album_info']['title']}")
-            
+
             # Verify Elena was selected
             if "Elena" in result_data['album_info']['protagonist']:
                 print("✅ Correct character selected: Elena")
@@ -327,7 +327,7 @@ async def test_character_name_specification():
             else:
                 print(f"❌ Wrong character selected: {result_data['album_info']['protagonist']}")
                 return False
-            
+
     except Exception as e:
         print(f"❌ EXCEPTION: {str(e)}")
         return False
@@ -335,11 +335,11 @@ async def test_character_name_specification():
 @pytest.mark.asyncio
 async def test_error_cases():
     """Test error handling"""
-    
+
     ctx = MockContext()
-    
+
     print("\n=== Testing Error Cases ===")
-    
+
     # Test 1: Too short narrative
     print("Test 1: Too short narrative")
     result = await create_story_integrated_album_fixed(
@@ -352,7 +352,7 @@ async def test_error_cases():
     else:
         print("❌ Failed to reject short narrative")
         return False
-    
+
     # Test 2: Invalid track count
     print("Test 2: Invalid track count")
     result = await create_story_integrated_album_fixed(
@@ -366,7 +366,7 @@ async def test_error_cases():
     else:
         print("❌ Failed to reject invalid track count")
         return False
-    
+
     # Test 3: Character not found
     print("Test 3: Character not found")
     narrative = '''
@@ -393,7 +393,7 @@ async def test_error_cases():
         print("❌ Failed to handle character not found")
         print(f"Got result: {result_data}")
         return False
-    
+
     print("✅ All error cases handled correctly")
     return True
 
@@ -401,16 +401,16 @@ async def main():
     """Run all tests"""
     print("Testing create_story_integrated_album Character Detection Fix")
     print("=" * 60)
-    
+
     # Test 1: Basic functionality
     test1_result = await test_create_story_integrated_album()
-    
+
     # Test 2: Character name specification
     test2_result = await test_character_name_specification()
-    
+
     # Test 3: Error handling
     test3_result = await test_error_cases()
-    
+
     # Summary
     print("\n" + "=" * 60)
     print("TEST SUMMARY")
@@ -418,7 +418,7 @@ async def main():
     print(f"Basic album creation: {'✅ PASS' if test1_result else '❌ FAIL'}")
     print(f"Character specification: {'✅ PASS' if test2_result else '❌ FAIL'}")
     print(f"Error handling: {'✅ PASS' if test3_result else '❌ FAIL'}")
-    
+
     if test1_result and test2_result and test3_result:
         print("\n🎉 ALL TESTS PASSED - Task 8 implementation successful!")
         print("\nThe create_story_integrated_album character detection has been fixed:")
@@ -431,7 +431,7 @@ async def main():
         print("\nThe middleware approach successfully avoids MCP tool conflicts!")
     else:
         print("\n❌ SOME TESTS FAILED - Task 8 needs additional work")
-    
+
     return test1_result and test2_result and test3_result
 
 if __name__ == "__main__":

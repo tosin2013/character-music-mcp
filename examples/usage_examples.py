@@ -9,7 +9,6 @@ through the MCP client interface.
 
 import asyncio
 import json
-from fastmcp import Client
 
 # Sample narrative texts for testing
 SAMPLE_NARRATIVES = {
@@ -29,7 +28,7 @@ SAMPLE_NARRATIVES = {
     determine their fate, and Elara felt the familiar mix of fear and determination that 
     had carried her through countless battles.
     """,
-    
+
     "modern_drama": """
     Sarah Chen stared at her reflection in the coffee shop window, wondering when she had 
     become so tired. At thirty-five, she was a successful architect with a corner office 
@@ -46,7 +45,7 @@ SAMPLE_NARRATIVES = {
     waiting for this conversation for years, watching his ambitious friend climb the 
     corporate ladder while losing pieces of herself along the way.
     """,
-    
+
     "mystery_thriller": """
     Detective Ray Morrison lit his third cigarette of the morning as he studied the crime 
     scene photos spread across his cluttered desk. Twenty years on the force had taught 
@@ -69,19 +68,19 @@ async def demo_complete_workflow():
     """Demonstrate the complete character-to-music workflow"""
     print("🎭 Character-Driven Music Generation Demo")
     print("=" * 50)
-    
+
     # For demo purposes, we'll simulate the MCP server responses
     # In actual usage, you would connect to the running MCP server
-    
+
     narrative = SAMPLE_NARRATIVES["fantasy_adventure"]
-    
+
     print("📖 Sample Narrative:")
     print(narrative[:200] + "...")
     print()
-    
+
     print("🔍 Step 1: Character Analysis")
     print("Analyzing narrative text for character profiles...")
-    
+
     # Simulated character analysis result
     character_analysis = {
         "characters": [
@@ -105,15 +104,15 @@ async def demo_complete_workflow():
         "narrative_themes": ["revenge", "justice", "friendship", "sacrifice"],
         "emotional_arc": ["Section 1: determination", "Section 2: loyalty", "Section 3: anticipation"]
     }
-    
+
     print(f"✅ Found {len(character_analysis['characters'])} character(s)")
     print(f"   - Primary character: {character_analysis['characters'][0]['name']}")
     print(f"   - Key traits: {', '.join(character_analysis['characters'][0]['personality_drivers'][:2])}")
     print()
-    
+
     print("🎵 Step 2: Artist Persona Generation")
     print("Mapping character psychology to musical identity...")
-    
+
     # Simulated artist persona generation
     artist_persona = {
         "character_name": "Elara",
@@ -127,15 +126,15 @@ async def demo_complete_workflow():
         "persona_description": "Epic orchestral artist channeling ancient warrior spirit with modern cinematic power",
         "character_mapping_confidence": 0.85
     }
-    
+
     print(f"✅ Generated artist persona: {artist_persona['artist_name']}")
     print(f"   - Primary genre: {artist_persona['primary_genre']}")
     print(f"   - Vocal style: {artist_persona['vocal_style']}")
     print()
-    
+
     print("🎼 Step 3: Suno AI Command Generation")
     print("Creating optimized music generation commands...")
-    
+
     # Simulated Suno command generation
     suno_commands = [
         {
@@ -154,19 +153,19 @@ async def demo_complete_workflow():
             "rationale": "Custom command leveraging detailed character analysis for nuanced epic orchestral composition"
         },
         {
-            "command_type": "bracket_notation", 
+            "command_type": "bracket_notation",
             "prompt": "[epic orchestral] [determination] [powerful commanding vocals] [strings, brass, percussion] [heroic energy] Song inspired by Elara's journey through justice and vengeance",
             "estimated_effectiveness": 0.88,
             "rationale": "Bracket notation command for precise musical element control based on character analysis"
         }
     ]
-    
+
     print(f"✅ Generated {len(suno_commands)} optimized commands")
     for i, cmd in enumerate(suno_commands, 1):
         print(f"   {i}. {cmd['command_type'].title()} Command (effectiveness: {cmd['estimated_effectiveness']})")
         print(f"      \"{cmd['prompt'][:80]}...\"")
     print()
-    
+
     print("🎯 Workflow Complete!")
     print("Character successfully transformed into musical artist with Suno AI commands.")
 
@@ -174,16 +173,16 @@ async def demo_creative_mode():
     """Demonstrate creative music generation from abstract concepts"""
     print("\n🎨 Creative Music Generation Demo")
     print("=" * 40)
-    
+
     concepts = [
         "The silence between raindrops",
-        "Digital nostalgia in a cyberpunk world", 
+        "Digital nostalgia in a cyberpunk world",
         "The weight of unspoken words"
     ]
-    
+
     for concept in concepts:
         print(f"💡 Concept: \"{concept}\"")
-        
+
         # Simulated creative generation
         creative_result = {
             "concept": concept,
@@ -201,7 +200,7 @@ async def demo_creative_mode():
                 }
             ]
         }
-        
+
         print(f"   🎵 Generated {len(creative_result['creative_commands'])} interpretations")
         for cmd in creative_result['creative_commands']:
             print(f"      - {cmd['approach']}")
@@ -211,7 +210,7 @@ async def demo_mcp_client_integration():
     """Demonstrate MCP client integration patterns"""
     print("\n🔌 MCP Client Integration Demo")
     print("=" * 40)
-    
+
     print("Example MCP client usage:")
     print("""
     # Connect to the MCP server
@@ -241,7 +240,7 @@ def demo_configuration_examples():
     """Show configuration examples for different deployment scenarios"""
     print("\n⚙️  Configuration Examples")
     print("=" * 35)
-    
+
     print("Claude Desktop MCP Configuration:")
     claude_config = {
         "mcpServers": {
@@ -256,7 +255,7 @@ def demo_configuration_examples():
         }
     }
     print(json.dumps(claude_config, indent=2))
-    
+
     print("\nDocker Compose Configuration:")
     print("""
     services:
@@ -276,13 +275,13 @@ async def main():
     print("🎭🎵 Character-Driven Music Generation MCP Server")
     print("Demonstration and Usage Examples")
     print("=" * 60)
-    
+
     # Run demonstrations
     await demo_complete_workflow()
     await demo_creative_mode()
     await demo_mcp_client_integration()
     demo_configuration_examples()
-    
+
     print("\n✨ Demonstration Complete!")
     print("This MCP server bridges narrative content and musical expression")
     print("through systematic character psychology analysis.")

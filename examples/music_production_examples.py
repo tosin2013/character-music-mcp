@@ -7,8 +7,6 @@ artist stories, producer guidance, and music bible generation.
 """
 
 import asyncio
-import json
-from typing import Dict, Any
 
 # ================================================================================================
 # EXAMPLE 1: Complete Music Production Workflow
@@ -19,7 +17,7 @@ async def example_complete_production_workflow():
     Example of the full music production company workflow
     From narrative text to complete music bible with Suno commands
     """
-    
+
     # Sample narrative text
     narrative_text = """
     Sarah Chen stood at the edge of the rooftop, city lights blurring through tears she refused 
@@ -31,9 +29,9 @@ async def example_complete_production_workflow():
     real." Below, the city hummed its indifferent symphony, but for the first time, Sarah heard 
     her own voice rising above the noise—fragile, frightened, but finally, devastatingly free.
     """
-    
+
     print("=== COMPLETE MUSIC PRODUCTION WORKFLOW ===\n")
-    
+
     # Step 1: Character Analysis
     print("Step 1: Analyzing character using three-layer methodology...")
     character_analysis = {
@@ -64,7 +62,7 @@ async def example_complete_production_workflow():
             }]
         }
     }
-    
+
     # Step 2: Generate Artist Story
     print("\nStep 2: Creating introspective artist story...")
     artist_story = {
@@ -108,7 +106,7 @@ async def example_complete_production_workflow():
             "artistic_evolution": "From perfectionist facade observer to bold storyteller, driven by need for truth"
         }
     }
-    
+
     # Step 3: Generate Musical Persona
     print("\nStep 3: Creating musical persona...")
     musical_persona = {
@@ -130,7 +128,7 @@ async def example_complete_production_workflow():
             "genre_justification": "Indie's raw authenticity matches her journey from perfection to truth"
         }
     }
-    
+
     # Step 4: Producer Analysis
     print("\nStep 4: AI Producer analyzing production needs...")
     producer_analysis = {
@@ -176,7 +174,7 @@ async def example_complete_production_workflow():
             "collaboration_approach": "Solo focus with minimal external collaboration"
         }
     }
-    
+
     # Step 5: Get Suno Knowledge
     print("\nStep 5: Fetching Suno AI best practices...")
     suno_knowledge = {
@@ -199,7 +197,7 @@ async def example_complete_production_workflow():
             }
         }
     }
-    
+
     # Step 6: Create Music Bible
     print("\nStep 6: Creating comprehensive music bible...")
     music_bible = {
@@ -242,7 +240,7 @@ async def example_complete_production_workflow():
             "production_philosophy": "Every production choice serves the story. Minimal, authentic production emphasizing emotional rawness allows Music as a weapon against disappointing others, every note a declaration of authenticity. Raw truth over polished lies. Technical excellence never overshadows emotional truth."
         }
     }
-    
+
     # Step 7: Generate Suno Commands
     print("\nStep 7: Creating optimized Suno AI commands...")
     suno_commands = {
@@ -270,7 +268,7 @@ async def example_complete_production_workflow():
             ]
         }
     }
-    
+
     print("\n=== WORKFLOW COMPLETE ===")
     print("\nGenerated Output Summary:")
     print(f"- Artist Name: {musical_persona['expected_output']['artist_name']}")
@@ -278,7 +276,7 @@ async def example_complete_production_workflow():
     print(f"- Album Concept: {artist_story['expected_output']['album_concepts'][0]['title']}")
     print(f"- Total Song Blueprints: {music_bible['expected_output']['summary']['total_songs']}")
     print(f"- Suno Command Variations: {len(suno_commands['expected_output']['commands'])}")
-    
+
     return {
         "character": character_analysis,
         "story": artist_story,
@@ -297,9 +295,9 @@ async def example_introspective_music_generation():
     Example focused on generating deeply introspective music
     from character psychological profiles
     """
-    
+
     print("\n=== INTROSPECTIVE MUSIC GENERATION ===\n")
-    
+
     # Character with deep internal conflicts
     character_profile = {
         "name": "Marcus Rivera",
@@ -309,7 +307,7 @@ async def example_introspective_music_generation():
         "motivations": ["healing generational trauma", "building authentic community"],
         "formative_experiences": ["father's departure at age 7", "finding solace in music", "grandmother's last words about staying true"]
     }
-    
+
     # Generate introspective themes
     print("Extracting introspective themes from psychological profile...")
     introspective_themes = [
@@ -318,7 +316,7 @@ async def example_introspective_music_generation():
         "reconciling loyalty vs self-preservation",
         "healing generational trauma"
     ]
-    
+
     # Create song concepts
     print("\nGenerating introspective song concepts...")
     song_concepts = [
@@ -341,11 +339,11 @@ async def example_introspective_music_generation():
             "emotional_journey": "Recognition → Confrontation → Forgiveness → Liberation"
         }
     ]
-    
+
     print("\nIntrospective Album Narrative:")
     print("'Letters to My Ghosts' - A journey through the shadows of abandonment to the light of self-acceptance.")
     print("Each song peels back layers of protection to reveal the raw truth beneath.")
-    
+
     return {
         "character": character_profile,
         "themes": introspective_themes,
@@ -361,9 +359,9 @@ async def example_producer_guidance():
     Example showcasing the AI Producer tool's capabilities
     for creating detailed production guidance
     """
-    
+
     print("\n=== AI PRODUCER GUIDANCE EXAMPLE ===\n")
-    
+
     # Artist requiring production guidance
     artist_info = {
         "artist_name": "Echoing Silence",
@@ -372,10 +370,10 @@ async def example_producer_guidance():
         "vocal_style": "ethereal and processed",
         "emotional_core": "melancholic hope"
     }
-    
+
     print("Producer Analysis for:", artist_info["artist_name"])
     print("\nProduction Recommendations:")
-    
+
     production_guide = {
         "overall_approach": "Contrast cold digital textures with warm human elements",
         "sound_design": {
@@ -405,10 +403,10 @@ async def example_producer_guidance():
             "atmosphere": "Arca - 'Desafío'"
         }
     }
-    
+
     print("\nKey Production Philosophy:")
     print("'Technology as a medium for human emotion, not a barrier to it.'")
-    
+
     return production_guide
 
 # ================================================================================================
@@ -420,9 +418,9 @@ async def example_music_bible_usage():
     Example showing how to use a generated Music Bible
     for actual music production
     """
-    
+
     print("\n=== USING YOUR MUSIC BIBLE ===\n")
-    
+
     # Sample Music Bible excerpt
     music_bible_excerpt = {
         "artist": "Fragile Freedom",
@@ -440,28 +438,28 @@ async def example_music_bible_usage():
             "performance_notes": "Channel the rooftop moment - fragile but free"
         }
     }
-    
+
     print("Step-by-Step Production Process:")
     print("\n1. PRE-PRODUCTION")
     print("   - Review emotional arc: Confession → Vulnerability → Liberation")
     print("   - Set up intimate recording space")
     print("   - Prepare artist mentally for vulnerable performance")
-    
+
     print("\n2. SUNO GENERATION")
     print("   - Use primary prompt first")
     print("   - If needed, try variations with different meta tag orders")
     print("   - Save seeds that capture the right emotion")
-    
+
     print("\n3. PRODUCTION NOTES")
     print("   - Vocal approach:", music_bible_excerpt["song_blueprint"]["recording_notes"]["vocals"])
     print("   - Instrumental:", music_bible_excerpt["song_blueprint"]["recording_notes"]["guitar"])
     print("   - Atmosphere:", music_bible_excerpt["song_blueprint"]["recording_notes"]["ambience"])
-    
+
     print("\n4. QUALITY CHECK")
     print("   - Does it feel authentic rather than performed?")
     print("   - Is the vulnerability palpable?")
     print("   - Does it serve the story?")
-    
+
     return music_bible_excerpt
 
 # ================================================================================================
@@ -472,9 +470,9 @@ async def example_troubleshooting():
     """
     Example of troubleshooting common issues in the workflow
     """
-    
+
     print("\n=== TROUBLESHOOTING GUIDE ===\n")
-    
+
     issues_and_solutions = {
         "Issue: Generic Suno Output": {
             "symptoms": "Music sounds like typical genre without character depth",
@@ -514,13 +512,13 @@ async def example_troubleshooting():
             "example_fix": "Remove [Epic Production], add [Bedroom Recording] [Honest]"
         }
     }
-    
+
     print("Quick Diagnostic Questions:")
     print("1. Can you hear the character's story in the music?")
     print("2. Does the production serve or distract from the emotion?")
     print("3. Would the character actually create this music?")
     print("4. Is the vulnerability authentic or performed?")
-    
+
     return issues_and_solutions
 
 # ================================================================================================
@@ -531,14 +529,14 @@ async def main():
     """Run all examples"""
     print("MUSIC PRODUCTION COMPANY WORKFLOW EXAMPLES")
     print("=" * 50)
-    
+
     # Run examples
     await example_complete_production_workflow()
     await example_introspective_music_generation()
     await example_producer_guidance()
     await example_music_bible_usage()
     await example_troubleshooting()
-    
+
     print("\n" + "=" * 50)
     print("EXAMPLES COMPLETE")
     print("\nThese examples demonstrate the full capabilities of the enhanced")

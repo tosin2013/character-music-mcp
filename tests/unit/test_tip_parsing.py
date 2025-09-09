@@ -4,12 +4,12 @@ Test tip page parsing functionality
 """
 
 from wiki_content_parser import ContentParser
-from wiki_data_system import Technique
+
 
 def test_tip_parsing():
     """Test tip page parsing with sample HTML"""
     parser = ContentParser()
-    
+
     # Sample HTML structure similar to Suno AI Wiki tip page
     sample_html = """
     <html>
@@ -64,72 +64,72 @@ def test_tip_parsing():
         </body>
     </html>
     """
-    
+
     try:
         techniques = parser.parse_tip_page(sample_html, "http://test.com/tips/structure-prompts")
-        
+
         print(f"✓ Parsed {len(techniques)} techniques")
-        
+
         # Verify we got the main technique
         technique_names = [t.name for t in techniques]
-        
+
         # Check for main technique
         main_technique = next((t for t in techniques if "Structure Prompts" in t.name), None)
         assert main_technique is not None, "Expected main technique about structuring prompts"
-        
+
         print("✓ Main technique found")
-        
+
         # Check for additional techniques from numbered list
         custom_mode_technique = next((t for t in techniques if "Custom Mode" in t.name), None)
         comma_technique = next((t for t in techniques if "Separating Elements" in t.name), None)
         bracket_technique = next((t for t in techniques if "Brackets" in t.name), None)
-        
+
         assert custom_mode_technique is not None, "Expected technique about custom mode"
         assert comma_technique is not None, "Expected technique about separating elements"
         assert bracket_technique is not None, "Expected technique about using brackets"
-        
+
         print("✓ Additional techniques found")
-        
+
         # Test technique object properties
         assert main_technique.source_url == "http://test.com/tips/structure-prompts", "Source URL not set correctly"
         assert main_technique.technique_type == "prompt_structure", f"Expected 'prompt_structure', got '{main_technique.technique_type}'"
         assert len(main_technique.description) > 0, "Expected description for main technique"
         assert len(main_technique.applicable_scenarios) > 0, "Expected applicable scenarios"
-        
+
         print("✓ Technique object properties validated")
-        
+
         # Test examples extraction
         techniques_with_examples = [t for t in techniques if len(t.examples) > 0]
         assert len(techniques_with_examples) > 0, "Expected at least one technique with examples"
-        
+
         # Check for specific code examples
         all_examples = []
         for t in techniques:
             all_examples.extend(t.examples)
-        
+
         assert any("Heavy Metal" in example for example in all_examples), "Expected Heavy Metal example"
         assert any("Gothic" in example for example in all_examples), "Expected Gothic example"
         assert any("[Verse1]" in example for example in all_examples), "Expected bracket example"
-        
+
         print("✓ Examples extraction working")
-        
+
         # Test technique type classification
         prompt_techniques = [t for t in techniques if t.technique_type == "prompt_structure"]
         assert len(prompt_techniques) > 0, "Expected at least one prompt structure technique"
-        
+
         print("✓ Technique type classification working")
-        
+
         # Test applicable scenarios
         for technique in techniques:
             assert len(technique.applicable_scenarios) > 0, f"Expected applicable scenarios for {technique.name}"
             # Should have music-related scenarios
             music_scenarios = [s for s in technique.applicable_scenarios if any(word in s.lower() for word in ['music', 'ai', 'prompt', 'generation', 'composition'])]
             assert len(music_scenarios) > 0, f"Expected music-related scenarios for {technique.name}, got: {technique.applicable_scenarios}"
-        
+
         print("✓ Applicable scenarios working")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Test failed: {e}")
         return False
@@ -137,7 +137,7 @@ def test_tip_parsing():
 def test_technique_type_determination():
     """Test technique type determination"""
     parser = ContentParser()
-    
+
     test_cases = [
         ("How to Structure Prompts", "prompting techniques", "prompt_structure"),
         ("Vocal Style Techniques", "voice and singing", "vocal_style"),
@@ -147,46 +147,46 @@ def test_technique_type_determination():
         ("Fix Song Endings", "song structure", "song_structure"),
         ("Bypass Restrictions", "solve problems", "technical"),
     ]
-    
+
     for name, desc, expected_type in test_cases:
         result_type = parser._determine_technique_type(name, desc)
         assert result_type == expected_type, f"Expected '{expected_type}' for '{name}', got '{result_type}'"
-    
+
     print("✓ Technique type determination tests passed")
     return True
 
 def test_applicable_scenarios_extraction():
     """Test applicable scenarios extraction"""
     parser = ContentParser()
-    
+
     # Test with prompt-related technique
     scenarios = parser._extract_applicable_scenarios(
-        "Structure Prompts", 
-        "prompting Suno AI for better results", 
+        "Structure Prompts",
+        "prompting Suno AI for better results",
         []
     )
     assert "AI music generation" in scenarios, "Expected AI music generation scenario"
     assert "prompt engineering" in scenarios, "Expected prompt engineering scenario"
-    
+
     # Test with vocal technique
     scenarios = parser._extract_applicable_scenarios(
-        "Vocal Styles", 
-        "improve voice quality in songs", 
+        "Vocal Styles",
+        "improve voice quality in songs",
         []
     )
     assert "vocal music" in scenarios, "Expected vocal music scenario"
-    
+
     print("✓ Applicable scenarios extraction tests passed")
     return True
 
 if __name__ == "__main__":
     print("Testing tip page parsing functionality...")
-    
+
     success = True
     success &= test_technique_type_determination()
     success &= test_applicable_scenarios_extraction()
     success &= test_tip_parsing()
-    
+
     if success:
         print("\n✓ All tip parsing tests passed!")
     else:

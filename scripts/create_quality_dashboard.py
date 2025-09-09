@@ -6,23 +6,22 @@ Creates interactive dashboards for monitoring test coverage, performance metrics
 and overall code quality with real-time updates and historical trends.
 """
 
-import json
-import sys
-import os
-from pathlib import Path
-from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
 import argparse
+import json
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 from jinja2 import Template
 
 
 class QualityDashboardCreator:
     """Creates comprehensive quality monitoring dashboards"""
-    
+
     def __init__(self, output_dir: str = "dashboard"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
-        
+
         # Dashboard templates
         self.main_template = """
 <!DOCTYPE html>
@@ -402,7 +401,7 @@ class QualityDashboardCreator:
 </body>
 </html>
         """
-    
+
     def load_quality_metrics(self) -> Dict[str, Any]:
         """Load current quality metrics from various sources"""
         metrics = {
@@ -413,20 +412,20 @@ class QualityDashboardCreator:
             "security_score": 0.0,
             "code_quality_score": 0.0
         }
-        
+
         # Load from quality metrics file
         quality_file = Path("quality_metrics.json")
         if quality_file.exists():
             try:
                 with open(quality_file, 'r') as f:
                     data = json.load(f)
-                
+
                 for name, metric_data in data.items():
                     if name in metrics:
                         metrics[name] = metric_data.get("current_value", 0.0)
             except Exception as e:
                 print(f"⚠️ Failed to load quality metrics: {e}")
-        
+
         # Load from test reports
         test_reports = list(Path(".").glob("*test_report*.json"))
         if test_reports:
@@ -437,7 +436,7 @@ class QualityDashboardCreator:
                 metrics["test_success_rate"] = data.get("overall_success_rate", 0.0) * 100
             except Exception:
                 pass
-        
+
         # Load from coverage reports
         coverage_file = Path("coverage.xml")
         if coverage_file.exists():
@@ -451,9 +450,9 @@ class QualityDashboardCreator:
                     metrics["test_coverage"] = line_rate * 100
             except Exception:
                 pass
-        
+
         return metrics
-    
+
     def load_performance_data(self) -> Dict[str, Any]:
         """Load performance metrics and trends"""
         performance_data = {
@@ -461,14 +460,14 @@ class QualityDashboardCreator:
             "trends": {},
             "history": []
         }
-        
+
         # Load from performance metrics file
         perf_file = Path("performance_metrics.json")
         if perf_file.exists():
             try:
                 with open(perf_file, 'r') as f:
                     data = json.load(f)
-                
+
                 # Group by metric name
                 metric_groups = {}
                 for metric in data:
@@ -476,7 +475,7 @@ class QualityDashboardCreator:
                     if name not in metric_groups:
                         metric_groups[name] = []
                     metric_groups[name].append(metric)
-                
+
                 # Get current values and trends
                 for name, metrics in metric_groups.items():
                     if metrics:
@@ -486,37 +485,37 @@ class QualityDashboardCreator:
                             "unit": latest["unit"],
                             "timestamp": latest["timestamp"]
                         }
-                        
+
                         # Calculate trend
                         if len(metrics) >= 5:
                             recent_values = [m["value"] for m in metrics[-5:]]
                             older_values = [m["value"] for m in metrics[-10:-5]] if len(metrics) >= 10 else recent_values
-                            
+
                             recent_avg = sum(recent_values) / len(recent_values)
                             older_avg = sum(older_values) / len(older_values)
-                            
+
                             if older_avg > 0:
                                 trend_percent = ((recent_avg - older_avg) / older_avg) * 100
                                 performance_data["trends"][name] = trend_percent
-                
+
                 performance_data["history"] = data
-                
+
             except Exception as e:
                 print(f"⚠️ Failed to load performance data: {e}")
-        
+
         return performance_data
-    
+
     def load_alerts(self) -> List[Dict[str, Any]]:
         """Load active alerts from various sources"""
         alerts = []
-        
+
         # Load quality alerts
         quality_alerts_file = Path("quality_alerts.json")
         if quality_alerts_file.exists():
             try:
                 with open(quality_alerts_file, 'r') as f:
                     data = json.load(f)
-                
+
                 for alert in data:
                     alerts.append({
                         "severity": alert.get("severity", "info"),
@@ -527,14 +526,14 @@ class QualityDashboardCreator:
                     })
             except Exception:
                 pass
-        
+
         # Load performance alerts
         perf_alerts_file = Path("performance_alerts.json")
         if perf_alerts_file.exists():
             try:
                 with open(perf_alerts_file, 'r') as f:
                     data = json.load(f)
-                
+
                 for alert in data:
                     alerts.append({
                         "severity": alert.get("severity", "info"),
@@ -545,13 +544,13 @@ class QualityDashboardCreator:
                     })
             except Exception:
                 pass
-        
+
         # Sort by timestamp (newest first)
         alerts.sort(key=lambda x: x["timestamp"], reverse=True)
-        
+
         return alerts[:10]  # Return last 10 alerts
-    
-    def format_metric_for_display(self, name: str, value: float, 
+
+    def format_metric_for_display(self, name: str, value: float,
                                  trend: Optional[float] = None) -> Dict[str, Any]:
         """Format metric for dashboard display"""
         # Determine status class based on value and thresholds
@@ -563,9 +562,9 @@ class QualityDashboardCreator:
             "security_score": {"excellent": 95, "good": 90, "warning": 80},
             "code_quality_score": {"excellent": 90, "good": 80, "warning": 70}
         }
-        
+
         metric_thresholds = thresholds.get(name, {"excellent": 90, "good": 80, "warning": 70})
-        
+
         if value >= metric_thresholds["excellent"]:
             status_class = "excellent"
         elif value >= metric_thresholds["good"]:
@@ -574,12 +573,12 @@ class QualityDashboardCreator:
             status_class = "warning"
         else:
             status_class = "critical"
-        
+
         # Format trend
         trend_direction = "stable"
         trend_icon = "➡️"
         trend_text = "Stable"
-        
+
         if trend is not None:
             if trend > 2:
                 trend_direction = "up"
@@ -589,7 +588,7 @@ class QualityDashboardCreator:
                 trend_direction = "down"
                 trend_icon = "📉"
                 trend_text = f"{trend:.1f}%"
-        
+
         # Metric-specific formatting
         titles = {
             "test_coverage": "Test Coverage",
@@ -599,7 +598,7 @@ class QualityDashboardCreator:
             "security_score": "Security Score",
             "code_quality_score": "Code Quality"
         }
-        
+
         icons = {
             "test_coverage": "🧪",
             "test_success_rate": "✅",
@@ -608,7 +607,7 @@ class QualityDashboardCreator:
             "security_score": "🔒",
             "code_quality_score": "🎯"
         }
-        
+
         subtitles = {
             "test_coverage": "Line coverage percentage",
             "test_success_rate": "Passing tests percentage",
@@ -617,7 +616,7 @@ class QualityDashboardCreator:
             "security_score": "Security scan results",
             "code_quality_score": "Code quality metrics"
         }
-        
+
         return {
             "title": titles.get(name, name.replace("_", " ").title()),
             "value": f"{value:.1f}",
@@ -630,17 +629,17 @@ class QualityDashboardCreator:
             "subtitle": subtitles.get(name, ""),
             "progress_percent": min(100, max(0, value))
         }
-    
+
     def format_alerts_for_display(self, alerts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Format alerts for dashboard display"""
         formatted_alerts = []
-        
+
         for alert in alerts:
             # Calculate time ago
             try:
                 alert_time = datetime.fromisoformat(alert["timestamp"])
                 time_diff = datetime.now() - alert_time
-                
+
                 if time_diff.days > 0:
                     time_ago = f"{time_diff.days}d ago"
                 elif time_diff.seconds > 3600:
@@ -653,14 +652,14 @@ class QualityDashboardCreator:
                     time_ago = "Just now"
             except:
                 time_ago = "Unknown"
-            
+
             # Alert icons
             icons = {
                 "critical": "🚨",
                 "warning": "⚠️",
                 "info": "ℹ️"
             }
-            
+
             formatted_alerts.append({
                 "severity": alert["severity"],
                 "title": alert["title"],
@@ -668,9 +667,9 @@ class QualityDashboardCreator:
                 "time_ago": time_ago,
                 "icon": icons.get(alert["severity"], "📢")
             })
-        
+
         return formatted_alerts
-    
+
     def generate_chart_data(self, performance_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate chart data for performance and coverage trends"""
         chart_data = {
@@ -685,27 +684,27 @@ class QualityDashboardCreator:
                 "success_rate": []
             }
         }
-        
+
         # Process performance history
         if "history" in performance_data:
             # Group by date
             daily_data = {}
-            
+
             for metric in performance_data["history"]:
                 try:
                     date = datetime.fromisoformat(metric["timestamp"]).date()
                     date_str = date.strftime("%m/%d")
-                    
+
                     if date_str not in daily_data:
                         daily_data[date_str] = {}
-                    
+
                     daily_data[date_str][metric["name"]] = metric["value"]
                 except:
                     continue
-            
+
             # Sort by date and extract data
             sorted_dates = sorted(daily_data.keys())[-14:]  # Last 14 days
-            
+
             for date_str in sorted_dates:
                 data = daily_data[date_str]
                 chart_data["performance_chart"]["labels"].append(date_str)
@@ -715,7 +714,7 @@ class QualityDashboardCreator:
                 chart_data["performance_chart"]["workflow"].append(
                     data.get("complete_workflow_time", 0)
                 )
-        
+
         # Generate sample coverage data (would be loaded from actual metrics)
         import random
         for i in range(14):
@@ -727,13 +726,13 @@ class QualityDashboardCreator:
             chart_data["coverage_chart"]["success_rate"].append(
                 random.uniform(85, 100)  # Sample data
             )
-        
+
         return chart_data
-    
+
     def get_system_status(self, metrics: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Get system component status"""
         status_items = []
-        
+
         # Test Suite Status
         test_success = metrics.get("test_success_rate", 0)
         if test_success >= 95:
@@ -748,14 +747,14 @@ class QualityDashboardCreator:
             test_status = "failing"
             test_status_text = "Failing"
             test_details = f"{test_success:.1f}% tests passing"
-        
+
         status_items.append({
             "component": "Test Suite",
             "status": test_status,
             "status_text": test_status_text,
             "details": test_details
         })
-        
+
         # Coverage Status
         coverage = metrics.get("test_coverage", 0)
         if coverage >= 80:
@@ -770,14 +769,14 @@ class QualityDashboardCreator:
             coverage_status = "failing"
             coverage_status_text = "Critical"
             coverage_details = f"{coverage:.1f}% line coverage"
-        
+
         status_items.append({
             "component": "Code Coverage",
             "status": coverage_status,
             "status_text": coverage_status_text,
             "details": coverage_details
         })
-        
+
         # Performance Status
         perf_score = metrics.get("performance_score", 0)
         if perf_score >= 80:
@@ -792,14 +791,14 @@ class QualityDashboardCreator:
             perf_status = "failing"
             perf_status_text = "Poor"
             perf_details = f"{perf_score:.1f}% benchmarks passing"
-        
+
         status_items.append({
             "component": "Performance",
             "status": perf_status,
             "status_text": perf_status_text,
             "details": perf_details
         })
-        
+
         # Security Status
         security_score = metrics.get("security_score", 0)
         if security_score >= 95:
@@ -814,41 +813,41 @@ class QualityDashboardCreator:
             security_status = "failing"
             security_status_text = "Vulnerable"
             security_details = "Critical issues detected"
-        
+
         status_items.append({
             "component": "Security",
             "status": security_status,
             "status_text": security_status_text,
             "details": security_details
         })
-        
+
         return status_items
-    
+
     def create_dashboard(self) -> str:
         """Create the complete quality dashboard"""
         print("📊 Creating quality dashboard...")
-        
+
         # Load all data
         metrics = self.load_quality_metrics()
         performance_data = self.load_performance_data()
         alerts = self.load_alerts()
-        
+
         # Format metrics for display
         key_metrics = []
         for name, value in metrics.items():
             trend = performance_data["trends"].get(name)
             formatted_metric = self.format_metric_for_display(name, value, trend)
             key_metrics.append(formatted_metric)
-        
+
         # Format alerts
         formatted_alerts = self.format_alerts_for_display(alerts)
-        
+
         # Generate chart data
         chart_data = self.generate_chart_data(performance_data)
-        
+
         # Get system status
         system_status = self.get_system_status(metrics)
-        
+
         # Prepare template data
         template_data = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -858,18 +857,18 @@ class QualityDashboardCreator:
             "performance_chart": chart_data["performance_chart"],
             "coverage_chart": chart_data["coverage_chart"]
         }
-        
+
         # Render template
         template = Template(self.main_template)
         html_content = template.render(**template_data)
-        
+
         # Save dashboard
         dashboard_file = self.output_dir / "index.html"
         with open(dashboard_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        
+
         print(f"✅ Quality dashboard created: {dashboard_file}")
-        
+
         # Create API endpoint for data
         api_data = {
             "timestamp": template_data["timestamp"],
@@ -881,11 +880,11 @@ class QualityDashboardCreator:
             "alerts_count": len(formatted_alerts),
             "system_health": "good" if all(s["status"] == "passing" for s in system_status) else "warning"
         }
-        
+
         api_file = self.output_dir / "api.json"
         with open(api_file, 'w', encoding='utf-8') as f:
             json.dump(api_data, f, indent=2)
-        
+
         return str(dashboard_file)
 
 
@@ -898,25 +897,25 @@ def main():
                        help="Watch for changes and auto-regenerate")
     parser.add_argument("--interval", "-i", type=int, default=300,
                        help="Update interval in seconds (for watch mode)")
-    
+
     args = parser.parse_args()
-    
+
     creator = QualityDashboardCreator(args.output)
-    
+
     if args.watch:
         print(f"🔄 Starting dashboard watch mode (interval: {args.interval}s)")
         try:
             while True:
                 dashboard_file = creator.create_dashboard()
                 print(f"📊 Dashboard updated: {dashboard_file}")
-                
+
                 import time
                 time.sleep(args.interval)
         except KeyboardInterrupt:
             print("\n🛑 Dashboard watch stopped by user")
     else:
         dashboard_file = creator.create_dashboard()
-        print(f"🎉 Dashboard created successfully!")
+        print("🎉 Dashboard created successfully!")
         print(f"📂 Open: {dashboard_file}")
 
 

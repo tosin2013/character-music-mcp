@@ -1,4 +1,5 @@
 import pytest
+
 #!/usr/bin/env python3
 """
 Test suite for Enhanced Music Production Core Classes
@@ -8,15 +9,16 @@ focusing on the business logic and data processing capabilities.
 """
 
 import asyncio
-import sys
 import os
+import sys
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import core classes (without MCP decorators)
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Any, Union, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
 
 # Reproduce core data classes for testing
 @dataclass
@@ -95,7 +97,7 @@ class SunoKnowledgeManager:
                 "case_sensitivity": "lowercase for subtle, UPPERCASE for prominent"
             }
         }
-    
+
     async def get_knowledge(self, topic: str, specific_area: Optional[str] = None) -> Dict[str, Any]:
         if topic in self.knowledge_base:
             if specific_area and isinstance(self.knowledge_base[topic], dict):
@@ -113,17 +115,17 @@ class StoryGenerator:
         for conflict in character.conflicts[:1]:
             themes.append(f"reconciling {conflict}")
         return themes
-    
+
     def _create_origin_story(self, character: CharacterProfile) -> str:
         backstory_elements = character.backstory.split('.')[:3]
         formative = character.formative_experiences[0] if character.formative_experiences else "early struggles"
         return f"Born from {backstory_elements[0]}, shaped by {formative}"
-    
+
     def _create_manifesto(self, character: CharacterProfile) -> str:
         core_belief = character.motivations[0] if character.motivations else "authentic expression"
         fear_to_overcome = character.fears[0] if character.fears else "silence"
         return f"Music as a weapon against {fear_to_overcome}, every note a declaration of {core_belief}."
-    
+
     async def generate_artist_story(self, character: CharacterProfile, ctx) -> ArtistStory:
         return ArtistStory(
             origin_narrative=self._create_origin_story(character),
@@ -145,13 +147,13 @@ class MusicProducer:
         if "raw" in str(story.introspective_themes).lower():
             return "Minimal, authentic production emphasizing emotional rawness"
         return "Balanced production highlighting narrative elements"
-    
+
     def _create_meta_tag_strategy(self, persona: Dict[str, Any], knowledge: Dict[str, Any]) -> List[str]:
         tags = ["[Verse] [Introspective]", "[Chorus] [Emotional Peak]"]
         if "tags" in knowledge:
             tags.extend(knowledge["tags"][:3])
         return tags
-    
+
     async def analyze_production_needs(self, artist_persona: Dict[str, Any], artist_story: ArtistStory, ctx) -> SunoProducerProfile:
         return SunoProducerProfile(
             production_style=self._determine_production_style(artist_persona, artist_story),
@@ -176,7 +178,7 @@ class MusicProducer:
 class MockContext:
     def __init__(self):
         self.messages = []
-    
+
     async def info(self, message):
         self.messages.append(f"INFO: {message}")
 
@@ -216,60 +218,60 @@ TEST_ARTIST_PERSONA = {
 @pytest.mark.asyncio
 async def test_suno_knowledge_manager():
     print("Testing Suno Knowledge Manager...")
-    
+
     manager = SunoKnowledgeManager()
-    
+
     # Test meta tags
     meta_tags = await manager.get_knowledge("meta_tags")
     assert "structure" in meta_tags
     assert "[Intro]" in meta_tags["structure"]
     print("✅ Meta tags knowledge working")
-    
+
     # Test genre knowledge
     indie_knowledge = await manager.get_knowledge("genres", "indie")
     assert "tags" in indie_knowledge
     assert "[Lo-fi]" in indie_knowledge["tags"]
     print("✅ Genre-specific knowledge working")
-    
+
     # Test advanced techniques
     advanced = await manager.get_knowledge("advanced_techniques")
     assert "double_brackets" in advanced
     print("✅ Advanced techniques knowledge working")
-    
+
     return True
 
 @pytest.mark.asyncio
 async def test_story_generator():
     print("Testing Story Generator...")
-    
+
     generator = StoryGenerator()
     ctx = MockContext()
-    
+
     # Test story generation
     story = await generator.generate_artist_story(TEST_CHARACTER, ctx)
-    
+
     assert isinstance(story, ArtistStory)
     assert story.origin_narrative is not None
     assert len(story.introspective_themes) > 0
     assert story.artistic_manifesto is not None
     print("✅ Story generation working")
-    
+
     # Test theme extraction
     themes = generator._extract_introspective_themes(TEST_CHARACTER)
     assert len(themes) > 0
     assert any("confronting" in theme for theme in themes)
     assert any("searching" in theme for theme in themes)
     print("✅ Theme extraction working")
-    
+
     return True
 
 @pytest.mark.asyncio
 async def test_music_producer():
     print("Testing Music Producer...")
-    
+
     producer = MusicProducer()
     ctx = MockContext()
-    
+
     # Create test story
     test_story = ArtistStory(
         origin_narrative="Test origin",
@@ -281,80 +283,80 @@ async def test_music_producer():
         key_life_moments=[],
         artistic_evolution="evolution"
     )
-    
+
     # Test production analysis
     profile = await producer.analyze_production_needs(TEST_ARTIST_PERSONA, test_story, ctx)
-    
+
     assert isinstance(profile, SunoProducerProfile)
     assert profile.production_style is not None
     assert len(profile.meta_tag_strategy) > 0
     assert profile.version_preference == "V3.5"
     print("✅ Production analysis working")
-    
+
     # Test production style determination
     style = producer._determine_production_style(TEST_ARTIST_PERSONA, test_story)
     assert "minimal" in style.lower() or "raw" in style.lower()
     print("✅ Production style determination working")
-    
+
     return True
 
 @pytest.mark.asyncio
 async def test_integration_workflow():
     print("Testing Integration Workflow...")
-    
+
     ctx = MockContext()
-    
+
     # Step 1: Generate story
     story_generator = StoryGenerator()
     story = await story_generator.generate_artist_story(TEST_CHARACTER, ctx)
-    
+
     # Step 2: Analyze production
     producer = MusicProducer()
     producer_profile = await producer.analyze_production_needs(TEST_ARTIST_PERSONA, story, ctx)
-    
+
     # Test integration
     assert story.introspective_themes[0] is not None
     assert producer_profile.production_style is not None
-    
+
     # Test that story themes influence production
     has_theme_influence = any(
-        theme_word in producer_profile.production_style.lower() 
-        for theme in story.introspective_themes 
+        theme_word in producer_profile.production_style.lower()
+        for theme in story.introspective_themes
         for theme_word in theme.split()[-2:]  # Get last words from themes
     )
-    
+
     print("✅ Integration workflow working")
     return True
 
 @pytest.mark.asyncio
 async def test_error_handling():
     print("Testing Error Handling...")
-    
+
     # Test with minimal character
     minimal_character = CharacterProfile(
         name="", aliases=[], physical_description="", mannerisms=[],
-        speech_patterns=[], behavioral_traits=[], backstory="", relationships=[], 
+        speech_patterns=[], behavioral_traits=[], backstory="", relationships=[],
         formative_experiences=[], social_connections=[], motivations=[],
         fears=[], desires=[], conflicts=[], personality_drivers=[],
         confidence_score=0.0, text_references=[], first_appearance="", importance_score=0.0
     )
-    
+
     ctx = MockContext()
     story_generator = StoryGenerator()
-    
+
     try:
         story = await story_generator.generate_artist_story(minimal_character, ctx)
         assert story is not None
         print("✅ Empty character handled gracefully")
     except Exception as e:
         print(f"⚠️ Error handling could be improved: {e}")
-    
+
     return True
 
 async def run_core_tests():
     print("🧪 Running Core Classes Tests")
     print("=" * 50)
-    
+
     tests = [
         test_suno_knowledge_manager,
         test_story_generator,
@@ -362,26 +364,26 @@ async def run_core_tests():
         test_integration_workflow,
         test_error_handling
     ]
-    
+
     passed = 0
     total = len(tests)
-    
+
     for test in tests:
         try:
             await test()
             passed += 1
         except Exception as e:
             print(f"❌ Test failed: {e}")
-    
+
     print("\n" + "=" * 50)
     print(f"🎯 Results: {passed}/{total} tests passed")
-    
+
     if passed == total:
         print("🎉 All core functionality tests passed!")
         print("✅ Enhanced features are working correctly")
     else:
         print(f"⚠️ {total - passed} tests failed")
-    
+
     return passed == total
 
 if __name__ == "__main__":

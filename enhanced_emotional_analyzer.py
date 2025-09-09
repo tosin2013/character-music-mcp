@@ -7,11 +7,9 @@ This module provides sophisticated emotional analysis capabilities that replace
 the generic "contemplative" responses with meaningful, varied emotional insights.
 """
 
-import re
-import json
-from typing import Dict, List, Any, Tuple
 from dataclasses import dataclass
-from collections import Counter
+from typing import Any, Dict, List
+
 
 @dataclass
 class EmotionalInsight:
@@ -37,12 +35,12 @@ class EnhancedEmotionalAnalyzer:
     Advanced emotional analysis engine that provides meaningful, varied insights
     instead of generic "contemplative" responses.
     """
-    
+
     def __init__(self):
         self.emotion_patterns = self._initialize_emotion_patterns()
         self.musical_mappings = self._initialize_musical_mappings()
         self.contextual_modifiers = self._initialize_contextual_modifiers()
-    
+
     def _initialize_emotion_patterns(self) -> Dict[str, Dict[str, Any]]:
         """Initialize sophisticated emotion detection patterns"""
         return {
@@ -68,7 +66,7 @@ class EnhancedEmotionalAnalyzer:
                 "musical_key": "major",
                 "energy": "low"
             },
-            
+
             # Sadness and Melancholy
             "melancholic": {
                 "keywords": ["melancholy", "wistful", "bittersweet", "nostalgic", "longing", "yearning", "soulful", "weeping", "mournful", "sad", "sorrowful", "blue", "somber"],
@@ -91,7 +89,7 @@ class EnhancedEmotionalAnalyzer:
                 "musical_key": "minor",
                 "energy": "low"
             },
-            
+
             # Fear and Anxiety
             "anxious": {
                 "keywords": ["worry", "nervous", "tension", "stress", "uncertain", "restless"],
@@ -114,7 +112,7 @@ class EnhancedEmotionalAnalyzer:
                 "musical_key": "minor",
                 "energy": "medium"
             },
-            
+
             # Anger and Intensity
             "furious": {
                 "keywords": ["rage", "fury", "anger", "wrath", "outrage", "indignation"],
@@ -130,7 +128,7 @@ class EnhancedEmotionalAnalyzer:
                 "musical_key": "minor",
                 "energy": "medium"
             },
-            
+
             # Complex Emotions
             "conflicted": {
                 "keywords": ["torn", "divided", "conflicted", "ambivalent", "uncertain", "dilemma"],
@@ -161,7 +159,7 @@ class EnhancedEmotionalAnalyzer:
                 "energy": "medium"
             }
         }
-    
+
     def _initialize_musical_mappings(self) -> Dict[str, Dict[str, Any]]:
         """Initialize mappings from emotions to musical elements"""
         return {
@@ -190,7 +188,7 @@ class EnhancedEmotionalAnalyzer:
                 "nature": ["organic_environmental_sounds", "natural_textures"]
             }
         }
-    
+
     def _initialize_contextual_modifiers(self) -> Dict[str, float]:
         """Initialize contextual modifiers that affect emotional intensity"""
         return {
@@ -205,7 +203,7 @@ class EnhancedEmotionalAnalyzer:
             "discovery": 1.2,
             "loss": 1.3
         }
-    
+
     def analyze_emotional_content(self, text: str, source_type: str = "general") -> EmotionalProfile:
         """
         Perform comprehensive emotional analysis of text content
@@ -219,24 +217,24 @@ class EnhancedEmotionalAnalyzer:
         """
         # Detect primary emotions
         primary_emotions = self._detect_emotions(text)
-        
+
         # Analyze emotional arc
         emotional_arc = self._analyze_emotional_arc(text)
-        
+
         # Calculate emotional complexity
         emotional_complexity = self._calculate_emotional_complexity(primary_emotions)
-        
+
         # Determine dominant mood
         dominant_mood = self._determine_dominant_mood(primary_emotions)
-        
+
         # Extract emotional themes
         emotional_themes = self._extract_emotional_themes(text, primary_emotions)
-        
+
         # Generate musical recommendations
         musical_recommendations = self._generate_musical_recommendations(
             primary_emotions, emotional_arc, source_type
         )
-        
+
         return EmotionalProfile(
             primary_emotions=primary_emotions,
             emotional_arc=emotional_arc,
@@ -245,27 +243,27 @@ class EnhancedEmotionalAnalyzer:
             emotional_themes=emotional_themes,
             musical_recommendations=musical_recommendations
         )
-    
+
     def _detect_emotions(self, text: str) -> List[EmotionalInsight]:
         """Detect emotions in text using sophisticated pattern matching"""
         text_lower = text.lower()
         detected_emotions = []
-        
+
         for emotion_name, emotion_data in self.emotion_patterns.items():
             # Count keyword matches
             matches = []
             for keyword in emotion_data["keywords"]:
                 if keyword in text_lower:
                     matches.append(keyword)
-            
+
             if matches:
                 # Calculate intensity based on matches and context
                 base_intensity = emotion_data["intensity_base"]
                 match_boost = min(len(matches) * 0.1, 0.3)
                 context_modifier = self._get_context_modifier(text_lower)
-                
+
                 intensity = min(base_intensity + match_boost + context_modifier, 1.0)
-                
+
                 # Generate musical implications
                 musical_implications = {
                     "tempo": emotion_data["musical_tempo"],
@@ -274,10 +272,10 @@ class EnhancedEmotionalAnalyzer:
                     "suggested_instruments": self._suggest_instruments(emotion_name),
                     "production_notes": self._generate_production_notes(emotion_name, intensity)
                 }
-                
+
                 # Extract context around matches
                 context = self._extract_context(text, matches[0])
-                
+
                 emotion_insight = EmotionalInsight(
                     emotion=emotion_name,
                     intensity=intensity,
@@ -285,13 +283,13 @@ class EnhancedEmotionalAnalyzer:
                     triggers=matches,
                     musical_implications=musical_implications
                 )
-                
+
                 detected_emotions.append(emotion_insight)
-        
+
         # Sort by intensity and return top emotions
         detected_emotions.sort(key=lambda x: x.intensity, reverse=True)
         return detected_emotions[:5]  # Return top 5 emotions
-    
+
     def _get_context_modifier(self, text: str) -> float:
         """Get contextual modifier based on text content"""
         modifier = 0.0
@@ -299,84 +297,84 @@ class EnhancedEmotionalAnalyzer:
             if context in text:
                 modifier += (value - 1.0) * 0.1  # Scale down the modifier
         return min(modifier, 0.3)  # Cap the modifier
-    
+
     def _extract_context(self, text: str, keyword: str) -> str:
         """Extract context around a keyword match"""
         text_lower = text.lower()
         keyword_pos = text_lower.find(keyword)
         if keyword_pos == -1:
             return ""
-        
+
         # Extract 50 characters before and after
         start = max(0, keyword_pos - 50)
         end = min(len(text), keyword_pos + len(keyword) + 50)
         context = text[start:end].strip()
-        
+
         return context
-    
+
     def _analyze_emotional_arc(self, text: str) -> Dict[str, str]:
         """Analyze the emotional progression through the text"""
         # Split text into three parts
         text_length = len(text)
         part_size = text_length // 3
-        
+
         beginning = text[:part_size]
         middle = text[part_size:2*part_size]
         end = text[2*part_size:]
-        
+
         # Analyze each part
         beginning_emotions = self._detect_emotions(beginning)
         middle_emotions = self._detect_emotions(middle)
         end_emotions = self._detect_emotions(end)
-        
+
         return {
             "beginning": beginning_emotions[0].emotion if beginning_emotions else "neutral",
             "middle": middle_emotions[0].emotion if middle_emotions else "neutral",
             "end": end_emotions[0].emotion if end_emotions else "neutral"
         }
-    
+
     def _calculate_emotional_complexity(self, emotions: List[EmotionalInsight]) -> float:
         """Calculate the emotional complexity of the content"""
         if not emotions:
             return 0.0
-        
+
         # Complexity based on number of emotions and intensity variation
         num_emotions = len(emotions)
         intensity_variance = self._calculate_variance([e.intensity for e in emotions])
-        
+
         # Normalize complexity score
         complexity = (num_emotions * 0.2) + (intensity_variance * 0.8)
         return min(complexity, 1.0)
-    
+
     def _calculate_variance(self, values: List[float]) -> float:
         """Calculate variance of a list of values"""
         if len(values) < 2:
             return 0.0
-        
+
         mean = sum(values) / len(values)
         variance = sum((x - mean) ** 2 for x in values) / len(values)
         return variance
-    
+
     def _determine_dominant_mood(self, emotions: List[EmotionalInsight]) -> str:
         """Determine the overall dominant mood"""
         if not emotions:
             return "neutral"
-        
+
         # Weight emotions by intensity
         weighted_emotions = {}
         for emotion in emotions:
             if emotion.emotion not in weighted_emotions:
                 weighted_emotions[emotion.emotion] = 0
             weighted_emotions[emotion.emotion] += emotion.intensity
-        
+
         # Return the emotion with highest weighted score
         return max(weighted_emotions.items(), key=lambda x: x[1])[0]
-    
+
     def _extract_emotional_themes(self, text: str, emotions: List[EmotionalInsight]) -> List[str]:
         """Extract high-level emotional themes from the content"""
         themes = []
         text_lower = text.lower()
-        
+
         # Theme detection based on content and emotions
         theme_patterns = {
             "transformation": ["change", "growth", "evolution", "becoming", "transformation"],
@@ -390,11 +388,11 @@ class EnhancedEmotionalAnalyzer:
             "sacrifice": ["sacrifice", "giving up", "cost", "price", "trade-off"],
             "hope": ["hope", "future", "possibility", "dream", "aspiration"]
         }
-        
+
         for theme, keywords in theme_patterns.items():
             if any(keyword in text_lower for keyword in keywords):
                 themes.append(theme)
-        
+
         # Add themes based on detected emotions
         emotion_themes = {
             "melancholic": "nostalgia",
@@ -403,27 +401,27 @@ class EnhancedEmotionalAnalyzer:
             "passionate": "intensity",
             "conflicted": "inner_struggle"
         }
-        
+
         for emotion in emotions:
             if emotion.emotion in emotion_themes:
                 theme = emotion_themes[emotion.emotion]
                 if theme not in themes:
                     themes.append(theme)
-        
+
         return themes[:5]  # Return top 5 themes
-    
+
     def _generate_musical_recommendations(
-        self, 
-        emotions: List[EmotionalInsight], 
+        self,
+        emotions: List[EmotionalInsight],
         emotional_arc: Dict[str, str],
         source_type: str
     ) -> Dict[str, Any]:
         """Generate comprehensive musical recommendations based on emotional analysis"""
         if not emotions:
             return {"error": "No emotions detected for musical recommendations"}
-        
+
         primary_emotion = emotions[0]
-        
+
         # Base recommendations from primary emotion
         recommendations = {
             "tempo": primary_emotion.musical_implications["tempo"],
@@ -432,7 +430,7 @@ class EnhancedEmotionalAnalyzer:
             "primary_emotion": primary_emotion.emotion,
             "emotional_intensity": primary_emotion.intensity
         }
-        
+
         # Adjust based on emotional arc
         if emotional_arc["beginning"] != emotional_arc["end"]:
             recommendations["structure_suggestion"] = "dynamic_progression"
@@ -440,18 +438,18 @@ class EnhancedEmotionalAnalyzer:
         else:
             recommendations["structure_suggestion"] = "consistent_mood"
             recommendations["arc_description"] = f"Maintains {emotional_arc['beginning']} throughout"
-        
+
         # Genre suggestions based on emotions and source type
         recommendations["genre_suggestions"] = self._suggest_genres(emotions, source_type)
-        
+
         # Instrumentation suggestions
         recommendations["instrumentation"] = self._suggest_comprehensive_instrumentation(emotions)
-        
+
         # Production techniques
         recommendations["production_techniques"] = self._suggest_production_techniques(emotions)
-        
+
         return recommendations
-    
+
     def _suggest_instruments(self, emotion: str) -> List[str]:
         """Suggest instruments based on emotion"""
         instrument_mappings = {
@@ -463,9 +461,9 @@ class EnhancedEmotionalAnalyzer:
             "passionate": ["strings", "piano", "dynamic_percussion", "brass"],
             "mysterious": ["ambient_textures", "subtle_percussion", "ethereal_pads"]
         }
-        
+
         return instrument_mappings.get(emotion, ["piano", "strings", "light_percussion"])
-    
+
     def _generate_production_notes(self, emotion: str, intensity: float) -> List[str]:
         """Generate production notes based on emotion and intensity"""
         base_notes = {
@@ -476,17 +474,17 @@ class EnhancedEmotionalAnalyzer:
             "contemplative": ["Minimal processing", "Focus on clarity"],
             "passionate": ["Dynamic range", "Emotional builds"]
         }
-        
+
         notes = base_notes.get(emotion, ["Standard production"])
-        
+
         # Add intensity-based notes
         if intensity > 0.8:
             notes.append("High emotional intensity - emphasize dynamics")
         elif intensity < 0.3:
             notes.append("Subtle emotional content - focus on nuance")
-        
+
         return notes
-    
+
     def _suggest_genres(self, emotions: List[EmotionalInsight], source_type: str) -> List[str]:
         """Suggest musical genres based on emotions and source type"""
         genre_mappings = {
@@ -498,20 +496,20 @@ class EnhancedEmotionalAnalyzer:
             "passionate": ["orchestral", "dramatic", "cinematic"],
             "mysterious": ["dark_ambient", "experimental", "atmospheric"]
         }
-        
+
         suggested_genres = []
         for emotion in emotions[:3]:  # Top 3 emotions
             genres = genre_mappings.get(emotion.emotion, [])
             suggested_genres.extend(genres)
-        
+
         # Remove duplicates while preserving order
         unique_genres = []
         for genre in suggested_genres:
             if genre not in unique_genres:
                 unique_genres.append(genre)
-        
+
         return unique_genres[:5]  # Return top 5 genre suggestions
-    
+
     def _suggest_comprehensive_instrumentation(self, emotions: List[EmotionalInsight]) -> Dict[str, List[str]]:
         """Suggest comprehensive instrumentation based on emotional profile"""
         instrumentation = {
@@ -520,32 +518,32 @@ class EnhancedEmotionalAnalyzer:
             "texture": [],
             "rhythm": []
         }
-        
+
         for emotion in emotions[:3]:  # Top 3 emotions
             instruments = self._suggest_instruments(emotion.emotion)
-            
+
             # Categorize instruments
             if not instrumentation["primary"]:
                 instrumentation["primary"] = instruments[:2]
-            
+
             instrumentation["secondary"].extend(instruments[2:])
-            
+
             # Add texture elements based on emotion
             if emotion.emotion in ["mysterious", "contemplative"]:
                 instrumentation["texture"].extend(["ambient_pads", "ethereal_textures"])
             elif emotion.emotion in ["furious", "passionate"]:
                 instrumentation["texture"].extend(["dynamic_elements", "intensity_builders"])
-        
+
         # Remove duplicates
         for category in instrumentation:
             instrumentation[category] = list(set(instrumentation[category]))
-        
+
         return instrumentation
-    
+
     def _suggest_production_techniques(self, emotions: List[EmotionalInsight]) -> List[str]:
         """Suggest production techniques based on emotional profile"""
         techniques = []
-        
+
         for emotion in emotions[:3]:
             emotion_techniques = {
                 "melancholic": ["reverb_for_space", "subtle_compression", "warm_eq"],
@@ -555,14 +553,14 @@ class EnhancedEmotionalAnalyzer:
                 "contemplative": ["minimal_processing", "natural_dynamics", "clarity_focus"],
                 "passionate": ["dynamic_processing", "emotional_automation", "build_techniques"]
             }
-            
+
             emotion_specific = emotion_techniques.get(emotion.emotion, [])
             techniques.extend(emotion_specific)
-        
+
         # Remove duplicates while preserving order
         unique_techniques = []
         for technique in techniques:
             if technique not in unique_techniques:
                 unique_techniques.append(technique)
-        
+
         return unique_techniques

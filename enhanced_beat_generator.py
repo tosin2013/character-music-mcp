@@ -7,10 +7,11 @@ This module provides sophisticated beat pattern generation that creates
 genre-appropriate patterns based on emotional analysis instead of generic responses.
 """
 
-import json
-from typing import Dict, List, Any, Tuple
 from dataclasses import dataclass
-from enhanced_emotional_analyzer import EmotionalProfile, EmotionalInsight
+from typing import Any, Dict, List, Tuple
+
+from enhanced_emotional_analyzer import EmotionalInsight, EmotionalProfile
+
 
 @dataclass
 class BeatPattern:
@@ -40,12 +41,12 @@ class EnhancedBeatGenerator:
     Advanced beat pattern generator that creates genre-appropriate patterns
     based on emotional analysis instead of generic responses.
     """
-    
+
     def __init__(self):
         self.beat_patterns = self._initialize_beat_patterns()
         self.genre_characteristics = self._initialize_genre_characteristics()
         self.emotional_rhythms = self._initialize_emotional_rhythms()
-    
+
     def _initialize_beat_patterns(self) -> Dict[str, BeatPattern]:
         """Initialize comprehensive beat pattern library"""
         return {
@@ -62,7 +63,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["ambient", "chillout", "meditation"],
                 emotional_fit=["contemplative", "peaceful", "melancholic"]
             ),
-            
+
             "driving_electronic": BeatPattern(
                 name="Driving Electronic",
                 time_signature="4/4",
@@ -75,7 +76,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["electronic", "dance", "synthwave"],
                 emotional_fit=["energetic", "hopeful", "passionate"]
             ),
-            
+
             # Rock/Alternative Patterns
             "alternative_rock": BeatPattern(
                 name="Alternative Rock",
@@ -89,7 +90,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["alternative", "indie_rock", "grunge"],
                 emotional_fit=["frustrated", "conflicted", "passionate"]
             ),
-            
+
             "heavy_rock": BeatPattern(
                 name="Heavy Rock",
                 time_signature="4/4",
@@ -102,7 +103,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["metal", "hard_rock", "punk"],
                 emotional_fit=["furious", "aggressive", "intense"]
             ),
-            
+
             # Folk/Acoustic Patterns
             "folk_strum": BeatPattern(
                 name="Folk Strum",
@@ -116,7 +117,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["folk", "acoustic", "singer_songwriter"],
                 emotional_fit=["melancholic", "hopeful", "contemplative"]
             ),
-            
+
             "celtic_rhythm": BeatPattern(
                 name="Celtic Rhythm",
                 time_signature="6/8",
@@ -129,7 +130,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["celtic", "folk", "world"],
                 emotional_fit=["mysterious", "nostalgic", "adventurous"]
             ),
-            
+
             # Jazz/Complex Patterns
             "jazz_swing": BeatPattern(
                 name="Jazz Swing",
@@ -143,7 +144,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["jazz", "swing", "blues"],
                 emotional_fit=["sophisticated", "contemplative", "nostalgic"]
             ),
-            
+
             # Cinematic/Orchestral Patterns
             "cinematic_build": BeatPattern(
                 name="Cinematic Build",
@@ -157,7 +158,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["cinematic", "orchestral", "epic"],
                 emotional_fit=["dramatic", "passionate", "heroic"]
             ),
-            
+
             # Experimental/Irregular Patterns
             "irregular_complex": BeatPattern(
                 name="Irregular Complex",
@@ -171,7 +172,7 @@ class EnhancedBeatGenerator:
                 genre_associations=["progressive", "experimental", "art_rock"],
                 emotional_fit=["conflicted", "complex", "intellectual"]
             ),
-            
+
             # Minimal/Sparse Patterns
             "minimal_pulse": BeatPattern(
                 name="Minimal Pulse",
@@ -186,7 +187,7 @@ class EnhancedBeatGenerator:
                 emotional_fit=["meditative", "sparse", "introspective"]
             )
         }
-    
+
     def _initialize_genre_characteristics(self) -> Dict[str, Dict[str, Any]]:
         """Initialize genre-specific musical characteristics"""
         return {
@@ -227,7 +228,7 @@ class EnhancedBeatGenerator:
                 "emotional_associations": ["sophisticated", "smooth", "contemplative"]
             }
         }
-    
+
     def _initialize_emotional_rhythms(self) -> Dict[str, Dict[str, Any]]:
         """Initialize emotion-specific rhythm characteristics"""
         return {
@@ -268,7 +269,7 @@ class EnhancedBeatGenerator:
                 "suggested_patterns": ["cinematic_build", "alternative_rock"]
             }
         }
-    
+
     def generate_beat_patterns(self, emotional_profile: EmotionalProfile, genre_preferences: List[str] = None) -> Dict[str, Any]:
         """
         Generate comprehensive beat patterns based on emotional analysis
@@ -283,21 +284,21 @@ class EnhancedBeatGenerator:
         if not emotional_profile.primary_emotions:
             # Generate default patterns when no emotions are detected
             return self._generate_default_patterns(genre_preferences)
-        
+
         primary_emotion = emotional_profile.primary_emotions[0]
-        
+
         # Select appropriate beat patterns
         selected_patterns = self._select_patterns_for_emotion(primary_emotion, genre_preferences)
-        
+
         # Generate rhythm variations
         rhythm_variations = self._generate_rhythm_variations(emotional_profile)
-        
+
         # Create musical elements
         musical_elements = self._create_musical_elements(emotional_profile, selected_patterns)
-        
+
         # Generate Suno AI commands
         suno_commands = self._generate_suno_commands(selected_patterns, emotional_profile)
-        
+
         return {
             "primary_emotion": primary_emotion.emotion,
             "emotional_intensity": primary_emotion.intensity,
@@ -331,16 +332,16 @@ class EnhancedBeatGenerator:
             "suno_commands": suno_commands,
             "production_notes": self._generate_production_notes(emotional_profile, selected_patterns)
         }
-    
+
     def _select_patterns_for_emotion(self, emotion: EmotionalInsight, genre_preferences: List[str] = None) -> List[BeatPattern]:
         """Select appropriate beat patterns for the given emotion"""
         suitable_patterns = []
-        
+
         # Find patterns that match the emotion
         for pattern in self.beat_patterns.values():
             if emotion.emotion in pattern.emotional_fit:
                 suitable_patterns.append(pattern)
-        
+
         # If genre preferences are specified, filter by genre
         if genre_preferences:
             genre_filtered = []
@@ -349,19 +350,19 @@ class EnhancedBeatGenerator:
                     genre_filtered.append(pattern)
             if genre_filtered:
                 suitable_patterns = genre_filtered
-        
+
         # If no suitable patterns found, use fallback based on emotion characteristics
         if not suitable_patterns:
             suitable_patterns = self._get_fallback_patterns(emotion)
-        
+
         # Sort by emotional fit and complexity
         suitable_patterns.sort(key=lambda p: (
             emotion.emotion in p.emotional_fit,
             abs(p.complexity - emotion.intensity)
         ), reverse=True)
-        
+
         return suitable_patterns[:3]  # Return top 3 patterns
-    
+
     def _get_fallback_patterns(self, emotion: EmotionalInsight) -> List[BeatPattern]:
         """Get fallback patterns when no direct match is found"""
         if emotion.intensity > 0.7:
@@ -373,11 +374,11 @@ class EnhancedBeatGenerator:
         else:
             # Medium intensity emotions
             return [self.beat_patterns["alternative_rock"], self.beat_patterns["folk_strum"]]
-    
+
     def _generate_rhythm_variations(self, emotional_profile: EmotionalProfile) -> List[Dict[str, Any]]:
         """Generate rhythm variations based on emotional complexity"""
         variations = []
-        
+
         # Base variation on emotional complexity
         if emotional_profile.emotional_complexity > 0.7:
             variations.append({
@@ -385,7 +386,7 @@ class EnhancedBeatGenerator:
                 "description": "Layered rhythms reflecting emotional complexity",
                 "implementation": "Multiple percussion layers with different time signatures"
             })
-        
+
         # Variation based on emotional arc
         if emotional_profile.emotional_arc["beginning"] != emotional_profile.emotional_arc["end"]:
             variations.append({
@@ -393,7 +394,7 @@ class EnhancedBeatGenerator:
                 "description": f"Rhythm evolves from {emotional_profile.emotional_arc['beginning']} to {emotional_profile.emotional_arc['end']}",
                 "implementation": "Gradual tempo and complexity changes throughout the piece"
             })
-        
+
         # Variation based on dominant mood
         mood_variations = {
             "melancholic": {
@@ -412,16 +413,16 @@ class EnhancedBeatGenerator:
                 "implementation": "Dramatic tempo and volume changes"
             }
         }
-        
+
         if emotional_profile.dominant_mood in mood_variations:
             variations.append(mood_variations[emotional_profile.dominant_mood])
-        
+
         return variations
-    
+
     def _create_musical_elements(self, emotional_profile: EmotionalProfile, patterns: List[BeatPattern]) -> List[MusicalElement]:
         """Create comprehensive musical elements based on emotional analysis"""
         elements = []
-        
+
         # Rhythm element
         rhythm_element = MusicalElement(
             element_type="rhythm",
@@ -438,7 +439,7 @@ class EnhancedBeatGenerator:
             ]
         )
         elements.append(rhythm_element)
-        
+
         # Melody element based on emotional themes
         melody_characteristics = self._get_melody_characteristics(emotional_profile)
         melody_element = MusicalElement(
@@ -449,7 +450,7 @@ class EnhancedBeatGenerator:
             suno_commands=melody_characteristics["suno_commands"]
         )
         elements.append(melody_element)
-        
+
         # Harmony element
         harmony_characteristics = self._get_harmony_characteristics(emotional_profile)
         harmony_element = MusicalElement(
@@ -460,7 +461,7 @@ class EnhancedBeatGenerator:
             suno_commands=harmony_characteristics["suno_commands"]
         )
         elements.append(harmony_element)
-        
+
         # Texture element
         texture_characteristics = self._get_texture_characteristics(emotional_profile)
         texture_element = MusicalElement(
@@ -471,14 +472,14 @@ class EnhancedBeatGenerator:
             suno_commands=texture_characteristics["suno_commands"]
         )
         elements.append(texture_element)
-        
+
         return elements
-    
+
     def _get_rhythm_characteristics(self, emotion: EmotionalInsight) -> Dict[str, Any]:
         """Get rhythm characteristics for the given emotion"""
         if emotion.emotion in self.emotional_rhythms:
             return self.emotional_rhythms[emotion.emotion]
-        
+
         # Fallback based on intensity
         if emotion.intensity > 0.7:
             return {
@@ -492,31 +493,31 @@ class EnhancedBeatGenerator:
                 "tempo_modifier": 0.9,
                 "complexity_boost": -0.1
             }
-    
+
     def _get_tempo_recommendations(self, emotional_profile: EmotionalProfile) -> Dict[str, Any]:
         """Get tempo recommendations based on emotional profile"""
         primary_emotion = emotional_profile.primary_emotions[0]
         base_tempo = 100  # Default tempo
-        
+
         # Adjust based on emotion
         if primary_emotion.emotion in self.emotional_rhythms:
             modifier = self.emotional_rhythms[primary_emotion.emotion]["tempo_modifier"]
             base_tempo = int(base_tempo * modifier)
-        
+
         # Adjust based on intensity
         intensity_adjustment = int((primary_emotion.intensity - 0.5) * 40)
         final_tempo = base_tempo + intensity_adjustment
-        
+
         return {
             "recommended_tempo": final_tempo,
             "tempo_range": (final_tempo - 10, final_tempo + 10),
             "tempo_reasoning": f"Based on {primary_emotion.emotion} emotion with {primary_emotion.intensity:.1f} intensity"
         }
-    
+
     def _get_melody_characteristics(self, emotional_profile: EmotionalProfile) -> Dict[str, Any]:
         """Get melody characteristics based on emotional profile"""
         primary_emotion = emotional_profile.primary_emotions[0].emotion
-        
+
         melody_mappings = {
             "melancholic": {
                 "description": "Descending melodic lines with minor intervals",
@@ -543,18 +544,18 @@ class EnhancedBeatGenerator:
                 "suno_commands": ["[dramatic_melody]", "[passionate_vocals]", "[wide_range]"]
             }
         }
-        
+
         return melody_mappings.get(primary_emotion, {
             "description": "Balanced melodic lines",
             "purpose": "Provide melodic interest",
             "implementation": ["Standard melodic approach"],
             "suno_commands": ["[melodic_vocals]"]
         })
-    
+
     def _get_harmony_characteristics(self, emotional_profile: EmotionalProfile) -> Dict[str, Any]:
         """Get harmony characteristics based on emotional profile"""
         primary_emotion = emotional_profile.primary_emotions[0].emotion
-        
+
         harmony_mappings = {
             "melancholic": {
                 "description": "Minor key harmonies with added tensions",
@@ -581,19 +582,19 @@ class EnhancedBeatGenerator:
                 "suno_commands": ["[aggressive_chords]", "[dissonant_harmony]", "[power_chords]"]
             }
         }
-        
+
         return harmony_mappings.get(primary_emotion, {
             "description": "Standard harmonic progressions",
             "purpose": "Provide harmonic foundation",
             "implementation": ["Conventional chord progressions"],
             "suno_commands": ["[standard_harmony]"]
         })
-    
+
     def _get_texture_characteristics(self, emotional_profile: EmotionalProfile) -> Dict[str, Any]:
         """Get texture characteristics based on emotional profile"""
         complexity = emotional_profile.emotional_complexity
         primary_emotion = emotional_profile.primary_emotions[0].emotion
-        
+
         if complexity > 0.7:
             return {
                 "description": "Dense, layered texture with multiple elements",
@@ -615,36 +616,36 @@ class EnhancedBeatGenerator:
                 "implementation": ["Balanced instrumentation", "Clear arrangements", "Appropriate density"],
                 "suno_commands": ["[balanced_texture]", "[clear_arrangement]", "[moderate_instrumentation]"]
             }
-    
+
     def _generate_suno_commands(self, patterns: List[BeatPattern], emotional_profile: EmotionalProfile) -> List[str]:
         """Generate practical Suno AI commands based on patterns and emotions"""
         commands = []
-        
+
         if not patterns:
             return ["[standard_beat]"]
-        
+
         primary_pattern = patterns[0]
         primary_emotion = emotional_profile.primary_emotions[0]
-        
+
         # Tempo command
         tempo = int((primary_pattern.tempo_range[0] + primary_pattern.tempo_range[1]) / 2)
         commands.append(f"[{tempo}bpm]")
-        
+
         # Genre/style command
         if primary_pattern.genre_associations:
             genre = primary_pattern.genre_associations[0]
             commands.append(f"[{genre}]")
-        
+
         # Emotional directive
         commands.append(f"[{primary_emotion.emotion}_mood]")
-        
+
         # Rhythm pattern command
         rhythm_name = primary_pattern.name.lower().replace(" ", "_")
         commands.append(f"[{rhythm_name}_beat]")
-        
+
         # Energy level command
         commands.append(f"[{primary_pattern.energy_level}_energy]")
-        
+
         # Complexity command based on emotional intensity
         if primary_emotion.intensity > 0.7:
             commands.append("[complex_arrangement]")
@@ -652,19 +653,19 @@ class EnhancedBeatGenerator:
             commands.append("[simple_arrangement]")
         else:
             commands.append("[moderate_arrangement]")
-        
+
         # Time signature if not 4/4
         if primary_pattern.time_signature != "4/4":
             commands.append(f"[{primary_pattern.time_signature}_time]")
-        
+
         return commands
-    
+
     def _generate_production_notes(self, emotional_profile: EmotionalProfile, patterns: List[BeatPattern]) -> List[str]:
         """Generate production notes based on emotional profile and patterns"""
         notes = []
-        
+
         primary_emotion = emotional_profile.primary_emotions[0]
-        
+
         # Notes based on emotion
         emotion_notes = {
             "melancholic": [
@@ -693,10 +694,10 @@ class EnhancedBeatGenerator:
                 "Use gentle EQ to enhance presence"
             ]
         }
-        
+
         if primary_emotion.emotion in emotion_notes:
             notes.extend(emotion_notes[primary_emotion.emotion])
-        
+
         # Notes based on complexity
         if emotional_profile.emotional_complexity > 0.7:
             notes.append("Balance multiple elements carefully to avoid muddiness")
@@ -704,7 +705,7 @@ class EnhancedBeatGenerator:
         elif emotional_profile.emotional_complexity < 0.3:
             notes.append("Focus on perfecting fewer elements")
             notes.append("Use space as a compositional element")
-        
+
         # Notes based on patterns
         if patterns:
             pattern = patterns[0]
@@ -712,14 +713,14 @@ class EnhancedBeatGenerator:
                 notes.append("Maintain energy through consistent dynamics")
             elif pattern.energy_level == "low":
                 notes.append("Preserve intimacy through gentle processing")
-        
+
         return notes
-    
+
     def _generate_default_patterns(self, genre_preferences: List[str] = None) -> Dict[str, Any]:
         """Generate default patterns when no emotions are detected"""
         # Use contemplative/neutral patterns as default
         default_pattern = self.beat_patterns["ambient_pulse"]
-        
+
         # If genre preferences are provided, try to match them
         if genre_preferences:
             for genre in genre_preferences:
@@ -727,7 +728,7 @@ class EnhancedBeatGenerator:
                     if genre in pattern.genre_associations:
                         default_pattern = pattern
                         break
-        
+
         return {
             "primary_emotion": "neutral",
             "emotional_intensity": 0.5,

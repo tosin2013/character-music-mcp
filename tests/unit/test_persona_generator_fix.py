@@ -1,4 +1,5 @@
 import pytest
+
 #!/usr/bin/env python3
 """
 Test script to verify the MusicPersonaGenerator format fix
@@ -23,7 +24,7 @@ from tests.fixtures.mock_contexts import MockContext
 async def test_persona_generator_with_standard_profile():
     """Test that MusicPersonaGenerator works with StandardCharacterProfile"""
     print("Testing MusicPersonaGenerator with StandardCharacterProfile...")
-    
+
     # Create a test character using StandardCharacterProfile
     test_character = StandardCharacterProfile(
         name="Test Character",
@@ -46,22 +47,22 @@ async def test_persona_generator_with_standard_profile():
         first_appearance="Chapter 1",
         importance_score=0.9
     )
-    
+
     # Create persona generator
     persona_generator = MusicPersonaGenerator()
-    
+
     # Create mock context
     ctx = MockContext()
-    
+
     try:
         # Generate artist persona
         persona = await persona_generator.generate_artist_persona(test_character, ctx)
-        
+
         # Verify the persona was created successfully
         if not persona:
             print("❌ No persona generated")
             return False
-        
+
         # Check required fields
         required_fields = [
             "character_name", "artist_name", "primary_genre", "secondary_genres",
@@ -69,20 +70,20 @@ async def test_persona_generator_with_standard_profile():
             "emotional_palette", "artistic_influences", "collaboration_style",
             "character_mapping_confidence", "genre_justification", "persona_description"
         ]
-        
+
         for field in required_fields:
             if not hasattr(persona, field):
                 print(f"❌ Missing required field '{field}' in persona")
                 return False
-        
+
         print("✅ Successfully generated persona with StandardCharacterProfile")
         print(f"✅ Character: {persona.character_name}")
         print(f"✅ Artist: {persona.artist_name}")
         print(f"✅ Genre: {persona.primary_genre}")
         print(f"✅ Confidence: {persona.character_mapping_confidence}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Exception during persona generation: {str(e)}")
         import traceback
@@ -94,33 +95,33 @@ async def test_persona_generator_with_standard_profile():
 async def test_minimal_character_profile():
     """Test with minimal character profile data"""
     print("\nTesting with minimal character profile...")
-    
+
     # Create minimal character
     minimal_character = StandardCharacterProfile(
         name="Minimal Character",
         backstory="A character with minimal information"
     )
-    
+
     # Create persona generator
     persona_generator = MusicPersonaGenerator()
-    
+
     # Create mock context
     ctx = MockContext()
-    
+
     try:
         # Generate artist persona
         persona = await persona_generator.generate_artist_persona(minimal_character, ctx)
-        
+
         if not persona:
             print("❌ No persona generated for minimal character")
             return False
-        
+
         print("✅ Successfully generated persona for minimal character")
         print(f"✅ Character: {persona.character_name}")
         print(f"✅ Artist: {persona.artist_name}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Exception with minimal character: {str(e)}")
         import traceback
@@ -132,7 +133,7 @@ async def test_minimal_character_profile():
 async def test_character_profile_from_dict():
     """Test StandardCharacterProfile.from_dict with various formats"""
     print("\nTesting StandardCharacterProfile.from_dict...")
-    
+
     # Test with legacy format that might have caused errors
     legacy_data = {
         "name": "Legacy Character",
@@ -143,44 +144,44 @@ async def test_character_profile_from_dict():
         "fears": ["failure"],
         "unknown_field": "This should be ignored"
     }
-    
+
     try:
         # Create character from legacy data
         character = StandardCharacterProfile.from_dict(legacy_data)
-        
+
         if not character:
             print("❌ Failed to create character from legacy data")
             return False
-        
+
         if character.name != "Legacy Character":
             print(f"❌ Wrong character name: {character.name}")
             return False
-        
+
         # Check that unknown fields were ignored
         if hasattr(character, 'skin') or hasattr(character, 'age') or hasattr(character, 'unknown_field'):
             print("❌ Unknown fields were not properly ignored")
             return False
-        
+
         print("✅ Successfully created StandardCharacterProfile from legacy data")
         print(f"✅ Name: {character.name}")
         print(f"✅ Backstory: {character.backstory}")
         print(f"✅ Conflicts: {character.conflicts}")
         print(f"✅ Fears: {character.fears}")
-        
+
         # Now test persona generation with this character
         persona_generator = MusicPersonaGenerator()
         ctx = MockContext()
-        
+
         persona = await persona_generator.generate_artist_persona(character, ctx)
-        
+
         if not persona:
             print("❌ Failed to generate persona from legacy character")
             return False
-        
+
         print("✅ Successfully generated persona from legacy character data")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Exception with legacy data: {str(e)}")
         import traceback
@@ -191,16 +192,16 @@ async def test_character_profile_from_dict():
 async def main():
     """Run all tests"""
     print("🧪 Testing MusicPersonaGenerator format fixes\n")
-    
+
     tests = [
         test_persona_generator_with_standard_profile,
         test_minimal_character_profile,
         test_character_profile_from_dict
     ]
-    
+
     passed = 0
     total = len(tests)
-    
+
     for test in tests:
         try:
             if await test():
@@ -209,9 +210,9 @@ async def main():
                 print("❌ Test failed")
         except Exception as e:
             print(f"❌ Test failed with exception: {e}")
-    
+
     print(f"\n📊 Test Results: {passed}/{total} tests passed")
-    
+
     if passed == total:
         print("🎉 All tests passed! The MusicPersonaGenerator format fix is working correctly.")
         return True
