@@ -9,130 +9,130 @@
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #f8fafc; color: #334155; line-height: 1.6; 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.6;
         }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .header { 
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); 
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px;
             box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
         }
         .header h1 { font-size: 2.5em; margin-bottom: 10px; font-weight: 700; }
         .header p { font-size: 1.1em; opacity: 0.9; }
-        .refresh-info { 
-            background: rgba(255, 255, 255, 0.1); padding: 10px 15px; 
+        .refresh-info {
+            background: rgba(255, 255, 255, 0.1); padding: 10px 15px;
             border-radius: 8px; margin-top: 15px; font-size: 0.9em;
         }
-        .metrics-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px; margin-bottom: 30px; 
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; margin-bottom: 30px;
         }
-        .metric-card { 
-            background: white; padding: 25px; border-radius: 12px; 
+        .metric-card {
+            background: white; padding: 25px; border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .metric-card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12); 
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
         }
-        .metric-card h3 { 
-            color: #64748b; font-size: 0.85em; text-transform: uppercase; 
+        .metric-card h3 {
+            color: #64748b; font-size: 0.85em; text-transform: uppercase;
             letter-spacing: 1px; margin-bottom: 12px; font-weight: 600;
         }
-        .metric-value { 
-            font-size: 2.8em; font-weight: 800; margin-bottom: 8px; 
+        .metric-value {
+            font-size: 2.8em; font-weight: 800; margin-bottom: 8px;
             display: flex; align-items: center; gap: 10px;
         }
         .metric-value.excellent { color: #059669; }
         .metric-value.good { color: #0891b2; }
         .metric-value.warning { color: #d97706; }
         .metric-value.critical { color: #dc2626; }
-        .metric-trend { 
-            font-size: 0.9em; color: #64748b; display: flex; 
+        .metric-trend {
+            font-size: 0.9em; color: #64748b; display: flex;
             align-items: center; gap: 5px; margin-bottom: 10px;
         }
         .trend-up { color: #059669; }
         .trend-down { color: #dc2626; }
         .trend-stable { color: #64748b; }
         .metric-subtitle { color: #94a3b8; font-size: 0.9em; }
-        .section { 
-            background: white; padding: 30px; border-radius: 12px; 
+        .section {
+            background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 30px;
             border: 1px solid #e2e8f0;
         }
-        .section h2 { 
-            color: #1e293b; margin-bottom: 25px; padding-bottom: 15px; 
+        .section h2 {
+            color: #1e293b; margin-bottom: 25px; padding-bottom: 15px;
             border-bottom: 2px solid #f1f5f9; font-size: 1.5em; font-weight: 600;
         }
-        .chart-container { 
-            position: relative; height: 400px; margin: 20px 0; 
+        .chart-container {
+            position: relative; height: 400px; margin: 20px 0;
             background: #fafbfc; border-radius: 8px; padding: 15px;
         }
-        .alerts-container { 
-            display: grid; gap: 15px; 
+        .alerts-container {
+            display: grid; gap: 15px;
         }
-        .alert { 
+        .alert {
             padding: 15px 20px; border-radius: 8px; border-left: 4px solid;
             display: flex; align-items: center; gap: 12px;
         }
-        .alert.critical { 
-            background: #fef2f2; border-color: #dc2626; color: #991b1b; 
+        .alert.critical {
+            background: #fef2f2; border-color: #dc2626; color: #991b1b;
         }
-        .alert.warning { 
-            background: #fffbeb; border-color: #d97706; color: #92400e; 
+        .alert.warning {
+            background: #fffbeb; border-color: #d97706; color: #92400e;
         }
-        .alert.info { 
-            background: #eff6ff; border-color: #2563eb; color: #1d4ed8; 
+        .alert.info {
+            background: #eff6ff; border-color: #2563eb; color: #1d4ed8;
         }
         .alert-icon { font-size: 1.2em; }
         .alert-content { flex: 1; }
         .alert-time { font-size: 0.85em; opacity: 0.8; }
-        .status-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 20px; 
+        .status-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
-        .status-item { 
+        .status-item {
             padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;
             background: white;
         }
         .status-item h4 { color: #374151; margin-bottom: 10px; font-weight: 600; }
-        .status-badge { 
-            padding: 6px 12px; border-radius: 20px; font-size: 0.8em; 
+        .status-badge {
+            padding: 6px 12px; border-radius: 20px; font-size: 0.8em;
             font-weight: 600; text-transform: uppercase; display: inline-block;
         }
         .status-badge.passing { background: #d1fae5; color: #065f46; }
         .status-badge.failing { background: #fee2e2; color: #991b1b; }
         .status-badge.warning { background: #fef3c7; color: #92400e; }
-        .progress-bar { 
-            width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px; 
+        .progress-bar {
+            width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px;
             overflow: hidden; margin: 10px 0;
         }
-        .progress-fill { 
+        .progress-fill {
             height: 100%; transition: width 0.3s ease; border-radius: 4px;
         }
         .progress-fill.excellent { background: #059669; }
         .progress-fill.good { background: #0891b2; }
         .progress-fill.warning { background: #d97706; }
         .progress-fill.critical { background: #dc2626; }
-        .timestamp { 
-            text-align: center; color: #94a3b8; font-size: 0.9em; 
+        .timestamp {
+            text-align: center; color: #94a3b8; font-size: 0.9em;
             margin-top: 40px; padding-top: 20px; border-top: 1px solid #f1f5f9;
         }
-        .auto-refresh { 
-            position: fixed; top: 20px; right: 20px; background: white; 
+        .auto-refresh {
+            position: fixed; top: 20px; right: 20px; background: white;
             padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             border: 1px solid #e2e8f0; font-size: 0.9em;
         }
-        .refresh-toggle { 
-            margin-left: 10px; padding: 5px 10px; background: #3b82f6; 
+        .refresh-toggle {
+            margin-left: 10px; padding: 5px 10px; background: #3b82f6;
             color: white; border: none; border-radius: 4px; cursor: pointer;
         }
         .refresh-toggle:hover { background: #2563eb; }
         .refresh-toggle.disabled { background: #94a3b8; cursor: not-allowed; }
-        
+
         @media (max-width: 768px) {
             .container { padding: 15px; }
             .metrics-grid { grid-template-columns: 1fr; }
@@ -145,7 +145,7 @@
     <div class="auto-refresh">
         <span id="refresh-status">Auto-refresh: ON</span>
         <button class="refresh-toggle" onclick="toggleAutoRefresh()">Toggle</button>
-        <span id="last-update">Last: 2025-09-09 16:13:24</span>
+        <span id="last-update">Last: 2025-09-09 16:20:59</span>
     </div>
 
     <div class="container">
@@ -153,8 +153,8 @@
             <h1>🎵 Character Music MCP Quality Dashboard</h1>
             <p>Real-time monitoring of test coverage, performance, and code quality</p>
             <div class="refresh-info">
-                <strong>Live Dashboard</strong> • Updates every 5 minutes • 
-                Last updated: 2025-09-09 16:13:24
+                <strong>Live Dashboard</strong> • Updates every 5 minutes •
+                Last updated: 2025-09-09 16:20:59
             </div>
         </div>
 
@@ -173,7 +173,7 @@
                 </div>
                 <div class="metric-subtitle">Line coverage percentage</div>
                 <div class="progress-bar">
-                    <div class="progress-fill critical" 
+                    <div class="progress-fill critical"
                          style="width: 0%"></div>
                 </div>
             </div>
@@ -191,7 +191,7 @@
                 </div>
                 <div class="metric-subtitle">Passing tests percentage</div>
                 <div class="progress-bar">
-                    <div class="progress-fill critical" 
+                    <div class="progress-fill critical"
                          style="width: 0%"></div>
                 </div>
             </div>
@@ -209,7 +209,7 @@
                 </div>
                 <div class="metric-subtitle">Benchmark success rate</div>
                 <div class="progress-bar">
-                    <div class="progress-fill critical" 
+                    <div class="progress-fill critical"
                          style="width: 0%"></div>
                 </div>
             </div>
@@ -227,7 +227,7 @@
                 </div>
                 <div class="metric-subtitle">Documentation completeness</div>
                 <div class="progress-bar">
-                    <div class="progress-fill critical" 
+                    <div class="progress-fill critical"
                          style="width: 0%"></div>
                 </div>
             </div>
@@ -245,7 +245,7 @@
                 </div>
                 <div class="metric-subtitle">Security scan results</div>
                 <div class="progress-bar">
-                    <div class="progress-fill critical" 
+                    <div class="progress-fill critical"
                          style="width: 0%"></div>
                 </div>
             </div>
@@ -263,7 +263,7 @@
                 </div>
                 <div class="metric-subtitle">Code quality metrics</div>
                 <div class="progress-bar">
-                    <div class="progress-fill critical" 
+                    <div class="progress-fill critical"
                          style="width: 0%"></div>
                 </div>
             </div>
@@ -339,7 +339,7 @@
         </div>
 
         <div class="timestamp">
-            Dashboard generated at 2025-09-09 16:13:24 • 
+            Dashboard generated at 2025-09-09 16:20:59 •
             <a href="javascript:location.reload()" style="color: #3b82f6;">Refresh Now</a>
         </div>
     </div>
@@ -353,7 +353,7 @@
             autoRefreshEnabled = !autoRefreshEnabled;
             const status = document.getElementById('refresh-status');
             const button = document.querySelector('.refresh-toggle');
-            
+
             if (autoRefreshEnabled) {
                 status.textContent = 'Auto-refresh: ON';
                 button.textContent = 'Disable';
@@ -377,7 +377,7 @@
 
         function updateLastRefresh() {
             const now = new Date();
-            document.getElementById('last-update').textContent = 
+            document.getElementById('last-update').textContent =
                 'Last: ' + now.toLocaleTimeString();
         }
 
@@ -434,14 +434,14 @@
                 datasets: [
                     {
                         label: 'Test Coverage (%)',
-                        data: [92.71462398788866, 76.6763870987688, 92.9106996610111, 87.86805719117555, 84.94259594904021, 90.32780117295597, 86.82023495670552, 81.90094405906059, 75.50228193020881, 92.7695506346481, 93.13730843852466, 77.1757985775128, 88.28869074149794, 90.30584261049255],
+                        data: [76.6431727542041, 82.8971467527828, 86.48368389785553, 81.44923846698818, 86.18023010292089, 92.4671634554903, 82.83681787426916, 87.31278419185696, 94.20124992911569, 86.13841124821279, 75.54422617992388, 80.06448320501707, 90.37315247383488, 82.72890182983654],
                         borderColor: '#059669',
                         backgroundColor: 'rgba(5, 150, 105, 0.1)',
                         tension: 0.4
                     },
                     {
                         label: 'Success Rate (%)',
-                        data: [98.7605923799705, 87.98655094295133, 98.4192430990024, 86.00449442213792, 92.41192208496138, 88.2638916094745, 88.42498510288489, 86.79558212479155, 98.87273314188869, 91.87401018819669, 98.78116694744705, 98.16720979974043, 96.59592919744308, 90.73931112405177],
+                        data: [89.63953333346488, 97.23978014678458, 85.39319781981433, 94.11763144812444, 85.76637533861897, 90.71094733838748, 93.86819600486706, 97.46368597914827, 86.45268459362275, 93.5941299828799, 99.9160012799789, 90.71930105263482, 85.92150813884496, 85.50636760314828],
                         borderColor: '#dc2626',
                         backgroundColor: 'rgba(220, 38, 38, 0.1)',
                         tension: 0.4
@@ -472,7 +472,7 @@
 
         // Start auto-refresh
         startAutoRefresh();
-        
+
         // Update timestamp every minute
         setInterval(updateLastRefresh, 60000);
     </script>
