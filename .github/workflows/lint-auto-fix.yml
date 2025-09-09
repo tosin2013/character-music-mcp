@@ -186,18 +186,21 @@ jobs:
         if [ "$FORCE_FIX" = "true" ]; then
           echo "Running in force mode..."
           aider-lint-fixer \
-            --linters flake8,pylint,ruff \
+            --linters flake8,pylint \
             --profile strict \
             --force \
             --max-errors 50 \
+            --exclude ".venv/*,venv/*,node_modules/*" \
+            --skip-pre-lint-assessment \
             . 2>&1 | tee aider_output.log
         else
           echo "Running in normal mode..."
           aider-lint-fixer \
-            --linters flake8,pylint,ruff \
+            --linters flake8,pylint \
             --profile basic \
-            --yes \
             --max-errors 20 \
+            --exclude ".venv/*,venv/*,node_modules/*" \
+            --skip-pre-lint-assessment \
             . 2>&1 | tee aider_output.log
         fi
         
