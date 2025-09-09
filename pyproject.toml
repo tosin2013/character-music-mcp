@@ -45,6 +45,9 @@ line-length = 100
 select = ["E", "F", "W", "B", "I", "N"]
 ignore = ["E501", "B008"]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["E402"]  # Allow imports after docstrings in test files
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]

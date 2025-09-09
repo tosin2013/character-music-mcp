@@ -196,7 +196,7 @@ jobs:
           aider-lint-fixer \
             --linters flake8,pylint,ruff \
             --profile basic \
-            --interactive \
+            --yes \
             --max-errors 20 \
             . 2>&1 | tee aider_output.log
         fi
