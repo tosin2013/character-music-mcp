@@ -59,6 +59,7 @@ jobs:
         FIXABLE_ISSUES=$(grep -c "^+" fix_diff.txt || echo "0")
         echo "fixable_issues=$FIXABLE_ISSUES" >> $GITHUB_OUTPUT
         
+        # Output on single line to avoid GitHub Actions format issues
         echo "Found $TOTAL_ISSUES total issues, $FIXABLE_ISSUES are auto-fixable"
     
     - name: Auto-fix with Ruff
@@ -189,7 +190,6 @@ jobs:
             --profile strict \
             --force \
             --max-errors 50 \
-            --save-session \
             . 2>&1 | tee aider_output.log
         else
           echo "Running in normal mode..."
@@ -198,7 +198,6 @@ jobs:
             --profile basic \
             --interactive \
             --max-errors 20 \
-            --save-session \
             . 2>&1 | tee aider_output.log
         fi
         
