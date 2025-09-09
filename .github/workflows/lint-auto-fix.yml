@@ -115,7 +115,7 @@ jobs:
   aider-lint-fix:
     name: Aider AI-Powered Lint Fix
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     needs: ruff-auto-fix
     if: always()
     container:
@@ -198,7 +198,7 @@ jobs:
           aider-lint-fixer \
             --linters flake8,pylint \
             --profile basic \
-            --max-errors 20 \
+            --max-errors 5 \
             --exclude ".venv/*,venv/*,node_modules/*" \
             --skip-pre-lint-assessment \
             . 2>&1 | tee aider_output.log
